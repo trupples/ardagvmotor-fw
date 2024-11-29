@@ -28,6 +28,8 @@ int main(void)
 
 	 tmc9660_init(&tmc9660, &spi0);
 
+	int i = 0;
+
 	while(1) {
 		int temp;
 		int ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
@@ -38,7 +40,12 @@ int main(void)
 
 		gpio_pin_toggle_dt(&led);
 
-		k_msleep(1);
+		k_msleep(100);
+
+		i++;
+		tmc9660_set_gpio(&tmc9660, 16, i%2);
+
+		k_usleep(100);
 	}
 
 	return 0;
