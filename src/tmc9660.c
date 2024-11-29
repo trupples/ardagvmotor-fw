@@ -1,0 +1,264 @@
+#include <errno.h>
+#include "tmc9660.h"
+#include <zephyr/drivers/spi.h>
+
+enum tmc9660_operation_id { // FIXME: Only specifies a minimal subset of the documented operations
+    MST = 3, // Stop motor movement
+    SAP = 5, // Set parameter (motion control specific settings)
+    GAP = 6, // Get parameter (read out motion control specific settings)
+    SIO = 14, // Set digital output to specified value
+    GIO = 15, // Get value of analog/digital input
+    GetInfo = 157, // Get ID and version info
+};
+
+enum tmc9660_spi_status {
+    SPI_STATUS_OK = 0xff,
+    SPI_STATUS_CHECKSUM_ERROR = 0x00,
+    SPI_STATUS_FIRST_CMD = 0x0c,
+    SPI_STATUS_NOT_READY = 0xf0
+};
+
+enum tmc9660_tmcl_status {
+    REPLY_OK = 100,
+    REPLY_CMD_LOADED = 101,
+    REPLY_CHKERR = 1,
+    REPLY_INVALID_CMD = 2,
+    REPLY_WRONG_TYPE = 3,
+    REPLY_INVALID_VALUE = 4,
+    REPLY_CMD_NOT_AVAILABLE = 6,
+    REPLY_CMD_LOAD_ERROR = 7,
+    REPLY_MAX_EXCEEDED = 9,
+    REPLY_DOWNLOAD_NOT_POSSIBLE = 10
+};
+
+// Parameter mode checksum
+// NOT SUITABLE FOR BOOTLOADER MODE, THAT EXPECTS CRC
+uint8_t tmc9660_checksum(uint8_t buffer[8])
+{
+    uint8_t res = 0;
+    for(int i = 0; i < 7; i++)
+        res += buffer[i];
+    return res;
+}
+
+int tmc9660_tmcl_command(
+    struct tmc9660_dev *dev,
+    enum tmc9660_operation_id operation,
+    uint16_t type,
+    uint8_t motorbank,
+    uint32_t value_send,
+    uint32_t *value_recv
+)
+{
+    uint8_t send[8] = {
+        operation,
+        type,
+        motorbank,
+        (value_send >> 24) & 0xff,
+        (value_send >> 16) & 0xff,
+        (value_send >> 8) & 0xff,
+        (value_send >> 0) & 0xff,
+        0
+    };
+    uint8_t recv[16] = { 0 };
+
+    struct spi_buf tx_buf[2] = {
+        { .buf = send, .len = 8 }
+    };
+    struct spi_buf_set tx_bufs = {
+        .buffers = tx_buf, .count = 1
+    };
+    struct spi_buf rx_buf[2] = {
+        { .buf = recv, .len = 8 },
+    };
+    struct spi_buf_set rx_bufs = {
+        .buffers = rx_buf, .count = 1
+    };
+
+    send[7] = tmc9660_checksum(send);
+    
+    uint8_t spi_status, tmcl_status, reply_operation;
+    uint32_t data;
+
+    int retries = 100;
+    do {
+        printf("> ");
+        for(int i = 0; i < 8; i++)
+        {
+            printf("%02hhx ", send[i]);
+        }
+        printf("\n");
+
+        int ret = spi_transceive_dt(dev->spi, &tx_bufs, &rx_bufs);
+        if(ret < 0)
+        {
+            return -EIO;
+        }
+
+        printf("< ");
+        for(int i = 0; i < 16; i++)
+        {
+            printf("%02hhx ", recv[i]);
+        }
+        printf("\n");
+
+        if(recv[7] != tmc9660_checksum(recv))
+        {
+            // bad checksum
+            return -EIO;
+        }
+
+        spi_status = recv[0];
+        tmcl_status = (recv[1] << 4) | (recv[2] >> 4);
+        reply_operation = (recv[2] & 0b1111);
+        data = (recv[3] << 24) | (recv[4] << 16) | (recv[5] << 8) | recv[6];
+        printf("spi_status = %d\ntmcl_status = %d\nreply_op = %d\ndata = %08x\nretries = %d\n", spi_status, tmcl_status, reply_operation, data, retries);
+    } while(retries-- > 0 && (spi_status == SPI_STATUS_NOT_READY || spi_status == SPI_STATUS_CHECKSUM_ERROR));
+
+    if(value_recv) *value_recv = data;
+
+
+    // TODO: sanity check for returned values...
+    switch(spi_status)
+    {
+    case SPI_STATUS_OK: break;
+    case SPI_STATUS_CHECKSUM_ERROR: return -EIO;
+    case SPI_STATUS_FIRST_CMD: return -EIO; // Should never happen outside of init
+    case SPI_STATUS_NOT_READY: return -EAGAIN;
+    }
+
+    switch(tmcl_status)
+    {
+    case REPLY_OK: return 0;
+    case REPLY_CMD_LOADED: return 0;
+    case REPLY_CHKERR: return -EINVAL;
+    case REPLY_INVALID_CMD: return -EOPNOTSUPP;
+    case REPLY_WRONG_TYPE: return -EINVAL;
+    case REPLY_INVALID_VALUE: return -EINVAL;
+    case REPLY_CMD_NOT_AVAILABLE: return -EOPNOTSUPP;
+    case REPLY_CMD_LOAD_ERROR: return -EPERM;
+    case REPLY_MAX_EXCEEDED: return -EPERM;
+    case REPLY_DOWNLOAD_NOT_POSSIBLE: return -EPERM;
+    }
+
+    // Should never get here
+    return -1;
+}
+
+
+int tmc9660_init(
+    struct tmc9660_dev *dev,
+    const struct spi_dt_spec *spi
+)
+{
+    dev->spi = spi;
+
+    char tx[8] = { 6, 0, 0, 0, 0, 0, 0, 0 };
+    char rx[16];
+    tx[7] = tmc9660_checksum(tx);
+
+    
+
+    struct spi_buf tx_buf[1] = {
+        { .buf = tx, .len = 8 }
+    };
+    struct spi_buf_set tx_bufs[] = {
+        { .buffers = tx_buf, .count = 1 }
+    };
+    struct spi_buf rx_buf[1] = {
+        { .buf = rx, .len = 8 }
+    };
+    struct spi_buf_set rx_bufs[] = {
+        { .buffers = rx_buf, .count = 1 }
+    };
+
+    int retries = 5;
+    do {
+        k_msleep(1);
+        printf("> ");
+        for(int i = 0; i < 8; i++)
+        {
+            printf("%02hhx ", tx[i]);
+        }
+        printf("\n");
+        spi_transceive_dt(dev->spi, tx_bufs, rx_bufs);
+        printf("FIRST REPLY: ");
+        for(int i = 0; i < 8; i++)
+        {
+            printf("%02hhx ", rx[i]);
+        }
+        printf("\n");
+    } while(retries-- > 0);
+
+    spi_read_dt(dev->spi, rx_bufs);
+    printf("> ");
+    for(int i = 0; i < 8; i++)
+    {
+        printf("%02hhx ", rx[i]);
+    }
+    printf("\n");
+
+    
+    if(rx[0] != SPI_STATUS_FIRST_CMD) {
+        // Invalid wakeup
+        return -1;
+    }
+
+    return 0;
+}
+
+// TODO if performance is an issue: transaction function that allows for
+// multiple operations wihout requring NOOPs for reading back data
+
+int tmc9660_set_param(
+    struct tmc9660_dev *dev,
+    enum tmc9660_param_id param,
+    int value,
+    int *value_out
+)
+{
+    return tmc9660_tmcl_command(dev, SAP, param, 0, value, value_out);
+}
+
+int tmc9660_get_param(
+    struct tmc9660_dev *dev,
+    enum tmc9660_param_id param,
+    int *value
+)
+{
+    return tmc9660_tmcl_command(dev, GAP, param, 0, 0, value);
+}
+
+int tmc9660_set_gpio(
+    struct tmc9660_dev *dev,
+    int port,
+    int value
+)
+{
+    return tmc9660_tmcl_command(dev, SIO, port, 0, value, NULL);
+}
+
+int tmc9660_get_gpio_analog(
+    struct tmc9660_dev *dev,
+    int port,
+    int *value
+)
+{
+    return tmc9660_tmcl_command(dev, GIO, port, 1, 0, value);
+}
+
+int tmc9660_get_gpio_digital(
+    struct tmc9660_dev *dev,
+    int port,
+    int *value
+)
+{
+    return tmc9660_tmcl_command(dev, GIO, port, 0, 0, value);
+}
+
+int tmc9660_motor_stop(
+    struct tmc9660_dev *dev
+)
+{
+    return tmc9660_tmcl_command(dev, MST, 0, 0, 0, 0);
+}
