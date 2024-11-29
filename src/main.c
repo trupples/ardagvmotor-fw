@@ -24,75 +24,22 @@ int main(void)
 
 	k_msleep(1000);
 
-	struct tmc9660_dev tmc9660 = { 0 };
+	struct tmc9660_dev tmc9660;
 
-	while(1)
-	{
-		int command = 6;
-		int type = command == 6 ? CHIP_TEMPERATURE : 0;
-		uint8_t tx[8] = { command, (type & 0xff), (type&0xf00)>>4, 0, 0, 0, 0, 0 };
-		tx[7] = tx[0] + tx[1] + tx[2] + tx[3] + tx[4] + tx[5] + tx[6];
-		uint8_t rx[16];
+	 tmc9660_init(&tmc9660, &spi0);
 
-		struct spi_buf tx_buf[1] = {
-			{ .buf = tx, .len = 8 }
-		};
-		struct spi_buf_set tx_bufs = { .buffers = tx_buf, .count = 1 };
-		struct spi_buf rx1_buf[1] = {
-			{ .buf = rx, .len = 8 },
-		};
-		struct spi_buf_set rx1_bufs = { .buffers = rx1_buf, .count = 1 };
-		struct spi_buf rx2_buf[1] = {
-			{ .buf = rx+8, .len = 8 },
-		};
-		struct spi_buf_set rx2_bufs = { .buffers = rx2_buf, .count = 1 };
+	while(1) {
+		int temp;
+		int ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
+		if(ret < 0) {
+			printf("ERR tmc9660_get_param = %d\n", ret);
+		}
+		printf("Chip temperature: %d\n\n", temp);
 
-		// printf("\n> ");
-		// for(int i = 0; i < 8; i++)
-		// {
-		// 	printf("%02hhx ", tx[i]);
-		// }
-		// printf("\n");
-		spi_write_dt(&spi0, &tx_bufs);
-		// printf("< ");
-		// for(int i = 0; i < 8; i++)
-		// {
-		// 	printf("%02hhx ", rx[i]);
-		// }
-		// printf("\n");
-		k_usleep(1);
-		do {
-			spi_read_dt(&spi0, &rx2_bufs);
-			// printf("<                         ");
-			// for(int i = 8; i < 16; i++)
-			// {
-			// 	printf("%02hhx ", rx[i]);
-			// }
-			// printf("\n");
-			//printf("%02hhx\n", rx[8]);
-		} while(rx[8] != 0xff);
-		printf("spi: %d; tmcl: %d; CHIP_TEMPERATURE = %d", rx[8], rx[9], (rx[11] << 24) | (rx[12] << 16) | (rx[13] << 8) | rx[14]);
-		if(rx[9] != 100) printf(" (TMCL error)");
-		printf("\n");
-	// printf("\n");
-	// printf("\n");
-	// printf("\n");
+		gpio_pin_toggle_dt(&led);
+
+		k_msleep(1);
 	}
-
-	// tmc9660_init(&tmc9660, &spi0);
-
-	// while(0) {
-	// 	int temp;
-	// 	int ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
-	// 	if(ret < 0) {
-	// 		printf("ERR tmc9660_get_param = %d\n", ret);
-	// 	}
-	// 	printf("Chip temperature: %d\n\n\n\n\n", temp);
-
-	// 	gpio_pin_toggle_dt(&led);
-
-	// 	k_msleep(1000);
-	// }
 
 	return 0;
 }

@@ -52,15 +52,15 @@ int tmc9660_tmcl_command(
 {
     uint8_t send[8] = {
         operation,
-        type,
-        motorbank,
+        (type & 0xff),
+        ((type&0xf00)>>4) | motorbank,
         (value_send >> 24) & 0xff,
         (value_send >> 16) & 0xff,
         (value_send >> 8) & 0xff,
         (value_send >> 0) & 0xff,
         0
     };
-    uint8_t recv[16] = { 0 };
+    uint8_t recv[8] = { 0 };
 
     struct spi_buf tx_buf[2] = {
         { .buf = send, .len = 8 }
@@ -82,25 +82,23 @@ int tmc9660_tmcl_command(
 
     int retries = 100;
     do {
-        printf("> ");
-        for(int i = 0; i < 8; i++)
-        {
-            printf("%02hhx ", send[i]);
-        }
-        printf("\n");
+        // printf("> ");
+        // for(int i = 0; i < 8; i++)
+        // {
+        //     printf("%02hhx ", send[i]);
+        // }
+        // printf("\n");
 
-        int ret = spi_transceive_dt(dev->spi, &tx_bufs, &rx_bufs);
-        if(ret < 0)
-        {
-            return -EIO;
-        }
+        spi_write_dt(dev->spi, &tx_bufs);
+        k_usleep(1);
+        spi_read_dt(dev->spi, &rx_bufs);
 
-        printf("< ");
-        for(int i = 0; i < 16; i++)
-        {
-            printf("%02hhx ", recv[i]);
-        }
-        printf("\n");
+        // printf("< ");
+        // for(int i = 0; i < 8; i++)
+        // {
+        //     printf("%02hhx ", recv[i]);
+        // }
+        // printf("\n");
 
         if(recv[7] != tmc9660_checksum(recv))
         {
@@ -109,11 +107,12 @@ int tmc9660_tmcl_command(
         }
 
         spi_status = recv[0];
-        tmcl_status = (recv[1] << 4) | (recv[2] >> 4);
-        reply_operation = (recv[2] & 0b1111);
+        tmcl_status = recv[1];
+        reply_operation = recv[2];
         data = (recv[3] << 24) | (recv[4] << 16) | (recv[5] << 8) | recv[6];
-        printf("spi_status = %d\ntmcl_status = %d\nreply_op = %d\ndata = %08x\nretries = %d\n", spi_status, tmcl_status, reply_operation, data, retries);
     } while(retries-- > 0 && (spi_status == SPI_STATUS_NOT_READY || spi_status == SPI_STATUS_CHECKSUM_ERROR));
+    
+    //printf("spi_status = %d\ntmcl_status = %d\nreply_op = %d\ndata = %08x\nretries = %d\n", spi_status, tmcl_status, reply_operation, data, retries);
 
     if(value_recv) *value_recv = data;
 
@@ -153,51 +152,38 @@ int tmc9660_init(
 {
     dev->spi = spi;
 
-    char tx[8] = { 6, 0, 0, 0, 0, 0, 0, 0 };
-    char rx[16];
+    char tx[8] = { 3, 0, 0, 0, 0, 0, 0, 0 };
+    char rx[8];
     tx[7] = tmc9660_checksum(tx);
-
-    
 
     struct spi_buf tx_buf[1] = {
         { .buf = tx, .len = 8 }
     };
-    struct spi_buf_set tx_bufs[] = {
-        { .buffers = tx_buf, .count = 1 }
-    };
+    struct spi_buf_set tx_bufs = { .buffers = tx_buf, .count = 1 };
     struct spi_buf rx_buf[1] = {
         { .buf = rx, .len = 8 }
     };
-    struct spi_buf_set rx_bufs[] = {
-        { .buffers = rx_buf, .count = 1 }
-    };
+    struct spi_buf_set rx_bufs = { .buffers = rx_buf, .count = 1 };
 
     int retries = 5;
     do {
         k_msleep(1);
-        printf("> ");
-        for(int i = 0; i < 8; i++)
-        {
-            printf("%02hhx ", tx[i]);
-        }
-        printf("\n");
-        spi_transceive_dt(dev->spi, tx_bufs, rx_bufs);
-        printf("FIRST REPLY: ");
-        for(int i = 0; i < 8; i++)
-        {
-            printf("%02hhx ", rx[i]);
-        }
-        printf("\n");
-    } while(retries-- > 0);
-
-    spi_read_dt(dev->spi, rx_bufs);
-    printf("> ");
-    for(int i = 0; i < 8; i++)
-    {
-        printf("%02hhx ", rx[i]);
-    }
-    printf("\n");
-
+        // printf("> ");
+        // for(int i = 0; i < 8; i++)
+        // {
+        //     printf("%02hhx ", tx[i]);
+        // }
+        // printf("\n");
+        spi_write_dt(dev->spi, &tx_bufs);
+        k_usleep(1);
+        spi_read_dt(dev->spi, &rx_bufs);
+        // printf("FIRST REPLY: ");
+        // for(int i = 0; i < 8; i++)
+        // {
+        //     printf("%02hhx ", rx[i]);
+        // }
+        // printf("\n");
+    } while(rx[0] != SPI_STATUS_FIRST_CMD && retries-- > 0);
     
     if(rx[0] != SPI_STATUS_FIRST_CMD) {
         // Invalid wakeup
