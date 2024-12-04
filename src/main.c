@@ -7,7 +7,7 @@
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(led_ds2), gpios);
 static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_NODELABEL(fault), gpios);
-static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
+static const struct spi_dt_spec spi0; // = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
 
 int main(void)
 {
@@ -43,7 +43,10 @@ int main(void)
 		k_msleep(100);
 
 		i++;
-		tmc9660_set_gpio(&tmc9660, 16, i%2);
+		ret = tmc9660_set_gpio(&tmc9660, 16, i%2);
+		if(ret < 0) {
+			printf("ERR tmc9660_set_gpio = %d\n", ret);
+		}
 
 		k_usleep(100);
 	}

@@ -89,16 +89,18 @@ int tmc9660_tmcl_command(
         // }
         // printf("\n");
 
-        spi_write_dt(dev->spi, &tx_bufs);
-        k_usleep(1);
-        spi_read_dt(dev->spi, &rx_bufs);
 
-        // printf("< ");
-        // for(int i = 0; i < 8; i++)
-        // {
-        //     printf("%02hhx ", recv[i]);
-        // }
-        // printf("\n");
+        k_usleep(1);
+        nesimtit_transceive2(send, NULL);
+        k_usleep(1);
+        nesimtit_transceive2(NULL, recv);
+
+        printf("< ");
+        for(int i = 0; i < 8; i++)
+        {
+            printf("%02hhx ", recv[i]);
+        }
+        printf("\n");
 
         if(recv[7] != tmc9660_checksum(recv))
         {
@@ -152,6 +154,8 @@ int tmc9660_init(
 {
     dev->spi = spi;
 
+    nesimtit_init();
+
     char tx[8] = { 3, 0, 0, 0, 0, 0, 0, 0 };
     char rx[8];
     tx[7] = tmc9660_checksum(tx);
@@ -174,9 +178,15 @@ int tmc9660_init(
         //     printf("%02hhx ", tx[i]);
         // }
         // printf("\n");
-        spi_write_dt(dev->spi, &tx_bufs);
+
         k_usleep(1);
-        spi_read_dt(dev->spi, &rx_bufs);
+        nesimtit_transceive2(tx, NULL);
+        k_usleep(1);
+        nesimtit_transceive2(NULL, rx);
+
+        // spi_write_dt(dev->spi, &tx_bufs);
+        // k_usleep(1);
+        // spi_read_dt(dev->spi, &rx_bufs);
         // printf("FIRST REPLY: ");
         // for(int i = 0; i < 8; i++)
         // {

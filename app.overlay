@@ -17,11 +17,11 @@
 };
 
 &spi0 {
-    tmc9660: tmc9660@0 {
-        compatible = "vnd,spi-device";
-        reg = <0>;
-        spi-max-frequency = <1000000>;
-        label = "TMC9660";
-        status = "okay";
-    };
+    // tmc9660: tmc9660@0 {
+    //     compatible = "vnd,spi-device";
+    //     reg = <0>;
+    //     spi-max-frequency = <100000>;
+    //     label = "TMC9660";
+    //     status = "okay";
+    // };
 };
