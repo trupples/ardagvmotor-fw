@@ -7,15 +7,6 @@
 #include "nesimtit.h"
 #endif
 
-enum tmc9660_operation_id { // FIXME: Only specifies a minimal subset of the documented operations
-    MST = 3, // Stop motor movement
-    SAP = 5, // Set parameter (motion control specific settings)
-    GAP = 6, // Get parameter (read out motion control specific settings)
-    SIO = 14, // Set digital output to specified value
-    GIO = 15, // Get value of analog/digital input
-    GetInfo = 157, // Get ID and version info
-};
-
 enum tmc9660_spi_status {
     SPI_STATUS_OK = 0xff,
     SPI_STATUS_CHECKSUM_ERROR = 0x00,

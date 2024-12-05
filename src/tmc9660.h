@@ -2232,11 +2232,30 @@ enum tmc9660_param_id {
     TMC9660_PARAM_MAX
 };
 
+enum tmc9660_operation_id { // FIXME: Only specifies a minimal subset of the documented operations
+    MST = 3, // Stop motor movement
+    SAP = 5, // Set parameter (motion control specific settings)
+    GAP = 6, // Get parameter (read out motion control specific settings)
+    SIO = 14, // Set digital output to specified value
+    GIO = 15, // Get value of analog/digital input
+	RamDebug = 142, // Access to RamDebug control
+    GetInfo = 157, // Get ID and version info
+};
 
 /* Initialize a freshly booted TMC9660 and puts it into parameter mode */
 int tmc9660_init(
     struct tmc9660_dev *dev,
     const struct spi_dt_spec *spi
+);
+
+/* Arbitrary TMCL command */
+int tmc9660_tmcl_command(
+    struct tmc9660_dev *dev,
+    enum tmc9660_operation_id operation,
+    uint16_t type,
+    uint8_t motorbank,
+    uint32_t value_send,
+    uint32_t *value_recv
 );
 
 /* Set parameter mode parameter without checking resulting value. */

@@ -28,14 +28,15 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 	tmc9660_set_param(tmc9660, MOTOR_PWM_FREQUENCY, 25000);
 	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
 	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // // proportional to VIN, 1638 = 10%
-	tmc9660_set_param(tmc9660, OUTPUT_VOLTAGE_LIMIT, 16383); // proportional to VIN, 16383 = 100%, goes up to 200%
-	tmc9660_set_param(tmc9660, MAX_TORQUE, 2000);
-	tmc9660_set_param(tmc9660, MAX_FLUX, 2000);
+	tmc9660_set_param(tmc9660, OUTPUT_VOLTAGE_LIMIT, 20000); // proportional to VIN, 16383 = 100%, goes up to 200%
+	tmc9660_set_param(tmc9660, MAX_TORQUE, 4000);
+	tmc9660_set_param(tmc9660, MAX_FLUX, 4000);
 	tmc9660_set_param(tmc9660, RAMP_VMAX, 4200000);
 
 	// Velocity ramp: set a max acceleration
-	tmc9660_set_param(tmc9660, RAMP_ENABLE, 0);
-
+	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
+	tmc9660_set_param(tmc9660, RAMP_AMAX, 5000);
+	tmc9660_set_param(tmc9660, RAMP_DMAX, 5000);
 
 	// Stepper
 	tmc9660_set_param(tmc9660, MOTOR_TYPE, 2);
@@ -44,10 +45,6 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 
 	// ADC
 	tmc9660_set_param(tmc9660, CURRENT_SCALING_FACTOR, 390);
-	tmc9660_set_param(tmc9660, PHASE_UX1_ADC_MAPPING, 0);
-	tmc9660_set_param(tmc9660, PHASE_VX2_ADC_MAPPING, 1);
-	tmc9660_set_param(tmc9660, PHASE_WY1_ADC_MAPPING, 2);
-	tmc9660_set_param(tmc9660, PHASE_Y2_ADC_MAPPING, 3);
 	
 	// ABN
 	tmc9660_set_param(tmc9660, ABN_1_STEPS, 40000);
@@ -174,11 +171,8 @@ int main(void)
 	int ret;
 
 	float rpms[] = {
-		0, 10, 20, 30, 40, 50, 60, 100, 150, 170, 180, 170, 150, 100,
-		50, 40, 30, 20, 10, 0
+		0, 30, 60, 100, 180, -180, 180, 0
 	};
-
-	k_msleep(1000);
 
 	for(int i = 0; i < sizeof(rpms)/sizeof(rpms[0]); i++)
 	{
@@ -186,9 +180,9 @@ int main(void)
 		printf("Setting speed to %.1f RPM\n", rpm);
 		agv_set_velocity(&tmc9660, rpm);
 
-		for(int j = 0; j < 10; j++)
+		for(int j = 0; j < 1000; j++)
 		{
-			int temp, volt;
+			int temp, volt, curr;
 
 			ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
 			if(ret < 0)
@@ -202,9 +196,54 @@ int main(void)
 				printf("Error: GAP SUPPLY_VOLTAGE (%d: %s)", ret, strerror(ret));
 			}
 
-			printf("T = %.1f\tV = %.1f\n", (double)(temp * 0.01615 - 268.15), (double)(volt * 0.1));
-			k_msleep(100);
+			ret = tmc9660_get_param(&tmc9660, ACTUAL_TOTAL_MOTOR_CURRENT, &curr);
+			if(ret < 0)
+			{
+				printf("Error: GAP ACTUAL_TOTAL_MOTOR_CURRENT (%d: %s)", ret, strerror(ret));
+			}
+
+			printf("(% 3d) T = %.1f\tV = %.1f\tI = %d mA\n", j, (double)(temp * 0.01615 - 268.15), (double)(volt * 0.1), curr);
+			k_msleep(1);
 		}
+	}
+
+	while(1)
+	{
+		int temp, volt, curr;
+
+		ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
+		if(ret < 0)
+		{
+			printf("Error: GAP CHIP_TEMPERATURE (%d: %s)", ret, strerror(ret));
+		}
+
+		ret = tmc9660_get_param(&tmc9660, SUPPLY_VOLTAGE, &volt);
+		if(ret < 0)
+		{
+			printf("Error: GAP SUPPLY_VOLTAGE (%d: %s)", ret, strerror(ret));
+		}
+
+		ret = tmc9660_get_param(&tmc9660, ACTUAL_TOTAL_MOTOR_CURRENT, &curr);
+		if(ret < 0)
+		{
+			printf("Error: GAP ACTUAL_TOTAL_MOTOR_CURRENT (%d: %s)", ret, strerror(ret));
+		}
+
+		printf("T = %.1f\tV = %.1f\tI = %d mA\n", (double)(temp * 0.01615 - 268.15), (double)(volt * 0.1), curr);
+	}
+
+	while(0)
+	{
+		int speed = getchar();
+		if(speed < '0' || speed > '9') {
+			printf("%d\n", speed);
+			k_msleep(1);
+			continue;
+		}
+
+		int rpm = (speed - '0') * 18;
+		printf("%d RPM\n", rpm);
+		agv_set_velocity(&tmc9660, rpm);
 	}
 
 	// int i = 0;
