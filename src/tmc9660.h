@@ -2239,8 +2239,15 @@ int tmc9660_init(
     const struct spi_dt_spec *spi
 );
 
-/* Set parameter mode parameter. value_out contains the resulting value, which may not equal the set value in error cases. */
+/* Set parameter mode parameter without checking resulting value. */
 int tmc9660_set_param(
+    struct tmc9660_dev *dev,
+    enum tmc9660_param_id param,
+    int value
+);
+
+/* Set parameter mode parameter. value_out contains the resulting value, which may not equal the set value in error cases. */
+int tmc9660_set_param2(
     struct tmc9660_dev *dev,
     enum tmc9660_param_id param,
     int value,

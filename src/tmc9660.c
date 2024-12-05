@@ -1,6 +1,11 @@
 #include <errno.h>
 #include "tmc9660.h"
+
+#ifndef ESTI_NESIMTIT
 #include <zephyr/drivers/spi.h>
+#else
+#include "nesimtit.h"
+#endif
 
 enum tmc9660_operation_id { // FIXME: Only specifies a minimal subset of the documented operations
     MST = 3, // Stop motor movement
@@ -41,6 +46,8 @@ uint8_t tmc9660_checksum(uint8_t buffer[8])
     return res;
 }
 
+#define hexdump(v, n) do { for(int i = 0; i < n; i++) printf("%02hhx ", v[i]); } while(0)
+
 int tmc9660_tmcl_command(
     struct tmc9660_dev *dev,
     enum tmc9660_operation_id operation,
@@ -62,6 +69,7 @@ int tmc9660_tmcl_command(
     };
     uint8_t recv[8] = { 0 };
 
+#ifndef ESTI_NESIMTIT
     struct spi_buf tx_buf[2] = {
         { .buf = send, .len = 8 }
     };
@@ -74,42 +82,42 @@ int tmc9660_tmcl_command(
     struct spi_buf_set rx_bufs = {
         .buffers = rx_buf, .count = 1
     };
+#endif // ESTI_NESIMTIT
 
     send[7] = tmc9660_checksum(send);
     
     uint8_t spi_status, tmcl_status, reply_operation;
     uint32_t data;
 
-    int retries = 100;
+    int retries = 5;
     do {
-        // printf("> ");
-        // for(int i = 0; i < 8; i++)
-        // {
-        //     printf("%02hhx ", send[i]);
-        // }
-        // printf("\n");
+        // printf("> "); hexdump(send, 8); printf("\n");
 
+#ifdef ESTI_NESIMTIT
+        nesimtit_spi_transceive(send, NULL);
+        nesimtit_spi_transceive(NULL, recv);
+#else
         spi_write_dt(dev->spi, &tx_bufs);
-        k_usleep(1);
         spi_read_dt(dev->spi, &rx_bufs);
+#endif
 
-        // printf("< ");
-        // for(int i = 0; i < 8; i++)
-        // {
-        //     printf("%02hhx ", recv[i]);
-        // }
-        // printf("\n");
-
-        if(recv[7] != tmc9660_checksum(recv))
-        {
-            // bad checksum
-            return -EIO;
-        }
+        // printf("< "); hexdump(recv, 8); printf("\n");
 
         spi_status = recv[0];
         tmcl_status = recv[1];
         reply_operation = recv[2];
         data = (recv[3] << 24) | (recv[4] << 16) | (recv[5] << 8) | recv[6];
+        
+        if(spi_status == SPI_STATUS_NOT_READY)
+        {
+            continue;
+        }
+
+        if(recv[7] != tmc9660_checksum(recv))
+        {
+            // bad checksum - rest of datagram will be malformed, incl the checksul
+            return -EIO;
+        }
     } while(retries-- > 0 && (spi_status == SPI_STATUS_NOT_READY || spi_status == SPI_STATUS_CHECKSUM_ERROR));
     
     //printf("spi_status = %d\ntmcl_status = %d\nreply_op = %d\ndata = %08x\nretries = %d\n", spi_status, tmcl_status, reply_operation, data, retries);
@@ -152,10 +160,12 @@ int tmc9660_init(
 {
     dev->spi = spi;
 
+
     char tx[8] = { 3, 0, 0, 0, 0, 0, 0, 0 };
     char rx[8];
     tx[7] = tmc9660_checksum(tx);
 
+#ifndef ESTI_NESIMTIT
     struct spi_buf tx_buf[1] = {
         { .buf = tx, .len = 8 }
     };
@@ -164,25 +174,23 @@ int tmc9660_init(
         { .buf = rx, .len = 8 }
     };
     struct spi_buf_set rx_bufs = { .buffers = rx_buf, .count = 1 };
+#else
+    nesimtit_init();
+#endif
 
     int retries = 5;
     do {
-        k_msleep(1);
-        // printf("> ");
-        // for(int i = 0; i < 8; i++)
-        // {
-        //     printf("%02hhx ", tx[i]);
-        // }
-        // printf("\n");
+        // printf("> "); hexdump(tx, 8); printf("\n");
+
+#ifdef ESTI_NESIMTIT
+        nesimtit_spi_transceive(tx, NULL);
+        nesimtit_spi_transceive(NULL, rx);
+#else
         spi_write_dt(dev->spi, &tx_bufs);
-        k_usleep(1);
         spi_read_dt(dev->spi, &rx_bufs);
-        // printf("FIRST REPLY: ");
-        // for(int i = 0; i < 8; i++)
-        // {
-        //     printf("%02hhx ", rx[i]);
-        // }
-        // printf("\n");
+#endif
+
+        // printf("FIRST REPLY: ); hexdump(rx, 8); printf("\n");
     } while(rx[0] != SPI_STATUS_FIRST_CMD && retries-- > 0);
     
     if(rx[0] != SPI_STATUS_FIRST_CMD) {
@@ -197,6 +205,15 @@ int tmc9660_init(
 // multiple operations wihout requring NOOPs for reading back data
 
 int tmc9660_set_param(
+    struct tmc9660_dev *dev,
+    enum tmc9660_param_id param,
+    int value
+)
+{
+    return tmc9660_tmcl_command(dev, SAP, param, 0, value, NULL);
+}
+
+int tmc9660_set_param2(
     struct tmc9660_dev *dev,
     enum tmc9660_param_id param,
     int value,
