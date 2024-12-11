@@ -170,7 +170,60 @@ int main(void)
 	}
 	printf("\n");
 
-	struct tmc9660_dev tmc9660;
+	nesimtit_init();
+
+	uint8_t count = 0;
+	while(1)
+	{
+		char msg[8]; // can message (sent or received)
+		int len; // received can message length
+		int srcid; // received can message sender node id
+
+		if(gpio_pin_get_dt(&btn))
+		{
+			gpio_pin_set_dt(&led, 1);
+			printf("pressed!\n");
+
+			char msg[8] = {count++, 1, 2, 3, 4, 5, 6, 7};
+			nesimtit_can_transmit(msg, 2);
+
+			while(gpio_pin_get_dt(&btn));
+
+			gpio_pin_set_dt(&led, 0);
+			printf("released!\n");
+		}
+
+		else if(nesimtit_can_receive_noblock(msg, &len, &srcid) == 0)
+		{
+			printf("got %d bytes from %d:", len, srcid);
+			for(int i = 0; i < len; i++)
+			{
+				printf(" %hhx", msg[i]);
+			}
+			printf("\n");
+
+			for(int i = 0; i < srcid; i++)
+			{
+				gpio_pin_set_dt(&led, 1);
+				k_msleep(200);
+				gpio_pin_set_dt(&led, 0);
+				k_msleep(200);
+			}
+		}
+
+		else {
+			static int k = 0;
+			if(k++ % 100000 == 0) { // heartbeat
+				gpio_pin_set_dt(&led, 1);
+				k_msleep(10);
+				gpio_pin_set_dt(&led, 0);
+			}
+		}
+	}
+
+	return 0;
+
+	/*struct tmc9660_dev tmc9660;
 
 	printf("tmc9660_init...\n");
 	tmc9660_init(&tmc9660, &spi0);
@@ -283,5 +336,5 @@ int main(void)
 	// 	k_msleep(10);
 	// }
 
-	return 0;
+	return 0;*/
 }

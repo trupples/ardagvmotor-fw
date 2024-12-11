@@ -12,5 +12,10 @@ void nesimtit_init();
 int nesimtit_spi_transceive(char *tx, char *rx);
 
 /* TODO: CAN functions */
+int nesimtit_can_receive_noblock(char *message, int *out_len, int *src_node);
+
+void nesimtit_can_transmit(char *data, int len);
+
+void nesimtit_can(void);
 
 #endif // ESTI_NESIMTIT
