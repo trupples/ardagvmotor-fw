@@ -5,8 +5,13 @@
 #include <zephyr/drivers/spi.h>
 #include "tmc9660.h"
 
+#ifdef ESTI_NESIMTIT
+#include "nesimtit.h"
+#endif
+
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(led_ds2), gpios);
 static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_NODELABEL(fault), gpios);
+static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(DT_NODELABEL(btn), gpios);
 
 static const struct spi_dt_spec spi0 =
 #ifndef ESTI_NESIMTIT
@@ -35,8 +40,8 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 
 	// Velocity ramp: set a max acceleration
 	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
-	tmc9660_set_param(tmc9660, RAMP_AMAX, 5000);
-	tmc9660_set_param(tmc9660, RAMP_DMAX, 5000);
+	tmc9660_set_param(tmc9660, RAMP_AMAX, 100000);
+	tmc9660_set_param(tmc9660, RAMP_DMAX, 100000);
 
 	// Stepper
 	tmc9660_set_param(tmc9660, MOTOR_TYPE, 2);
@@ -52,26 +57,34 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 	tmc9660_set_param(tmc9660, ABN_1_INIT_METHOD, 0);
 
 	// Tuning
-	tmc9660_set_param(tmc9660, TORQUE_P, 1457);
-	tmc9660_set_param(tmc9660, TORQUE_I, 3464);
-	tmc9660_set_param(tmc9660, FLUX_P, 1457);
-	tmc9660_set_param(tmc9660, FLUX_I, 3464);
+	tmc9660_set_param(tmc9660, TORQUE_P, 1039);
+	tmc9660_set_param(tmc9660, TORQUE_I, 2880);
+	tmc9660_set_param(tmc9660, FLUX_P, 1039);
+	tmc9660_set_param(tmc9660, FLUX_I, 2880);
 	tmc9660_set_param(tmc9660, CURRENT_NORM_P, 0);
 	tmc9660_set_param(tmc9660, CURRENT_NORM_I, 1);
 	tmc9660_set_param(tmc9660, VELOCITY_SENSOR_SELECTION, 0);
-	tmc9660_set_param(tmc9660, VELOCITY_P, 12000);
-	tmc9660_set_param(tmc9660, VELOCITY_I, 40);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_P, 2);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 1);
+	tmc9660_set_param(tmc9660, VELOCITY_P, 400);
+	tmc9660_set_param(tmc9660, VELOCITY_I, 10000);
+	tmc9660_set_param(tmc9660, VELOCITY_NORM_P, 1);
+	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 2);
 	tmc9660_set_param(tmc9660, VELOCITY_SCALING_FACTOR, 1);
 	tmc9660_set_param(tmc9660, VELOCITY_LOOP_DOWNSAMPLING, 5);
 	tmc9660_set_param(tmc9660, POSITION_SENSOR_SELECTION, 0);
 	tmc9660_set_param(tmc9660, POSITION_SCALING_FACTOR, 1024);
-	tmc9660_set_param(tmc9660, POSITION_P, 200);
-	tmc9660_set_param(tmc9660, POSITION_I, 15);
-	tmc9660_set_param(tmc9660, POSITION_NORM_P, 0);
-	tmc9660_set_param(tmc9660, POSITION_NORM_I, 0);
+	tmc9660_set_param(tmc9660, POSITION_P, 10000);
+	tmc9660_set_param(tmc9660, POSITION_I, 0);
+	tmc9660_set_param(tmc9660, POSITION_NORM_P, 1);
+	tmc9660_set_param(tmc9660, POSITION_NORM_I, 1);
 	tmc9660_set_param(tmc9660, POSITION_LOOP_DOWNSAMPLING, 0);
+	
+	// slow sinc + 1st degree to even out velocity noise
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ENABLE, 0);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_1, (1<<20) * 0.99);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_2, 0);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_0, (1<<20) * 0.00333);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_1, (1<<20) * 0.00333);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_2, (1<<20) * 0.00333);
 
 	// Start FOC
 	tmc9660_set_param(tmc9660, COMMUTATION_MODE, 5);
@@ -149,6 +162,7 @@ int main(void)
 
 	gpio_pin_configure_dt(&led, GPIO_OUTPUT);
 	gpio_pin_configure_dt(&fault, GPIO_INPUT);
+	gpio_pin_configure_dt(&btn, GPIO_INPUT);
 
 	while(gpio_pin_get_dt(&fault) == 0)
 	{
