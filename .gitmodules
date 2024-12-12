@@ -1,0 +1,3 @@
+[submodule "CANopenADI"]
+	path = CANopenADI
+	url = https://github.com/analogdevicesinc/CANopenADI
