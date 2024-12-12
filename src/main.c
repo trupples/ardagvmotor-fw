@@ -4,21 +4,14 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
 #include "tmc9660.h"
+#include "nesimtit.h" // Bodged SPI & CAN
 
-#ifdef ESTI_NESIMTIT
-#include "nesimtit.h"
-#endif
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_PATH(leds, status), gpios);
+static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_PATH(gpios, fault), gpios);
+static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(DT_PATH(gpios, btn), gpios);
 
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(led_ds2), gpios);
-static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_NODELABEL(fault), gpios);
-static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(DT_NODELABEL(btn), gpios);
-
-static const struct spi_dt_spec spi0 =
-#ifndef ESTI_NESIMTIT
-	SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
-#else
-	{};
-#endif
+static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
+static const void *can0 = DEVICE_DT_GET(DT_NODELABEL(can0));
 
 #ifndef ESTI_NESIMTIT
 #warning ESTI_NESIMTIT not set, SPI and CAN will likely misbehave :(
@@ -164,11 +157,24 @@ int main(void)
 	gpio_pin_configure_dt(&fault, GPIO_INPUT);
 	gpio_pin_configure_dt(&btn, GPIO_INPUT);
 
+
 	while(gpio_pin_get_dt(&fault) == 0)
 	{
 		printf(".");
 	}
 	printf("\n");
+
+	gpio_pin_configure_dt(&fault, GPIO_OUTPUT);
+	
+	for(int i = 0; i < 10; i++)
+	{
+		gpio_pin_set_dt(&fault, 1);
+		k_msleep(100);
+		gpio_pin_set_dt(&fault, 0);
+		k_msleep(100);
+	}
+
+	gpio_pin_configure_dt(&fault, GPIO_INPUT);
 
 	nesimtit_init();
 

@@ -11,11 +11,10 @@ void nesimtit_init();
 /* Transmit / receive an 8 byte SPI datagram. tx, rx can be NULL. */
 int nesimtit_spi_transceive(char *tx, char *rx);
 
-/* TODO: CAN functions */
+/* Read a received CAN message, or return -EAGAIN. src_node may be NULL */
 int nesimtit_can_receive_noblock(char *message, int *out_len, int *src_node);
 
+/* Send a message over CAN using the NODE_ID defined in nesimtit.c */
 void nesimtit_can_transmit(char *data, int len);
-
-void nesimtit_can(void);
 
 #endif // ESTI_NESIMTIT

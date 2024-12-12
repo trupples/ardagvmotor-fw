@@ -1,39 +1,142 @@
+/* Delete or disable MAX32662EVKIT specifics. A much better way to do this would be to define a proper board. */
+
 / {
+    chosen {
+        /delete-property/ zephyr,display;
+    };
+
     leds {
-        led_ds2: led_ds2 {
+        /delete-node/ led1;
+    };
+
+    buttons {
+        /delete-node/ pb1;
+    };
+
+    aliases {
+        /delete-property/ led0;
+        /delete-property/ sw0;
+    };
+
+    /delete-node/ mipi_dbi;
+};
+
+&i2c1 {
+    status = "disabled";
+};
+
+&spi1 {
+    status = "disabled";
+};
+
+/* Add our board's config */
+
+/ {
+    model = "Analog Devices Arduino AGV Motor Control";
+    compatible = "adi,ardagvmotorcontrol";
+
+    leds {
+        status {
             gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
-            label = "DS2 LED";
+            label = "Status LED";
+            status = "okay";
+        };
+        
+        fault {
+            gpios = <&gpio0 20 GPIO_ACTIVE_LOW>;
+            label = "Fault LED";
             status = "okay";
         };
     };
 
-    buttons {
-        fault: fault {
-            gpios = <&gpio0 20 0>;
-            label = "TMC Fault (inverted)";
+    gpios {
+        compatible = "gpio-keys";
+        status = "okay";
+
+        fault {
+            gpios = <&gpio0 20 GPIO_ACTIVE_LOW>;
+            label = "Fault";
             status = "okay";
         };
-
-        btn: btn {
+        
+        /* TODO: reva revb */
+        btn {
             gpios = <&gpio0 15 0>;
             label = "User button";
             status = "okay";
         };
+
+        s1_1 {
+            gpios = <&gpio0 19 0>;
+            label = "Config DIP 1";
+            status = "okay";
+        };
+
+        s1_2 {
+            gpios = <&gpio0 18 0>;
+            label = "Config DIP 2";
+            status = "okay";
+        };
+
+        s1_3 {
+            gpios = <&gpio0 15 0>;
+            label = "Config DIP 3";
+            status = "okay";
+        };
+    };
+
+    soc {
+        can0: can0@40064000 {
+            compatible = "adi,max32-can";
+            reg = <0x40064000 0x1000>;
+            interrupts = <0x6b 0>;
+            pinctrl-0 = < &can0b_rx &can0b_tx >;
+        };
     };
 };
 
-#ifndef ESTI_NESIMTIT
+&pinctrl {
+    can0b_rx: can0b_rx {
+        pinmux = < MAX32_PINMUX(0, 6, AF2) >;
+    };
+
+    can0b_tx: can0b_tx {
+        pinmux = < MAX32_PINMUX(0, 9, AF2) >;
+    };
+};
+
+&clk_erfo {
+    clock-frequency = < 24576000 >;
+};
+
 &spi0 {
+    status = "okay";
+
     tmc9660: tmc9660@0 {
         compatible = "vnd,spi-device";
         reg = <0>;
-        spi-max-frequency = <100000>;
+        spi-max-frequency = <1000000>;
         label = "TMC9660";
         status = "okay";
     };
 };
-#endif
 
-&clk_erfo {
-    clock-frequency = < 24576000 >;
+&i2c0 {
+    status = "okay";
+
+    max31827@1a {
+        compatible = "adi,max31827";
+        reg = <0x1a>;
+        label = "Temperature sensor";
+        status = "okay";
+    };
+};
+
+/* TODO uart1 to TMC */
+&uart1 {
+    status = "okay";
+
+    tmc9660 {
+        compatible = "adi,tmc9660-uart";
+    };
 };
