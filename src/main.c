@@ -148,22 +148,12 @@ void dump_flags(struct tmc9660_dev *tmc9660)
 	printf("\n");
 }
 
-int main(void)
+// 2024-12-12
+// fault pin can be pulled down by both the TMC and MAX. We normally use it
+// to watch if the TMC is doing alright, but can also use it to signal, for
+// CanOpen CiA 303-3 (indicator LED) compliance.
+void demo_blink_fault() 
 {
-	k_msleep(1000);
-	printf("Hello World! %s\n", CONFIG_BOARD_TARGET);
-
-	gpio_pin_configure_dt(&led, GPIO_OUTPUT);
-	gpio_pin_configure_dt(&fault, GPIO_INPUT);
-	gpio_pin_configure_dt(&btn, GPIO_INPUT);
-
-
-	while(gpio_pin_get_dt(&fault) == 0)
-	{
-		printf(".");
-	}
-	printf("\n");
-
 	gpio_pin_configure_dt(&fault, GPIO_OUTPUT);
 	
 	for(int i = 0; i < 10; i++)
@@ -175,9 +165,13 @@ int main(void)
 	}
 
 	gpio_pin_configure_dt(&fault, GPIO_INPUT);
+}
 
-	nesimtit_init();
-
+// 2024-12-11
+// When button is pressed, send a CAN message to all other connected devices to
+// blink NODE_ID times (NODE_ID defined in nesimtit.c)
+void demo_can_blinky() 
+{
 	uint8_t count = 0;
 	while(1)
 	{
@@ -226,10 +220,22 @@ int main(void)
 			}
 		}
 	}
+}
 
-	return 0;
-
-	/*struct tmc9660_dev tmc9660;
+// 2024-11-05
+// Initializes TMC and sends some fixed velocity commands
+// For some reason (likely insufficient initialization), speeds over 100ish RPM
+// go very quickly from 100-200mA to 6A draw and the motor locks up. This has
+// confirmed our MOSFETS are well sized (they barely even heat up), but
+// indicates we still don't fully understand which params must be written for
+// proper fumctioning.
+// I intentianally omitted some parameters which seemed to only refer to 3phase
+// operation, such as the overcurrent protection ones, but still, I don't see
+// why overcurrent *protection* would affect the control algorithm while well
+// within its limits.
+void demo_tmc_spi()
+{
+	struct tmc9660_dev tmc9660;
 
 	printf("tmc9660_init...\n");
 	tmc9660_init(&tmc9660, &spi0);
@@ -253,6 +259,7 @@ int main(void)
 		printf("Setting speed to %.1f RPM\n", rpm);
 		agv_set_velocity(&tmc9660, rpm);
 
+		// Log everything until it dies
 		for(int j = 0; j < 1000; j++)
 		{
 			int temp, volt, curr;
@@ -304,10 +311,10 @@ int main(void)
 
 		printf("T = %.1f\tV = %.1f\tI = %d mA\n", (double)(temp * 0.01615 - 268.15), (double)(volt * 0.1), curr);
 	}
-
+	
 	while(0)
 	{
-		int speed = getchar();
+		int speed = getchar(); // FIXME: Doesn't work, returns zeroes without blocking. Check out console_getchar?
 		if(speed < '0' || speed > '9') {
 			printf("%d\n", speed);
 			k_msleep(1);
@@ -318,29 +325,58 @@ int main(void)
 		printf("%d RPM\n", rpm);
 		agv_set_velocity(&tmc9660, rpm);
 	}
+}
 
-	// int i = 0;
+// 2024-11-29
+// Blink the two status LEDs, one through a GPIO pin of the MAX, and one through
+// the GPIO pin of the TMC, through SIO (Set gpIO) TMCL commands.
+void demo_blink_tmc_gpio() 
+{
+	int i = 0;
 
-	// while(1) {
-	// 	int temp;
-	// 	int ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
-	// 	if(ret < 0) {
-	// 		printf("ERR tmc9660_get_param = %d\n", ret);
-	// 	}
-	// 	printf("Chip temperature: %d\n\n", temp);
+	while(1) {
+		int temp;
+		int ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
+		if(ret < 0) {
+			printf("ERR tmc9660_get_param = %d\n", ret);
+		}
+		printf("Chip temperature: %d\n\n", temp);
 
-	// 	gpio_pin_toggle_dt(&led);
+		gpio_pin_toggle_dt(&led);
 
-	// 	k_msleep(10);
+		k_msleep(10);
 
-	// 	i++;
-	// 	ret = tmc9660_set_gpio(&tmc9660, 16, i%2);
-	// 	if(ret < 0) {
-	// 		printf("ERR tmc9660_set_gpio = %d\n", ret);
-	// 	}
+		i++;
+		ret = tmc9660_set_gpio(&tmc9660, 16, i%2);
+		if(ret < 0) {
+			printf("ERR tmc9660_set_gpio = %d\n", ret);
+		}
 
-	// 	k_msleep(10);
-	// }
+		k_msleep(10);
+	}
+}
 
-	return 0;*/
+int main(void)
+{
+	k_msleep(1000);
+	printf("Hello World! %s\n", CONFIG_BOARD_TARGET);
+
+	gpio_pin_configure_dt(&led, GPIO_OUTPUT);
+	gpio_pin_configure_dt(&fault, GPIO_INPUT);
+	gpio_pin_configure_dt(&btn, GPIO_INPUT);
+
+	// While the TMC is booting up, it will hold the FAULT pin active. There are
+	// a couple hundred milliseconds between whn the LDOs are up (and as such we
+	// boot) and the parameter mode application is up and running.
+	while(gpio_pin_get_dt(&fault) == 0)
+	{
+		printf(".");
+	}
+	printf("\n");
+
+	nesimtit_init();
+	demo_blink_fault();
+	demo_can_blinky();
+
+	return 0;
 }
