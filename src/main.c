@@ -233,18 +233,14 @@ void demo_can_blinky()
 // operation, such as the overcurrent protection ones, but still, I don't see
 // why overcurrent *protection* would affect the control algorithm while well
 // within its limits.
-void demo_tmc_spi()
+void demo_tmc_spi(struct tmc9660_dev *tmc9660)
 {
-	struct tmc9660_dev tmc9660;
-
-	printf("tmc9660_init...\n");
-	tmc9660_init(&tmc9660, &spi0);
 	printf("agv_init_params...\n");
-	agv_init_params(&tmc9660);
+	agv_init_params(tmc9660);
 	printf("start commutation...\n");
 	for(int i = 0; i < 50; i++)
 	{
-		dump_flags(&tmc9660);
+		dump_flags(tmc9660);
 	}
 
 	int ret;
@@ -257,26 +253,26 @@ void demo_tmc_spi()
 	{
 		float rpm = rpms[i];
 		printf("Setting speed to %.1f RPM\n", rpm);
-		agv_set_velocity(&tmc9660, rpm);
+		agv_set_velocity(tmc9660, rpm);
 
 		// Log everything until it dies
 		for(int j = 0; j < 1000; j++)
 		{
 			int temp, volt, curr;
 
-			ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
+			ret = tmc9660_get_param(tmc9660, CHIP_TEMPERATURE, &temp);
 			if(ret < 0)
 			{
 				printf("Error: GAP CHIP_TEMPERATURE (%d: %s)", ret, strerror(ret));
 			}
 
-			ret = tmc9660_get_param(&tmc9660, SUPPLY_VOLTAGE, &volt);
+			ret = tmc9660_get_param(tmc9660, SUPPLY_VOLTAGE, &volt);
 			if(ret < 0)
 			{
 				printf("Error: GAP SUPPLY_VOLTAGE (%d: %s)", ret, strerror(ret));
 			}
 
-			ret = tmc9660_get_param(&tmc9660, ACTUAL_TOTAL_MOTOR_CURRENT, &curr);
+			ret = tmc9660_get_param(tmc9660, ACTUAL_TOTAL_MOTOR_CURRENT, &curr);
 			if(ret < 0)
 			{
 				printf("Error: GAP ACTUAL_TOTAL_MOTOR_CURRENT (%d: %s)", ret, strerror(ret));
@@ -291,19 +287,19 @@ void demo_tmc_spi()
 	{
 		int temp, volt, curr;
 
-		ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
+		ret = tmc9660_get_param(tmc9660, CHIP_TEMPERATURE, &temp);
 		if(ret < 0)
 		{
 			printf("Error: GAP CHIP_TEMPERATURE (%d: %s)", ret, strerror(ret));
 		}
 
-		ret = tmc9660_get_param(&tmc9660, SUPPLY_VOLTAGE, &volt);
+		ret = tmc9660_get_param(tmc9660, SUPPLY_VOLTAGE, &volt);
 		if(ret < 0)
 		{
 			printf("Error: GAP SUPPLY_VOLTAGE (%d: %s)", ret, strerror(ret));
 		}
 
-		ret = tmc9660_get_param(&tmc9660, ACTUAL_TOTAL_MOTOR_CURRENT, &curr);
+		ret = tmc9660_get_param(tmc9660, ACTUAL_TOTAL_MOTOR_CURRENT, &curr);
 		if(ret < 0)
 		{
 			printf("Error: GAP ACTUAL_TOTAL_MOTOR_CURRENT (%d: %s)", ret, strerror(ret));
@@ -323,20 +319,20 @@ void demo_tmc_spi()
 
 		int rpm = (speed - '0') * 18;
 		printf("%d RPM\n", rpm);
-		agv_set_velocity(&tmc9660, rpm);
+		agv_set_velocity(tmc9660, rpm);
 	}
 }
 
 // 2024-11-29
 // Blink the two status LEDs, one through a GPIO pin of the MAX, and one through
 // the GPIO pin of the TMC, through SIO (Set gpIO) TMCL commands.
-void demo_blink_tmc_gpio() 
+void demo_blink_tmc_gpio(struct tmc9660_dev *tmc9660) 
 {
 	int i = 0;
 
 	while(1) {
 		int temp;
-		int ret = tmc9660_get_param(&tmc9660, CHIP_TEMPERATURE, &temp);
+		int ret = tmc9660_get_param(tmc9660, CHIP_TEMPERATURE, &temp);
 		if(ret < 0) {
 			printf("ERR tmc9660_get_param = %d\n", ret);
 		}
@@ -347,7 +343,7 @@ void demo_blink_tmc_gpio()
 		k_msleep(10);
 
 		i++;
-		ret = tmc9660_set_gpio(&tmc9660, 16, i%2);
+		ret = tmc9660_set_gpio(tmc9660, 16, i%2);
 		if(ret < 0) {
 			printf("ERR tmc9660_set_gpio = %d\n", ret);
 		}
@@ -375,8 +371,16 @@ int main(void)
 	printf("\n");
 
 	nesimtit_init();
+	
+	struct tmc9660_dev tmc9660;
+
+	printf("tmc9660_init...\n");
+	tmc9660_init(&tmc9660, &spi0);
+
 	demo_blink_fault();
 	demo_can_blinky();
+	// demo_blink_tmc_gpio(&tmc9660);
+	// demo_tmc_spi(&tmc9660);
 
 	return 0;
 }
