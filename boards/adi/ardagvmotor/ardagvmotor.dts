@@ -1,0 +1,128 @@
+/dts-v1/;
+
+#include <adi/max32/max32662.dtsi>
+#include <adi/max32/max32662-pinctrl.dtsi>
+#include <zephyr/dt-bindings/gpio/adi-max32-gpio.h>
+
+/ {
+    model = "Analog Devices Arduino AGV Motor Control";
+    compatible = "adi,ardagvmotor";
+
+    chosen {
+        zephyr,console = &uart0;
+        zephyr,shell-uart = &uart0;
+        zephyr,sram = &sram2;
+        zephyr,flash = &flash0;
+    };
+
+    leds {
+        compatible = "gpio-leds";
+        status = "okay";
+
+        led_status: led-status {
+            gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
+            label = "Status LED";
+            status = "okay";
+        };
+        
+        led_fault: led-fault {
+            gpios = <&gpio0 20 GPIO_ACTIVE_LOW>;
+            label = "Fault LED";
+            status = "okay";
+        };
+    };
+
+    buttons {
+        compatible = "gpio-keys";
+        status = "okay";
+
+        fault: fault {
+            gpios = <&gpio0 20 GPIO_ACTIVE_LOW>;
+            label = "Fault signal";
+            status = "okay";
+        };
+    };
+
+    aliases {
+        /* Compatibility with samples */
+        led0 = &led_status;
+        led1 = &led_fault;
+        watchdog0 = &wdt0;
+    };
+
+    soc {
+        can0: can0@40064000 {
+            compatible = "adi,max32-can";
+            reg = <0x40064000 0x1000>;
+            interrupts = <0x6b 0>;
+            pinctrl-0 = < &can0b_rx_p0_6 &can0b_tx_p0_9 >;
+        };
+    };
+};
+
+&clk_erfo {
+    clock-frequency = < 24576000 >;
+};
+
+/* UART0 - debug (A) / TMC (B) UART */
+&uart0 {
+    pinctrl-0 = <&uart0a_tx_p0_10 &uart0a_rx_p0_11>;
+    pinctrl-names = "default";
+    current-speed = <115200>;
+    data-bits = <8>;
+    parity = "none";
+    status = "okay";
+};
+
+&spi0 {
+    status = "okay";
+    pinctrl-0 = <&spi0a_copi_p0_3 &spi0a_cito_p0_2 &spi0a_sck_p0_4 &spi0a_ts0_p0_5>;
+    pinctrl-names = "default";
+    
+    tmc9660_spi: tmc9660-spi@0 {
+        compatible = "vnd,spi-device";
+        reg = <0>;
+        spi-max-frequency = <1000000>;
+        label = "TMC9660";
+        status = "okay";
+    };
+};
+
+&i2c0 {
+    status = "okay";
+
+    max31827@1a {
+        compatible = "adi,max31827";
+        reg = <0x1a>;
+        label = "MAX31827";
+        status = "okay";
+    };
+};
+
+&clk_ipo {
+    status = "okay";
+};
+
+&dma0 {
+    status = "okay";
+};
+
+&gpio0 {
+    status = "okay";
+};
+
+&trng {
+    status = "okay";
+};
+
+&wdt0 {
+    status = "okay";
+};
+
+&clk_ertco {
+    status = "okay";
+};
+
+&rtc_counter {
+    status = "okay";
+};

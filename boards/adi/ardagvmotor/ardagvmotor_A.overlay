@@ -1,0 +1,24 @@
+/ {
+    buttons {
+        btn: btn {
+            gpios = <&gpio0 15 0>;
+            label = "User button";
+            status = "okay";
+        };
+    };
+
+    aliases {
+        sw0 = &btn;
+    };
+};
+
+/* In revA boards, UART1 may be selected for communication with the TMC9660,
+ * with solder jumpers JP2,3 set to position 1-2 */
+ &uart1 {
+    pinctrl-0 = <&uart1b_tx_p0_2 &uart1b_rx_p0_3>;
+    pinctrl-names = "default";
+    current-speed = <115200>; /* Up to 250k with auto baud detection, up to 5M if explicitly bootstrapped */
+    data-bits = <8>;
+    parity = "none";
+    status = "disabled";
+};

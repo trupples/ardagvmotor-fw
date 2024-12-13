@@ -1,0 +1,13 @@
+/ {
+    buttons {
+        dip: dip {
+            gpios = <&gpio0 15 0>, <&gpio0 18 0>, <&gpio0 19 0>;
+            label = "DIP Switch";
+            status = "okay";
+        };
+    };
+
+    aliases {
+        sw0 = &btn;
+    };
+};

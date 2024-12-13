@@ -1,0 +1,12 @@
+board:
+  name: ardagvmotor
+  full_name: ADI Arduino AGV Motor Control
+  vendor: adi
+  revision:
+    format: letter
+    default: A
+    revisions:
+    - name: A
+    - name: B
+  socs:
+  - name: max32662

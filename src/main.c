@@ -6,11 +6,11 @@
 #include "tmc9660.h"
 #include "nesimtit.h" // Bodged SPI & CAN
 
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_PATH(leds, status), gpios);
-static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_PATH(gpios, fault), gpios);
-static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(DT_PATH(gpios, btn), gpios);
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_PATH(leds, led_status), gpios);
+static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_PATH(leds, led_fault), gpios);
+static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(DT_PATH(buttons, btn), gpios);
 
-static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
+static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660_spi), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
 static const void *can0 = DEVICE_DT_GET(DT_NODELABEL(can0));
 
 #ifndef ESTI_NESIMTIT
