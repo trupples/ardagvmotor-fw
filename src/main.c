@@ -18,26 +18,49 @@ static const void *can0 = DEVICE_DT_GET(DT_NODELABEL(can0));
 #warning ESTI_NESIMTIT not set, SPI and CAN will likely misbehave :(
 #endif
 
+#define MOTOR QSH4218
+
 void agv_init_params(struct tmc9660_dev *tmc9660)
 {
 	// Turn motor off
 	tmc9660_set_param(tmc9660, COMMUTATION_MODE, 0);
 
-	// General motor setup
-	tmc9660_set_param(tmc9660, MOTOR_TYPE, 2);
-	tmc9660_set_param(tmc9660, MOTOR_POLE_PAIRS, 50);
-	tmc9660_set_param(tmc9660, MOTOR_PWM_FREQUENCY, 25000);
-	tmc9660_set_param(tmc9660, ABN_1_STEPS, 40000);
-	tmc9660_set_param(tmc9660, RAMP_VMAX, 4200000); // Motor struggles to get to 4.2M internal velocity units, by construction. This limits the internal target so we don't get integral windup.
 
-	// General limits
-	tmc9660_set_param(tmc9660, OUTPUT_VOLTAGE_LIMIT, 20000); // proportional to VIN, 16383 = 100%, goes up to 200%
+
+	// General motor setup
+#if MOTOR == QSH6018 || MOTOR == QSH5718 || MOTOR == QSH4218
+	tmc9660_set_param(tmc9660, MOTOR_TYPE, 2);
+	tmc9660_set_param(tmc9660, MOTOR_PWM_FREQUENCY, 25000);
+	tmc9660_set_param(tmc9660, MOTOR_POLE_PAIRS, 50);
+	tmc9660_set_param(tmc9660, ABN_1_STEPS, 40000);
+#else
+#error Unsupported motor!
+#endif
+
+#if MOTOR == QSH6018
+	tmc9660_set_param(tmc9660, RAMP_VMAX, 4200000); // Motor struggles to get to 4.2M internal velocity units, by construction. This limits the internal target so we don't get integral windup.
 	tmc9660_set_param(tmc9660, MAX_TORQUE, 4000); // mA
 	tmc9660_set_param(tmc9660, MAX_FLUX, 4000); // mA
 	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
 	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // proportional to VIN, 1638 = 10%
+#elif MOTOR == QSH5718
+	tmc9660_set_param(tmc9660, RAMP_VMAX, 4100000);
+	tmc9660_set_param(tmc9660, MAX_TORQUE, 4000); // mA
+	tmc9660_set_param(tmc9660, MAX_FLUX, 4000); // mA
+	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
+	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // proportional to VIN, 1638 = 10%
+#elif MOTOR == QSH4218
+	tmc9660_set_param(tmc9660, RAMP_VMAX, 1234);
+	tmc9660_set_param(tmc9660, MAX_TORQUE, 2000); // mA
+	tmc9660_set_param(tmc9660, MAX_FLUX, 2000); // mA
+	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
+	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // proportional to VIN, 1638 = 10%
+#endif
 
-	// ADC Setup
+	// General limits
+	tmc9660_set_param(tmc9660, OUTPUT_VOLTAGE_LIMIT, 20000); // proportional to VIN, 16383 = 100%, goes up to 200%
+
+	// ADC Setup - depends on board, not motor!
 	tmc9660_set_param(tmc9660, ADC_SHUNT_TYPE, 4);
 	tmc9660_set_param(tmc9660, CSA_GAIN_ADC_I0_TO_ADC_I2, 1);
 	tmc9660_set_param(tmc9660, CSA_GAIN_ADC_I3, 1);
@@ -60,19 +83,35 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 	tmc9660_set_param(tmc9660, Y2_SOURCE_CURRENT, 5);
 
 	// Velocity ramp: set a max acceleration
+#if MOTOR == QSH6018
 	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
 	tmc9660_set_param(tmc9660, RAMP_AMAX, 100000);
 	tmc9660_set_param(tmc9660, RAMP_DMAX, 100000);
+#elif MOTOR == QSH5718
+	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
+	tmc9660_set_param(tmc9660, RAMP_AMAX, 500000);
+	tmc9660_set_param(tmc9660, RAMP_DMAX, 500000);
+#elif MOTOR == QSH4218
+	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
+	tmc9660_set_param(tmc9660, RAMP_AMAX, 300000);
+	tmc9660_set_param(tmc9660, RAMP_DMAX, 300000);
+#endif
 
-	// Velocity biquad: custom smoothing transfer function
+	// Velocity biquad
+#if MOTOR == QSH6018 || MOTOR == QSH5718 || MOTOR == QSH4218
+	// Custom 1st order filter because wizard chooses an unstable one
+	// FIXME: talk to Trinamic people on how to get a nice filter here
 	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ENABLE, 1);
 	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_1, 1038090);
 	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_2, 0);
 	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_0, 3491);
 	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_1, 3491);
 	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_2, 3491);
+#endif
+
 
 	// Tuning
+#if MOTOR == QSH6018
 	tmc9660_set_param(tmc9660, TORQUE_P, 521);
 	tmc9660_set_param(tmc9660, TORQUE_I, 1218);
 	tmc9660_set_param(tmc9660, FLUX_P, 521);
@@ -89,6 +128,41 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 	tmc9660_set_param(tmc9660, POSITION_I, 0);
 	tmc9660_set_param(tmc9660, POSITION_NORM_P, 1);
 	tmc9660_set_param(tmc9660, POSITION_NORM_I, 1);
+#elif MOTOR == QSH5718
+	tmc9660_set_param(tmc9660, TORQUE_P, 741);
+	tmc9660_set_param(tmc9660, TORQUE_I, 2258);
+	tmc9660_set_param(tmc9660, FLUX_P, 741);
+	tmc9660_set_param(tmc9660, FLUX_I, 2258);
+	tmc9660_set_param(tmc9660, CURRENT_NORM_P, 0);
+	tmc9660_set_param(tmc9660, CURRENT_NORM_I, 1);
+	
+	tmc9660_set_param(tmc9660, VELOCITY_P, 31718);
+	tmc9660_set_param(tmc9660, VELOCITY_I, 10000);
+	tmc9660_set_param(tmc9660, VELOCITY_NORM_P, 2);
+	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 2);
+	
+	tmc9660_set_param(tmc9660, POSITION_P, 300);
+	tmc9660_set_param(tmc9660, POSITION_I, 0);
+	tmc9660_set_param(tmc9660, POSITION_NORM_P, 0);
+	tmc9660_set_param(tmc9660, POSITION_NORM_I, 1);
+#elif MOTOR == QSH4218
+	tmc9660_set_param(tmc9660, TORQUE_P, 3933);
+	tmc9660_set_param(tmc9660, TORQUE_I, 19526);
+	tmc9660_set_param(tmc9660, FLUX_P, 3933);
+	tmc9660_set_param(tmc9660, FLUX_I, 19526);
+	tmc9660_set_param(tmc9660, CURRENT_NORM_P, 0);
+	tmc9660_set_param(tmc9660, CURRENT_NORM_I, 1);
+	
+	tmc9660_set_param(tmc9660, VELOCITY_P, 26218);
+	tmc9660_set_param(tmc9660, VELOCITY_I, 100);
+	tmc9660_set_param(tmc9660, VELOCITY_NORM_P, 2);
+	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 1);
+	
+	tmc9660_set_param(tmc9660, POSITION_P, 30);
+	tmc9660_set_param(tmc9660, POSITION_I, 0);
+	tmc9660_set_param(tmc9660, POSITION_NORM_P, 0);
+	tmc9660_set_param(tmc9660, POSITION_NORM_I, 1);
+#endif
 
 	// Protection - seems optional
 	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_UVW_LOW_SIDE_THRESHOLD, 1);
@@ -111,7 +185,7 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 
 void agv_set_velocity(struct tmc9660_dev *tmc9660, float rpm)
 {
-	int internal_units = rpm * 4200000 / 180; // rough approximation!!!
+	int internal_units = rpm * 4200000 / 180; // rough approximation!!! only valid for first motor
 	tmc9660_set_param(tmc9660, TARGET_VELOCITY, internal_units);
 }
 
@@ -438,13 +512,14 @@ void demo_uart_control(struct tmc9660_dev *tmc9660)
 			break;
 		}
 
-		int pos, vel, tor, temp;
+		int pos, vel, tor, temp, current;
 		tmc9660_get_param(tmc9660, ACTUAL_POSITION, &pos);
 		tmc9660_get_param(tmc9660, ACTUAL_VELOCITY, &vel);
 		tmc9660_get_param(tmc9660, ACTUAL_TORQUE, &tor);
 		tmc9660_get_param(tmc9660, CHIP_TEMPERATURE, &temp);
+		tmc9660_get_param(tmc9660, ACTUAL_TOTAL_MOTOR_CURRENT, &current);
 
-		printf("pos = %d\tvel = %d\ttor = %d\ttemp = %d\n", pos, vel, tor, temp);
+		printf("pos = %d\tvel = %d\ttor = %d\ttemp = %d\tcurrend = %d\n", pos, vel, tor, temp, current);
 	}
 }
 
