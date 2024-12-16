@@ -167,7 +167,7 @@ int tmc9660_init(
     };
     struct spi_buf_set rx_bufs = { .buffers = rx_buf, .count = 1 };
 #else
-    nesimtit_init();
+    //nesimtit_init();
 #endif
 
     int retries = 5;

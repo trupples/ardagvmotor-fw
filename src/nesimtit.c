@@ -7,8 +7,9 @@
 #include <nvic_table.h>
 #include <zephyr/logging/log.h>
 
-#define NODE_ID 0x4
 LOG_MODULE_REGISTER(nesimtit, LOG_LEVEL_DBG);
+
+int g_node_id;
 
 void CAN_IRQHandler(void*)
 {
@@ -45,7 +46,7 @@ mxc_can_req_t can_tx_req = {
     .data = can_tx_data,
 };
 
-void nesimtit_init()
+void nesimtit_init(int can_id)
 {
     // SPI to TMC9660
     mxc_spi_pins_t tmp;
@@ -55,6 +56,7 @@ void nesimtit_init()
     MXC_SPI0->sstime = 0x001919; // max inactive (256), a bit of post, a bit of pre (0x19 = 25 ~ 1us)
     // cca 50-65us between CS seems to be the fastest we can go
 
+    g_node_id = can_id;
 
     // MSDK_NO_GPIO_CLK_INIT is set, likely due to other zephyr internals
     // (auto config based on devicetree?) so we need to manually do the things
@@ -101,7 +103,7 @@ int nesimtit_spi_transceive(char *tx, char *rx)
 
 void nesimtit_can_transmit(char *data, int len)
 {
-    can_tx_info.msg_id = MXC_CAN_STANDARD_ID(NODE_ID);
+    can_tx_info.msg_id = MXC_CAN_STANDARD_ID(g_node_id);
     can_tx_info.rtr = 0;
     can_tx_info.fdf = 0;
     can_tx_info.brs = 0;

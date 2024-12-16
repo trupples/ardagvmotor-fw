@@ -6,7 +6,7 @@
 // CAN: no wrapper at all
 
 /* Initialize bodged SPI and CAN */
-void nesimtit_init();
+void nesimtit_init(int can_id);
 
 /* Transmit / receive an 8 byte SPI datagram. tx, rx can be NULL. */
 int nesimtit_spi_transceive(char *tx, char *rx);

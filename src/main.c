@@ -450,27 +450,24 @@ void demo_uart_control(struct tmc9660_dev *tmc9660)
 
 int main(void)
 {
-	k_msleep(1000);
-	printf("Hello World! %s\n", CONFIG_BOARD_TARGET);
-
 	gpio_pin_configure_dt(&led, GPIO_OUTPUT);
 	gpio_pin_configure_dt(&fault, GPIO_INPUT);
 	gpio_pin_configure_dt(&btn, GPIO_INPUT);
 
-	// While the TMC is booting up, it will hold the FAULT pin active. There are
-	// a couple hundred milliseconds between whn the LDOs are up (and as such we
-	// boot) and the parameter mode application is up and running.
+	// There are a few milliseconds between when the LDOs are up (= zephyr boot)
+	// and when the parameter mode application inside the TMC is fully
+	// initialized, time in which the TMC is configured to assert the fault
+	// signal (may be disabled via the bootstrapping settings). This waits for
+	// the TMC to initialize:
 	while(gpio_pin_get_dt(&fault) == 1)
 	{
 		printf(".");
 	}
-	printf("\n");
+	printf("\nHello World! %s\n", CONFIG_BOARD_TARGET);
 
-	nesimtit_init();
+	nesimtit_init(10); // Init bodged SPI & CAN
 	
 	struct tmc9660_dev tmc9660;
-
-	printf("tmc9660_init...\n");
 	tmc9660_init(&tmc9660, &spi0);
 
 	demo_blink_fault();
