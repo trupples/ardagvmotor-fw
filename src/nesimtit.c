@@ -5,15 +5,15 @@
 #include <gpio.h>
 #include <string.h>
 #include <nvic_table.h>
+#include <zephyr/logging/log.h>
 
 #define NODE_ID 0x4
+LOG_MODULE_REGISTER(nesimtit, LOG_LEVEL_DBG);
 
 void CAN_IRQHandler(void*)
 {
-    printf(".");
     MXC_CAN_Handler(0); // Moves message from RX FIFO to request structure
 }
-
 
 // Handles "object" events = relating to messages (transmit done, receive done, receive overrun)
 void nesimtit_can_obj_handler(uint32_t can_idx, uint32_t event);
@@ -69,7 +69,7 @@ void nesimtit_init()
     MXC_CAN_ObjectSetFilter(0, (MXC_CAN_FILT_CFG_MASK_ADD | MXC_CAN_FILT_CFG_SINGLE_STD_ID), 0x1FFFFFFF, 0); // Set receive filter to accept all standard IDs
     int err = MXC_CAN_SetBitRate(0, MXC_CAN_BITRATE_SEL_NOMINAL, 500000, MXC_CAN_BIT_SEGMENTS(7, 2, 2)); // Nominal bitrate 500kHz, TSEG1 - 7, TSEG2 - 2
     if ((MXC_CAN_GetBitRate(0, MXC_CAN_BITRATE_SEL_NOMINAL)) != 500000) {
-        printf("Could not initialize 500kbaud CAN. Have %d\n", MXC_CAN_GetBitRate(0, MXC_CAN_BITRATE_SEL_NOMINAL));
+        LOG_ERR("Could not initialize 500kbaud CAN. Have %d baud", MXC_CAN_GetBitRate(0, MXC_CAN_BITRATE_SEL_NOMINAL));
         return;
     }
 
@@ -78,7 +78,7 @@ void nesimtit_init()
 
     MXC_CAN_MessageReadAsync(0, &can_recv_req);
 
-    printf("dun!\n");
+    LOG_INF("Bodged CAN & SPI initialized!");
 }
 
 int nesimtit_spi_transceive(char *tx, char *rx)
@@ -112,9 +112,9 @@ void nesimtit_can_transmit(char *data, int len)
     memcpy(can_tx_data, data, len);
     can_tx_req.data_sz = len;
 
-    printf("sending...\n");
+    LOG_DBG("CAN sending...");
     MXC_CAN_MessageSend(0, &can_tx_req);
-    printf("sent!\n");
+    LOG_DBG("CAN sent!");
 }
 
 int nesimtit_can_receive_noblock(char *message, int *out_len, int *src_node)
@@ -133,12 +133,12 @@ int nesimtit_can_receive_noblock(char *message, int *out_len, int *src_node)
 
 void nesimtit_can_obj_handler(uint32_t can_idx, uint32_t event)
 {
-    printf("obj %x %x\n", can_idx, event);
+    LOG_DBG("obj %x %x", can_idx, event);
     if(can_idx != 0) return;
 
     if(event == MXC_CAN_OBJ_EVT_TX_COMPLETE) // Transmit done
     {
-        printf("CAN transmit OK\n");
+        LOG_DBG("CAN transmit OK");
         return;
     }
 
@@ -154,12 +154,7 @@ void nesimtit_can_obj_handler(uint32_t can_idx, uint32_t event)
         // Add received message to queue
         k_msgq_put(&canq, &msg, K_NO_WAIT); // FIXME: no error handling!
 
-        printf("CAN recv:");
-        for(int i = 0; i < msg.data_size; i++)
-        {
-            printf(" %02hhx", msg.data[i]);
-        }
-        printf("\n");
+        LOG_HEXDUMP_DBG(msg.data, msg.data_size, "CAN recv");
         return;
     }
 }
@@ -167,24 +162,24 @@ void nesimtit_can_obj_handler(uint32_t can_idx, uint32_t event)
 void nesimtit_can_unit_handler(uint32_t can_idx, uint32_t event) 
 {
 
-    printf("unit %x %x\n", can_idx, event);
+    LOG_DBG("unit %x %x", can_idx, event);
     if(can_idx != 0) return;
 
     switch(event) {
     case MXC_CAN_UNIT_EVT_INACTIVE:
-        printf("CAN state: MXC_CAN_UNIT_EVT_INACTIVE\n");
+        LOG_INF("CAN state: MXC_CAN_UNIT_EVT_INACTIVE");
         break;
     case MXC_CAN_UNIT_EVT_ACTIVE:
-        printf("CAN state: MXC_CAN_UNIT_EVT_ACTIVE\n");
+        LOG_INF("CAN state: MXC_CAN_UNIT_EVT_ACTIVE");
         break;
     case MXC_CAN_UNIT_EVT_WARNING:
-        printf("CAN state: MXC_CAN_UNIT_EVT_WARNING\n");
+        LOG_INF("CAN state: MXC_CAN_UNIT_EVT_WARNING");
         break;
     case MXC_CAN_UNIT_EVT_PASSIVE:
-        printf("CAN state: MXC_CAN_UNIT_EVT_PASSIVE\n");
+        LOG_INF("CAN state: MXC_CAN_UNIT_EVT_PASSIVE");
         break;
     case MXC_CAN_UNIT_EVT_BUS_OFF:
-        printf("CAN state: MXC_CAN_UNIT_EVT_BUS_OFF\n");
+        LOG_INF("CAN state: MXC_CAN_UNIT_EVT_BUS_OFF");
         break;
     }
 }

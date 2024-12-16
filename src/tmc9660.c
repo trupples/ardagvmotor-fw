@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <zephyr/logging/log.h>
 #include "tmc9660.h"
 
 #ifndef ESTI_NESIMTIT
@@ -6,6 +7,8 @@
 #else
 #include "nesimtit.h"
 #endif
+
+LOG_MODULE_REGISTER(tmc9660, LOG_LEVEL_INF);
 
 enum tmc9660_spi_status {
     SPI_STATUS_OK = 0xff,
@@ -36,8 +39,6 @@ uint8_t tmc9660_checksum(uint8_t buffer[8])
         res += buffer[i];
     return res;
 }
-
-#define hexdump(v, n) do { for(int i = 0; i < n; i++) printf("%02hhx ", v[i]); } while(0)
 
 int tmc9660_tmcl_command(
     struct tmc9660_dev *dev,
@@ -82,7 +83,7 @@ int tmc9660_tmcl_command(
 
     int retries = 5;
     do {
-        // printf("> "); hexdump(send, 8); printf("\n");
+        LOG_HEXDUMP_DBG(send, 8, "SPI send");
 
 #ifdef ESTI_NESIMTIT
         nesimtit_spi_transceive(send, NULL);
@@ -92,7 +93,7 @@ int tmc9660_tmcl_command(
         spi_read_dt(dev->spi, &rx_bufs);
 #endif
 
-        // printf("< "); hexdump(recv, 8); printf("\n");
+        LOG_HEXDUMP_DBG(recv, 8, "SPI recv");
 
         spi_status = recv[0];
         tmcl_status = recv[1];
@@ -111,7 +112,7 @@ int tmc9660_tmcl_command(
         }
     } while(retries-- > 0 && (spi_status == SPI_STATUS_NOT_READY || spi_status == SPI_STATUS_CHECKSUM_ERROR));
     
-    //printf("spi_status = %d\ntmcl_status = %d\nreply_op = %d\ndata = %08x\nretries = %d\n", spi_status, tmcl_status, reply_operation, data, retries);
+    LOG_DBG("spi_status = %d\ntmcl_status = %d\nreply_op = %d\ndata = %08x\nretries = %d\n", spi_status, tmcl_status, reply_operation, data, retries);
 
     if(value_recv) *value_recv = data;
 
@@ -171,7 +172,7 @@ int tmc9660_init(
 
     int retries = 5;
     do {
-        // printf("> "); hexdump(tx, 8); printf("\n");
+        LOG_HEXDUMP_DBG(tx, 8, "SPI send");
 
 #ifdef ESTI_NESIMTIT
         nesimtit_spi_transceive(tx, NULL);
@@ -181,7 +182,7 @@ int tmc9660_init(
         spi_read_dt(dev->spi, &rx_bufs);
 #endif
 
-        // printf("FIRST REPLY: ); hexdump(rx, 8); printf("\n");
+        LOG_HEXDUMP_DBG(rx, 8, "SPI recv");
     } while(rx[0] != SPI_STATUS_FIRST_CMD && retries-- > 0);
     
     if(rx[0] != SPI_STATUS_FIRST_CMD) {
