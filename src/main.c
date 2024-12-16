@@ -3,11 +3,12 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
+#include <zephyr/console/console.h>
 #include "tmc9660.h"
 #include "nesimtit.h" // Bodged SPI & CAN
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_PATH(leds, led_status), gpios);
-static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_PATH(leds, led_fault), gpios);
+static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_PATH(buttons, fault), gpios);
 static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(DT_PATH(buttons, btn), gpios);
 
 static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660_spi), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
@@ -22,62 +23,87 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 	// Turn motor off
 	tmc9660_set_param(tmc9660, COMMUTATION_MODE, 0);
 
-	// Common
+	// General motor setup
+	tmc9660_set_param(tmc9660, MOTOR_TYPE, 2);
+	tmc9660_set_param(tmc9660, MOTOR_POLE_PAIRS, 50);
 	tmc9660_set_param(tmc9660, MOTOR_PWM_FREQUENCY, 25000);
-	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
-	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // // proportional to VIN, 1638 = 10%
+	tmc9660_set_param(tmc9660, ABN_1_STEPS, 40000);
+	tmc9660_set_param(tmc9660, RAMP_VMAX, 4200000); // Motor struggles to get to 4.2M internal velocity units, by construction. This limits the internal target so we don't get integral windup.
+
+	// General limits
 	tmc9660_set_param(tmc9660, OUTPUT_VOLTAGE_LIMIT, 20000); // proportional to VIN, 16383 = 100%, goes up to 200%
-	tmc9660_set_param(tmc9660, MAX_TORQUE, 4000);
-	tmc9660_set_param(tmc9660, MAX_FLUX, 4000);
-	tmc9660_set_param(tmc9660, RAMP_VMAX, 4200000);
+	tmc9660_set_param(tmc9660, MAX_TORQUE, 4000); // mA
+	tmc9660_set_param(tmc9660, MAX_FLUX, 4000); // mA
+	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
+	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // proportional to VIN, 1638 = 10%
+
+	// ADC Setup
+	tmc9660_set_param(tmc9660, ADC_SHUNT_TYPE, 4);
+	tmc9660_set_param(tmc9660, CSA_GAIN_ADC_I0_TO_ADC_I2, 1);
+	tmc9660_set_param(tmc9660, CSA_GAIN_ADC_I3, 1);
+	tmc9660_set_param(tmc9660, CURRENT_SCALING_FACTOR, 390);
+	tmc9660_set_param(tmc9660, ADC_I0_INVERTED, 1);
+	tmc9660_set_param(tmc9660, ADC_I1_INVERTED, 0);
+	tmc9660_set_param(tmc9660, ADC_I2_INVERTED, 1);
+	tmc9660_set_param(tmc9660, ADC_I3_INVERTED, 0);
+
+	// Gate driver settings - seem optional but their absence might be the cause of the 6A bug???
+	tmc9660_set_param(tmc9660, USE_ADAPTIVE_DRIVE_TIME_UVW, 1);
+	tmc9660_set_param(tmc9660, USE_ADAPTIVE_DRIVE_TIME_Y2, 1);
+	tmc9660_set_param(tmc9660, DRIVE_TIME_SINK_UVW, 40);
+	tmc9660_set_param(tmc9660, DRIVE_TIME_SOURCE_UVW, 40);
+	tmc9660_set_param(tmc9660, DRIVE_TIME_SINK_Y2, 40);
+	tmc9660_set_param(tmc9660, DRIVE_TIME_SOURCE_Y2, 40);
+	tmc9660_set_param(tmc9660, UVW_SINK_CURRENT, 10);
+	tmc9660_set_param(tmc9660, UVW_SOURCE_CURRENT, 5);
+	tmc9660_set_param(tmc9660, Y2_SINK_CURRENT, 10);
+	tmc9660_set_param(tmc9660, Y2_SOURCE_CURRENT, 5);
 
 	// Velocity ramp: set a max acceleration
 	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
 	tmc9660_set_param(tmc9660, RAMP_AMAX, 100000);
 	tmc9660_set_param(tmc9660, RAMP_DMAX, 100000);
 
-	// Stepper
-	tmc9660_set_param(tmc9660, MOTOR_TYPE, 2);
-	tmc9660_set_param(tmc9660, MOTOR_POLE_PAIRS, 50);
-	tmc9660_set_param(tmc9660, MOTOR_DIRECTION, 0);
-
-	// ADC
-	tmc9660_set_param(tmc9660, CURRENT_SCALING_FACTOR, 390);
-	
-	// ABN
-	tmc9660_set_param(tmc9660, ABN_1_STEPS, 40000);
-	tmc9660_set_param(tmc9660, ABN_1_DIRECTION, 0);
-	tmc9660_set_param(tmc9660, ABN_1_INIT_METHOD, 0);
+	// Velocity biquad: custom smoothing transfer function
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ENABLE, 1);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_1, 1038090);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_2, 0);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_0, 3491);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_1, 3491);
+	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_2, 3491);
 
 	// Tuning
-	tmc9660_set_param(tmc9660, TORQUE_P, 1039);
-	tmc9660_set_param(tmc9660, TORQUE_I, 2880);
-	tmc9660_set_param(tmc9660, FLUX_P, 1039);
-	tmc9660_set_param(tmc9660, FLUX_I, 2880);
+	tmc9660_set_param(tmc9660, TORQUE_P, 521);
+	tmc9660_set_param(tmc9660, TORQUE_I, 1218);
+	tmc9660_set_param(tmc9660, FLUX_P, 521);
+	tmc9660_set_param(tmc9660, FLUX_I, 1218);
 	tmc9660_set_param(tmc9660, CURRENT_NORM_P, 0);
 	tmc9660_set_param(tmc9660, CURRENT_NORM_I, 1);
-	tmc9660_set_param(tmc9660, VELOCITY_SENSOR_SELECTION, 0);
-	tmc9660_set_param(tmc9660, VELOCITY_P, 400);
-	tmc9660_set_param(tmc9660, VELOCITY_I, 10000);
+	
+	tmc9660_set_param(tmc9660, VELOCITY_P, 315);
+	tmc9660_set_param(tmc9660, VELOCITY_I, 0);
 	tmc9660_set_param(tmc9660, VELOCITY_NORM_P, 1);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 2);
-	tmc9660_set_param(tmc9660, VELOCITY_SCALING_FACTOR, 1);
-	tmc9660_set_param(tmc9660, VELOCITY_LOOP_DOWNSAMPLING, 5);
-	tmc9660_set_param(tmc9660, POSITION_SENSOR_SELECTION, 0);
-	tmc9660_set_param(tmc9660, POSITION_SCALING_FACTOR, 1024);
+	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 3);
+	
 	tmc9660_set_param(tmc9660, POSITION_P, 10000);
 	tmc9660_set_param(tmc9660, POSITION_I, 0);
 	tmc9660_set_param(tmc9660, POSITION_NORM_P, 1);
 	tmc9660_set_param(tmc9660, POSITION_NORM_I, 1);
-	tmc9660_set_param(tmc9660, POSITION_LOOP_DOWNSAMPLING, 0);
-	
-	// slow sinc + 1st degree to even out velocity noise
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ENABLE, 0);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_1, (1<<20) * 0.99);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_2, 0);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_0, (1<<20) * 0.00333);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_1, (1<<20) * 0.00333);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_2, (1<<20) * 0.00333);
+
+	// Protection - seems optional
+	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_UVW_LOW_SIDE_THRESHOLD, 1);
+	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_UVW_HIGH_SIDE_THRESHOLD, 2);
+	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_Y2_LOW_SIDE_THRESHOLD, 1);
+	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_Y2_HIGH_SIDE_THRESHOLD, 2);
+	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_UVW_LOW_SIDE_USE_VDS, 0);
+	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_Y2_LOW_SIDE_USE_VDS, 0);
+	tmc9660_set_param(tmc9660, GDRV_RETRY_BEHAVIOUR, 0);
+	tmc9660_set_param(tmc9660, DRIVE_FAULT_BEHAVIOUR, 0);
+	tmc9660_set_param(tmc9660, FAULT_HANDLER_NUMBER_OF_RETRIES, 5);
+	tmc9660_set_param(tmc9660, SUPPLY_OVERVOLTAGE_WARNING_THRESHOLD, 710);
+	tmc9660_set_param(tmc9660, SUPPLY_UNDERVOLTAGE_WARNING_THRESHOLD, 78);
+	tmc9660_set_param(tmc9660, EXTERNAL_TEMPERATURE_SHUTDOWN_THRESHOLD, 65535);
+	tmc9660_set_param(tmc9660, EXTERNAL_TEMPERATURE_WARNING_THRESHOLD, 65535);
 
 	// Start FOC
 	tmc9660_set_param(tmc9660, COMMUTATION_MODE, 5);
@@ -352,6 +378,76 @@ void demo_blink_tmc_gpio(struct tmc9660_dev *tmc9660)
 	}
 }
 
+// 2024-12-16
+// Control TMC with human readable UART commands
+void demo_uart_control(struct tmc9660_dev *tmc9660)
+{
+	console_getline_init();
+	
+	printf("Initialising TMC...\n");
+	agv_init_params(tmc9660);
+
+	printf("Commands:\n"
+	       "E - Emergency stop\n"
+		   "V <+-rpm> - Set velocity\n"
+		   "P <pos> - Set position (absolute)\n"
+		   "P <+-pos> - Set position (relative to current position)\n"
+		   "T <+-current> - Set torque\n\n");
+
+	char *line;
+	while(line = console_getline())
+	{
+		switch(line[0])
+		{
+		default:
+			printf("Invalid command\n");
+			break;
+		case 0:
+			break;
+		case 'E':
+		case 'e':
+			tmc9660_motor_stop(tmc9660);
+			printf("Stopped motors! (Board has to be reset for TMC to be put in drive mode again)\n");
+			break;
+		case 'V':
+		case 'v':
+			int rpm;
+			sscanf(line, "%*c %d", &rpm);
+			agv_set_velocity(tmc9660, rpm);
+			printf("Set velocity to %d RPM (approx)\n", rpm);
+			break;
+		case 'P':
+		case 'p':
+			int pos;
+			sscanf(line, "%*c %d", &pos);
+			if(line[2] == '+' || line[2] == '-')
+			{
+				int actual_pos;
+				tmc9660_get_param(tmc9660, ACTUAL_POSITION, &actual_pos);
+				pos += actual_pos;
+			}
+			tmc9660_set_param(tmc9660, TARGET_POSITION, pos);
+			printf("Set position to %d position units\n", pos);
+			break;
+		case 'T':
+		case 't':
+			int tor;
+			sscanf(line, "%*c %d", &tor);
+			tmc9660_set_param(tmc9660, TARGET_TORQUE, tor);
+			printf("Set torque to %d mA\n", tor);
+			break;
+		}
+
+		int pos, vel, tor, temp;
+		tmc9660_get_param(tmc9660, ACTUAL_POSITION, &pos);
+		tmc9660_get_param(tmc9660, ACTUAL_VELOCITY, &vel);
+		tmc9660_get_param(tmc9660, ACTUAL_TORQUE, &tor);
+		tmc9660_get_param(tmc9660, CHIP_TEMPERATURE, &temp);
+
+		printf("pos = %d\tvel = %d\ttor = %d\ttemp = %d\n", pos, vel, tor, temp);
+	}
+}
+
 int main(void)
 {
 	k_msleep(1000);
@@ -364,7 +460,7 @@ int main(void)
 	// While the TMC is booting up, it will hold the FAULT pin active. There are
 	// a couple hundred milliseconds between whn the LDOs are up (and as such we
 	// boot) and the parameter mode application is up and running.
-	while(gpio_pin_get_dt(&fault) == 0)
+	while(gpio_pin_get_dt(&fault) == 1)
 	{
 		printf(".");
 	}
@@ -378,7 +474,8 @@ int main(void)
 	tmc9660_init(&tmc9660, &spi0);
 
 	demo_blink_fault();
-	demo_can_blinky();
+	demo_uart_control(&tmc9660);
+	// demo_can_blinky();
 	// demo_blink_tmc_gpio(&tmc9660);
 	// demo_tmc_spi(&tmc9660);
 

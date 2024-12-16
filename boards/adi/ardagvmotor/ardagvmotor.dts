@@ -25,20 +25,16 @@
             status = "okay";
         };
         
-        led_fault: led-fault {
-            gpios = <&gpio0 20 GPIO_ACTIVE_LOW>;
-            label = "Fault LED";
-            status = "okay";
-        };
     };
-
+    
     buttons {
         compatible = "gpio-keys";
         status = "okay";
-
+        
+        /* Can also be used as output to flash fault LED. */
         fault: fault {
-            gpios = <&gpio0 20 GPIO_ACTIVE_LOW>;
-            label = "Fault signal";
+            gpios = <&gpio0 20 (GPIO_ACTIVE_LOW)>;
+            label = "Fault";
             status = "okay";
         };
     };
@@ -46,7 +42,6 @@
     aliases {
         /* Compatibility with samples */
         led0 = &led_status;
-        led1 = &led_fault;
         watchdog0 = &wdt0;
     };
 
