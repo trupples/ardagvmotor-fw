@@ -44,15 +44,6 @@
         led0 = &led_status;
         watchdog0 = &wdt0;
     };
-
-    soc {
-        can0: can0@40064000 {
-            compatible = "adi,max32-can";
-            reg = <0x40064000 0x1000>;
-            interrupts = <0x6b 0>;
-            pinctrl-0 = < &can0b_rx_p0_6 &can0b_tx_p0_9 >;
-        };
-    };
 };
 
 &clk_erfo {
@@ -94,6 +85,12 @@
     };
 };
 
+&can0 {
+    status = "okay";
+    pinctrl-0 = <&can0b_rx_p0_6 &can0b_tx_p0_9>;
+    pinctrl-names = "default";
+};
+
 &clk_ipo {
     status = "okay";
 };
@@ -118,6 +115,8 @@
     status = "okay";
 };
 
-&rtc_counter {
+/* adi-innersource: rtc
+   zephyrprojext-rtos: rtc_clock */
+&rtc {
     status = "okay";
 };
