@@ -3,16 +3,17 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
+#include <zephyr/drivers/can.h>
 #include <zephyr/console/console.h>
 #include "tmc9660.h"
-#include "nesimtit.h" // Bodged SPI & CAN
+#include "nesimtit.h" // Bodged SPI
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_PATH(leds, led_status), gpios);
 static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_PATH(buttons, fault), gpios);
 static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(DT_PATH(buttons, btn), gpios);
 
 static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660_spi), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
-static const void *can0 = DEVICE_DT_GET(DT_NODELABEL(can0));
+static const struct device *can0 = DEVICE_DT_GET(DT_NODELABEL(can0));
 
 #ifndef ESTI_NESIMTIT
 #warning ESTI_NESIMTIT not set, SPI and CAN will likely misbehave :(
@@ -24,8 +25,6 @@ void agv_init_params(struct tmc9660_dev *tmc9660)
 {
 	// Turn motor off
 	tmc9660_set_param(tmc9660, COMMUTATION_MODE, 0);
-
-
 
 	// General motor setup
 #if MOTOR == QSH6018 || MOTOR == QSH5718 || MOTOR == QSH4218
@@ -267,25 +266,47 @@ void demo_blink_fault()
 	gpio_pin_configure_dt(&fault, GPIO_INPUT);
 }
 
-// 2024-12-11
+CAN_MSGQ_DEFINE(can_rx_msgq, 16); // Use a message queue for incoming CAN frames
+
+// 2024-12-11 using bodged CAN, 2024-12-17 using legit CAN
 // When button is pressed, send a CAN message to all other connected devices to
 // blink NODE_ID times (NODE_ID defined in nesimtit.c)
 void demo_can_blinky() 
 {
+	// Initialize CAN
+	const struct can_filter filter_all_standard = {
+		.id = 0,
+		.mask = 0,
+		.flags = 0
+	};
+	const struct can_filter filter_all_extended = {
+		.id = 0,
+		.mask = 0,
+		.flags = CAN_FILTER_IDE
+	};
+	
+	// Add all received standard and extended messages to the msgq
+	can_add_rx_filter_msgq(can0, &can_rx_msgq, &filter_all_standard);
+	can_add_rx_filter_msgq(can0, &can_rx_msgq, &filter_all_extended);
+
+	can_start(can0); // CAN Bitrate and timing are automatically set based on device tree
+
 	uint8_t count = 0;
 	while(1)
 	{
-		char msg[8]; // can message (sent or received)
-		int len; // received can message length
-		int srcid; // received can message sender node id
+		struct can_frame frame = { 0 }; // Used for both TX and RX
 
 		if(gpio_pin_get_dt(&btn))
 		{
 			gpio_pin_set_dt(&led, 1);
 			printf("pressed!\n");
 
-			char msg[8] = {count++, 1, 2, 3, 4, 5, 6, 7};
-			nesimtit_can_transmit(msg, 2);
+			frame.id = 5; // Change this for different nodes!
+			frame.dlc = can_bytes_to_dlc(2);
+			frame.data[0] = count++;
+			frame.data[1] = 1;
+			can_send(can0, &frame, K_FOREVER, NULL, NULL);
+			printf("sent!\n");
 
 			while(gpio_pin_get_dt(&btn));
 
@@ -293,16 +314,17 @@ void demo_can_blinky()
 			printf("released!\n");
 		}
 
-		else if(nesimtit_can_receive_noblock(msg, &len, &srcid) == 0)
+		else if(k_msgq_get(&can_rx_msgq, &frame, K_NO_WAIT) == 0)
 		{
-			printf("got %d bytes from %d:", len, srcid);
+			int len = can_dlc_to_bytes(frame.dlc);
+			printf("got %d bytes from %d:", len, frame.id);
 			for(int i = 0; i < len; i++)
 			{
-				printf(" %hhx", msg[i]);
+				printf(" %hhx", frame.data[i]);
 			}
 			printf("\n");
 
-			for(int i = 0; i < srcid; i++)
+			for(int i = 0; i < frame.id; i++)
 			{
 				gpio_pin_set_dt(&led, 1);
 				k_msleep(200);
@@ -540,14 +562,14 @@ int main(void)
 	}
 	printf("\nHello World! %s\n", CONFIG_BOARD_TARGET);
 
-	nesimtit_init(10); // Init bodged SPI & CAN
+	nesimtit_init(); // Init bodged SPI
 	
 	struct tmc9660_dev tmc9660;
 	tmc9660_init(&tmc9660, &spi0);
 
 	demo_blink_fault();
-	demo_uart_control(&tmc9660);
-	// demo_can_blinky();
+	// demo_uart_control(&tmc9660);
+	demo_can_blinky();
 	// demo_blink_tmc_gpio(&tmc9660);
 	// demo_tmc_spi(&tmc9660);
 
