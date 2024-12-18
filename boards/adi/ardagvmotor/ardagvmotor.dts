@@ -64,6 +64,7 @@
     status = "okay";
     pinctrl-0 = <&spi0a_copi_p0_3 &spi0a_cito_p0_2 &spi0a_sck_p0_4 &spi0a_ts0_p0_5>;
     pinctrl-names = "default";
+    cs-gpios = <&gpio0 5 GPIO_ACTIVE_LOW>;
     
     tmc9660_spi: tmc9660-spi@0 {
         compatible = "vnd,spi-device";

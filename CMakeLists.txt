@@ -1,12 +1,10 @@
 cmake_minimum_required(VERSION 3.20.0)
 
-add_compile_definitions(ESTI_NESIMTIT) # Bodged SPI and CAN :)
-
 # Bring in OOT board definition
 list(APPEND BOARD_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(motor_control)
 
-target_sources(app PRIVATE src/main.c src/tmc9660.c src/nesimtit.c objdict/CO_OD.c)
+target_sources(app PRIVATE src/main.c src/tmc9660.c objdict/CO_OD.c)
 zephyr_include_directories(objdict)

@@ -6,7 +6,6 @@
 #include <zephyr/drivers/can.h>
 #include <zephyr/console/console.h>
 #include "tmc9660.h"
-#include "nesimtit.h" // Bodged SPI
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_PATH(leds, led_status), gpios);
 static const struct gpio_dt_spec fault = GPIO_DT_SPEC_GET(DT_PATH(buttons, fault), gpios);
@@ -14,10 +13,6 @@ static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(DT_PATH(buttons, btn), g
 
 static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660_spi), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
 static const struct device *can0 = DEVICE_DT_GET(DT_NODELABEL(can0));
-
-#ifndef ESTI_NESIMTIT
-#warning ESTI_NESIMTIT not set, SPI and CAN will likely misbehave :(
-#endif
 
 #define MOTOR QSH4218
 
@@ -270,7 +265,7 @@ CAN_MSGQ_DEFINE(can_rx_msgq, 16); // Use a message queue for incoming CAN frames
 
 // 2024-12-11 using bodged CAN, 2024-12-17 using legit CAN
 // When button is pressed, send a CAN message to all other connected devices to
-// blink NODE_ID times (NODE_ID defined in nesimtit.c)
+// blink NODE_ID times.
 void demo_can_blinky() 
 {
 	// Initialize CAN
@@ -561,16 +556,14 @@ int main(void)
 		printf(".");
 	}
 	printf("\nHello World! %s\n", CONFIG_BOARD_TARGET);
-
-	nesimtit_init(); // Init bodged SPI
 	
 	struct tmc9660_dev tmc9660;
 	tmc9660_init(&tmc9660, &spi0);
 
 	demo_blink_fault();
 	// demo_uart_control(&tmc9660);
-	demo_can_blinky();
-	// demo_blink_tmc_gpio(&tmc9660);
+	// demo_can_blinky();
+	demo_blink_tmc_gpio(&tmc9660);
 	// demo_tmc_spi(&tmc9660);
 
 	return 0;

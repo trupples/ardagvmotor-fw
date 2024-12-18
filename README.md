@@ -53,7 +53,6 @@ only give individually, hmu.
     - `ardagvmotor_X.overlay`: revision overlays
 - `src`
     - `tmc9660.c/h`: TMC9660 parameter mode SPI driver
-    - `nesimtit.c/h`: "Romanul pune sarma" SPI implementation because the spi_max32 in zephyr misbehaves. Selected by the `ESTI_NESIMTIT` define in `CMakeList.txt`
     - `main.c`
 - `objdict`: Will be relevant for CANOpenNode
 - `prj.conf`: Additional kconfig settings
