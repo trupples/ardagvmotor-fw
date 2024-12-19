@@ -457,7 +457,7 @@ void demo_blink_tmc_gpio(struct tmc9660_dev *tmc9660)
 
 		gpio_pin_toggle_dt(&led);
 
-		k_msleep(10);
+		k_msleep(100);
 
 		i++;
 		ret = tmc9660_set_gpio(tmc9660, 16, i%2);
@@ -465,7 +465,7 @@ void demo_blink_tmc_gpio(struct tmc9660_dev *tmc9660)
 			printf("ERR tmc9660_set_gpio = %d\n", ret);
 		}
 
-		k_msleep(10);
+		k_msleep(100);
 	}
 }
 
@@ -562,8 +562,8 @@ int main(void)
 
 	demo_blink_fault();
 	// demo_uart_control(&tmc9660);
-	// demo_can_blinky();
-	demo_blink_tmc_gpio(&tmc9660);
+	demo_can_blinky();
+	// demo_blink_tmc_gpio(&tmc9660);
 	// demo_tmc_spi(&tmc9660);
 
 	return 0;
