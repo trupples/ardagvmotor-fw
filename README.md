@@ -4,19 +4,38 @@
 
 For more detail, see the official [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).
 
+If running Windows, WSL is highly recommended.
+
+Install prerequisite system packages:
 ```
-mkdir zephyrworkspace
-cd zephyrworkspace
-python3 -m venv .venv
-source .venv/bin/activate
-pip install west
-west init .
-west update # This may take a while
-west zephyr-export
+sudo apt install --no-install-recommends git cmake ninja-build gperf \
+  ccache dfu-util device-tree-compiler wget \
+  python3-dev python3-pip python3-setuptools python3-tk python3-wheel xz-utils file \
+  make gcc gcc-multilib g++-multilib libsdl2-dev libmagic1
 ```
 
-Clone this project in the zephyrworkspace folder (though it *should*
-fingers-crossed work if cloned anywhere on your machine):
+Create a folder with a python virtual environment:
+```
+mkdir zephyrproject
+cd zephyrproject
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Install `west` (metatool that does everyhting zephyr-related) and do a basic
+setup:
+```
+pip install west
+west init . # This might take a while - big download
+west update # This might take a while - big download
+west zephyr-export
+west packages pip --install
+cd zephyr
+west sdk install
+cd ..
+```
+
+Clone this project in the `zephyrworkspace` folder (T2 topology):
 ```
 git clone git@github.com:trupples/agv-motor-control-fw.git ardagvmotor
 cd ardagvmotor
@@ -26,14 +45,37 @@ Use project-specific manifest file, to bring the proper, currently internal
 drivers:
 ```
 west config manifest.path ardagvmotor
-west update
+west update # This will require innersource credentials
 ```
 
-If you cloned the project somewhere else, you must change the commands above to
-point to where you cloned it. Relative paths are based on the west workspace.
+If you cloned the project somewhere else, you must change the `manifest.path`
+command above to point to where you cloned it. Relative paths are based on the
+west workspace (`zephyrproject` folder).
 
 You will need access to https://github.com/Ioan-Dragomir_adi/zephyr, which I can
 only give individually, hmu.
+
+## Building and flashing
+
+You must be located in the `ardagvmotor` folder.
+
+Build:
+```
+west build . -b ardagvmotor
+```
+
+Clean ("pristine") build:
+```
+west build . -b ardagvmotor -p
+```
+
+Flash (assuming the DAPLINK is attached to WSL using USB/IP):
+```
+west flash --openocd-search /MaximSDK/Tools/OpenOCD/scripts/ --openocd /MaximSDK/Tools/OpenOCD/openocd
+```
+
+If it gets stuck during flashing, just try again, there's some embedded magic I
+don't understand going on and it only flashes every other try.
 
 ## Example code
 
