@@ -8,6 +8,7 @@ If running Windows, WSL is highly recommended.
 
 Install prerequisite system packages:
 ```
+sudo apt update
 sudo apt install --no-install-recommends git cmake ninja-build gperf \
   ccache dfu-util device-tree-compiler wget \
   python3-dev python3-pip python3-setuptools python3-tk python3-wheel xz-utils file \
@@ -57,7 +58,7 @@ only give individually, hmu.
 
 ## Building and flashing
 
-You must be located in the `ardagvmotor` folder.
+You must be located in the `ardagvmotor` folder and have the virtualenv loaded (Run `source ~/zephyrproject/.venv/bin/activate` in every new terminal in which you need west commands).
 
 Build:
 ```
