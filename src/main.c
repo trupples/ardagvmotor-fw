@@ -483,7 +483,8 @@ void demo_uart_control(struct tmc9660_dev *tmc9660)
 		   "V <+-rpm> - Set velocity\n"
 		   "P <pos> - Set position (absolute)\n"
 		   "P <+-pos> - Set position (relative to current position)\n"
-		   "T <+-current> - Set torque\n\n");
+		   "T <+-current> - Set torque\n"
+		   "R - Restart motor control (in case they turned off)\n\n");
 
 	char *line;
 	while(line = console_getline())
@@ -495,10 +496,16 @@ void demo_uart_control(struct tmc9660_dev *tmc9660)
 			break;
 		case 0:
 			break;
+		case 'R':
+		case 'r':
+			tmc9660_set_param(tmc9660, COMMUTATION_MODE, 0); // stop
+			tmc9660_set_param(tmc9660, COMMUTATION_MODE, 5); // start
+			printf("Restarted motor control!\n");
+			break;
 		case 'E':
 		case 'e':
 			tmc9660_motor_stop(tmc9660);
-			printf("Stopped motors! (Board has to be reset for TMC to be put in drive mode again)\n");
+			printf("Stopped motors!\n");
 			break;
 		case 'V':
 		case 'v':
@@ -561,8 +568,8 @@ int main(void)
 	tmc9660_init(&tmc9660, &spi0);
 
 	demo_blink_fault();
-	// demo_uart_control(&tmc9660);
-	demo_can_blinky();
+	demo_uart_control(&tmc9660);
+	// demo_can_blinky();
 	// demo_blink_tmc_gpio(&tmc9660);
 	// demo_tmc_spi(&tmc9660);
 
