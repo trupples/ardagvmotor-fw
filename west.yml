@@ -2,19 +2,23 @@ manifest:
   version: 0.7
   remotes:
     - name: innersource-ioan
-      url-base: https://github.com/Ioan-Dragomir_adi
+      url-base: innersource:Ioan-Dragomir_adi
     - name: analogdevicesinc
       url-base: https://github.com/analogdevicesinc
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
+    - name: NTURacingTeam
+      url-base: https://github.com/NTURacingTeam
   defaults:
     remote: zephyrproject-rtos
   projects:
     - name: zephyr
       remote: innersource-ioan
-      revision: feature/max32662-can
+      revision: custom-zephyr-agv 
       import: true
     - name: canopennode
-      revision: zephyr
+      remote: NTURacingTeam
+      revision: 2487004b06e035efe211ee1a80e5b19a63530d78
+      path: modules/canopennode
   self:
     path: ardagvmotor
