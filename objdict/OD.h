@@ -16,7 +16,7 @@
 
         Created:      2025-01-13 11:03:07 AM
         Created By:   
-        Modified:     2025-01-13 01:14:07 PM
+        Modified:     2025-01-13 07:10:34 PM
         Modified By:  
 
     Device Info:
@@ -44,7 +44,7 @@
 #define OD_CNT_HB_PROD 1
 #define OD_CNT_SDO_SRV 1
 #define OD_CNT_SDO_CLI 1
-#define OD_CNT_RPDO 3
+#define OD_CNT_RPDO 2
 #define OD_CNT_TPDO 2
 
 
@@ -101,32 +101,34 @@ typedef struct {
         uint16_t eventTimer;
     } x1403_RPDOCommunicationParameter;
     struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t COB_IDUsedByRPDO;
-        uint8_t transmissionType;
-        uint8_t inhibitTime;
-        uint16_t eventTimer;
-    } x1407_RPDOCommunicationParameter;
-    struct {
         uint8_t numberOfMappedApplicationObjectsInPDO;
-        uint32_t controlword;
+        uint32_t applicationObject1;
+        uint32_t applicationObject2;
+        uint32_t applicationObject3;
+        uint32_t applicationObject4;
+        uint32_t applicationObject5;
+        uint32_t applicationObject6;
+        uint32_t applicationObject7;
+        uint32_t applicationObject8;
     } x1600_RPDOMappingParameter;
     struct {
         uint8_t numberOfMappedApplicationObjectsInPDO;
-        uint32_t controlword;
-        uint32_t targetVelocityPv;
+        uint32_t applicationObject1;
+        uint32_t applicationObject2;
+        uint32_t applicationObject3;
+        uint32_t applicationObject4;
+        uint32_t applicationObject5;
+        uint32_t applicationObject6;
+        uint32_t applicationObject7;
+        uint32_t applicationObject8;
     } x1603_RPDOMappingParameter;
-    struct {
-        uint8_t numberOfMappedApplicationObjectsInPDO;
-        uint32_t controlword;
-        uint32_t modesOfOperation;
-    } x1607_RPDOMappingParameter;
     struct {
         uint8_t highestSub_indexSupported;
         uint32_t COB_IDUsedByTPDO;
         uint8_t transmissionType;
         uint16_t inhibitTime;
         uint16_t eventTimer;
+        uint8_t SYNCStartValue;
     } x1800_TPDOCommunicationParameter;
     struct {
         uint8_t highestSub_indexSupported;
@@ -134,15 +136,29 @@ typedef struct {
         uint8_t transmissionType;
         uint16_t inhibitTime;
         uint16_t eventTimer;
+        uint8_t SYNCStartValue;
     } x1803_TPDOCommunicationParameter;
     struct {
         uint8_t numberOfMappedApplicationObjectsInPDO;
-        uint32_t controlword;
+        uint32_t applicationObject1;
+        uint32_t applicationObject2;
+        uint32_t applicationObject3;
+        uint32_t applicationObject4;
+        uint32_t applicationObject5;
+        uint32_t applicationObject6;
+        uint32_t applicationObject7;
+        uint32_t applicationObject8;
     } x1A00_TPDOMappingParameter;
     struct {
         uint8_t numberOfMappedApplicationObjectsInPDO;
-        uint32_t controlword;
-        uint32_t velocityActualValue;
+        uint32_t applicationObject1;
+        uint32_t applicationObject2;
+        uint32_t applicationObject3;
+        uint32_t applicationObject4;
+        uint32_t applicationObject5;
+        uint32_t applicationObject6;
+        uint32_t applicationObject7;
+        uint32_t applicationObject8;
     } x1A03_TPDOMappingParameter;
 } OD_PERSIST_COMM_t;
 
@@ -157,6 +173,8 @@ typedef struct {
         uint32_t COB_IDClientToServerRx;
         uint32_t COB_IDServerToClientTx;
     } x1200_SDOServerParameter;
+    int8_t x6060_modesOfOperation;
+    int8_t x6061_modesOfOperationDisplay;
     uint8_t x607E_polarity;
     uint32_t x6081_profileVelocity;
     uint32_t x6083_profileAcceleration;
@@ -256,46 +274,44 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1280 &OD->list[19]
 #define OD_ENTRY_H1400 &OD->list[20]
 #define OD_ENTRY_H1403 &OD->list[21]
-#define OD_ENTRY_H1407 &OD->list[22]
-#define OD_ENTRY_H1600 &OD->list[23]
-#define OD_ENTRY_H1603 &OD->list[24]
-#define OD_ENTRY_H1607 &OD->list[25]
-#define OD_ENTRY_H1800 &OD->list[26]
-#define OD_ENTRY_H1803 &OD->list[27]
-#define OD_ENTRY_H1A00 &OD->list[28]
-#define OD_ENTRY_H1A03 &OD->list[29]
-#define OD_ENTRY_H6040 &OD->list[30]
-#define OD_ENTRY_H6041 &OD->list[31]
-#define OD_ENTRY_H6060 &OD->list[32]
-#define OD_ENTRY_H6061 &OD->list[33]
-#define OD_ENTRY_H6063 &OD->list[34]
-#define OD_ENTRY_H6069 &OD->list[35]
-#define OD_ENTRY_H606B &OD->list[36]
-#define OD_ENTRY_H606C &OD->list[37]
-#define OD_ENTRY_H6071 &OD->list[38]
-#define OD_ENTRY_H6072 &OD->list[39]
-#define OD_ENTRY_H607E &OD->list[40]
-#define OD_ENTRY_H6081 &OD->list[41]
-#define OD_ENTRY_H6083 &OD->list[42]
-#define OD_ENTRY_H6084 &OD->list[43]
-#define OD_ENTRY_H6086 &OD->list[44]
-#define OD_ENTRY_H6089 &OD->list[45]
-#define OD_ENTRY_H608A &OD->list[46]
-#define OD_ENTRY_H608B &OD->list[47]
-#define OD_ENTRY_H608C &OD->list[48]
-#define OD_ENTRY_H608F &OD->list[49]
-#define OD_ENTRY_H6090 &OD->list[50]
-#define OD_ENTRY_H6091 &OD->list[51]
-#define OD_ENTRY_H6092 &OD->list[52]
-#define OD_ENTRY_H6093 &OD->list[53]
-#define OD_ENTRY_H6094 &OD->list[54]
-#define OD_ENTRY_H6095 &OD->list[55]
-#define OD_ENTRY_H6096 &OD->list[56]
-#define OD_ENTRY_H6097 &OD->list[57]
-#define OD_ENTRY_H60F8 &OD->list[58]
-#define OD_ENTRY_H60FF &OD->list[59]
-#define OD_ENTRY_H6502 &OD->list[60]
-#define OD_ENTRY_H67FF &OD->list[61]
+#define OD_ENTRY_H1600 &OD->list[22]
+#define OD_ENTRY_H1603 &OD->list[23]
+#define OD_ENTRY_H1800 &OD->list[24]
+#define OD_ENTRY_H1803 &OD->list[25]
+#define OD_ENTRY_H1A00 &OD->list[26]
+#define OD_ENTRY_H1A03 &OD->list[27]
+#define OD_ENTRY_H6040 &OD->list[28]
+#define OD_ENTRY_H6041 &OD->list[29]
+#define OD_ENTRY_H6060 &OD->list[30]
+#define OD_ENTRY_H6061 &OD->list[31]
+#define OD_ENTRY_H6063 &OD->list[32]
+#define OD_ENTRY_H6069 &OD->list[33]
+#define OD_ENTRY_H606B &OD->list[34]
+#define OD_ENTRY_H606C &OD->list[35]
+#define OD_ENTRY_H6071 &OD->list[36]
+#define OD_ENTRY_H6072 &OD->list[37]
+#define OD_ENTRY_H607E &OD->list[38]
+#define OD_ENTRY_H6081 &OD->list[39]
+#define OD_ENTRY_H6083 &OD->list[40]
+#define OD_ENTRY_H6084 &OD->list[41]
+#define OD_ENTRY_H6086 &OD->list[42]
+#define OD_ENTRY_H6089 &OD->list[43]
+#define OD_ENTRY_H608A &OD->list[44]
+#define OD_ENTRY_H608B &OD->list[45]
+#define OD_ENTRY_H608C &OD->list[46]
+#define OD_ENTRY_H608F &OD->list[47]
+#define OD_ENTRY_H6090 &OD->list[48]
+#define OD_ENTRY_H6091 &OD->list[49]
+#define OD_ENTRY_H6092 &OD->list[50]
+#define OD_ENTRY_H6093 &OD->list[51]
+#define OD_ENTRY_H6094 &OD->list[52]
+#define OD_ENTRY_H6095 &OD->list[53]
+#define OD_ENTRY_H6096 &OD->list[54]
+#define OD_ENTRY_H6097 &OD->list[55]
+#define OD_ENTRY_H60F8 &OD->list[56]
+#define OD_ENTRY_H60FF &OD->list[57]
+#define OD_ENTRY_H6502 &OD->list[58]
+#define OD_ENTRY_H67FF &OD->list[59]
 
 
 /*******************************************************************************
@@ -323,46 +339,44 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1280_SDOClientParameter &OD->list[19]
 #define OD_ENTRY_H1400_RPDOCommunicationParameter &OD->list[20]
 #define OD_ENTRY_H1403_RPDOCommunicationParameter &OD->list[21]
-#define OD_ENTRY_H1407_RPDOCommunicationParameter &OD->list[22]
-#define OD_ENTRY_H1600_RPDOMappingParameter &OD->list[23]
-#define OD_ENTRY_H1603_RPDOMappingParameter &OD->list[24]
-#define OD_ENTRY_H1607_RPDOMappingParameter &OD->list[25]
-#define OD_ENTRY_H1800_TPDOCommunicationParameter &OD->list[26]
-#define OD_ENTRY_H1803_TPDOCommunicationParameter &OD->list[27]
-#define OD_ENTRY_H1A00_TPDOMappingParameter &OD->list[28]
-#define OD_ENTRY_H1A03_TPDOMappingParameter &OD->list[29]
-#define OD_ENTRY_H6040_controlword &OD->list[30]
-#define OD_ENTRY_H6041_statusword &OD->list[31]
-#define OD_ENTRY_H6060_modesOfOperation &OD->list[32]
-#define OD_ENTRY_H6061_modesOfOperationDisplay &OD->list[33]
-#define OD_ENTRY_H6063_positionActualValue &OD->list[34]
-#define OD_ENTRY_H6069_velocitySensorActualValue &OD->list[35]
-#define OD_ENTRY_H606B_velocityDemandValue &OD->list[36]
-#define OD_ENTRY_H606C_velocityActualValue &OD->list[37]
-#define OD_ENTRY_H6071_targetTorque &OD->list[38]
-#define OD_ENTRY_H6072_maxTorque &OD->list[39]
-#define OD_ENTRY_H607E_polarity &OD->list[40]
-#define OD_ENTRY_H6081_profileVelocity &OD->list[41]
-#define OD_ENTRY_H6083_profileAcceleration &OD->list[42]
-#define OD_ENTRY_H6084_profileDeceleration &OD->list[43]
-#define OD_ENTRY_H6086_motionProfileType &OD->list[44]
-#define OD_ENTRY_H6089_positionNotationIndex &OD->list[45]
-#define OD_ENTRY_H608A_positionDimensionIndex &OD->list[46]
-#define OD_ENTRY_H608B_velocityNotationIndex &OD->list[47]
-#define OD_ENTRY_H608C_velocityDimensionIndex &OD->list[48]
-#define OD_ENTRY_H608F_positionEncoderResolution &OD->list[49]
-#define OD_ENTRY_H6090_velocityEncoderResolution &OD->list[50]
-#define OD_ENTRY_H6091_gearRatio &OD->list[51]
-#define OD_ENTRY_H6092_feedConstant &OD->list[52]
-#define OD_ENTRY_H6093_positionFactor &OD->list[53]
-#define OD_ENTRY_H6094_velocityEncoderFactor &OD->list[54]
-#define OD_ENTRY_H6095_velocityFactor1 &OD->list[55]
-#define OD_ENTRY_H6096_velocityFactor2 &OD->list[56]
-#define OD_ENTRY_H6097_accelerationFactor &OD->list[57]
-#define OD_ENTRY_H60F8_maxSlippage &OD->list[58]
-#define OD_ENTRY_H60FF_targetVelocity &OD->list[59]
-#define OD_ENTRY_H6502_supportedDriveModes &OD->list[60]
-#define OD_ENTRY_H67FF_singleDeviceType &OD->list[61]
+#define OD_ENTRY_H1600_RPDOMappingParameter &OD->list[22]
+#define OD_ENTRY_H1603_RPDOMappingParameter &OD->list[23]
+#define OD_ENTRY_H1800_TPDOCommunicationParameter &OD->list[24]
+#define OD_ENTRY_H1803_TPDOCommunicationParameter &OD->list[25]
+#define OD_ENTRY_H1A00_TPDOMappingParameter &OD->list[26]
+#define OD_ENTRY_H1A03_TPDOMappingParameter &OD->list[27]
+#define OD_ENTRY_H6040_controlword &OD->list[28]
+#define OD_ENTRY_H6041_statusword &OD->list[29]
+#define OD_ENTRY_H6060_modesOfOperation &OD->list[30]
+#define OD_ENTRY_H6061_modesOfOperationDisplay &OD->list[31]
+#define OD_ENTRY_H6063_positionActualValue &OD->list[32]
+#define OD_ENTRY_H6069_velocitySensorActualValue &OD->list[33]
+#define OD_ENTRY_H606B_velocityDemandValue &OD->list[34]
+#define OD_ENTRY_H606C_velocityActualValue &OD->list[35]
+#define OD_ENTRY_H6071_targetTorque &OD->list[36]
+#define OD_ENTRY_H6072_maxTorque &OD->list[37]
+#define OD_ENTRY_H607E_polarity &OD->list[38]
+#define OD_ENTRY_H6081_profileVelocity &OD->list[39]
+#define OD_ENTRY_H6083_profileAcceleration &OD->list[40]
+#define OD_ENTRY_H6084_profileDeceleration &OD->list[41]
+#define OD_ENTRY_H6086_motionProfileType &OD->list[42]
+#define OD_ENTRY_H6089_positionNotationIndex &OD->list[43]
+#define OD_ENTRY_H608A_positionDimensionIndex &OD->list[44]
+#define OD_ENTRY_H608B_velocityNotationIndex &OD->list[45]
+#define OD_ENTRY_H608C_velocityDimensionIndex &OD->list[46]
+#define OD_ENTRY_H608F_positionEncoderResolution &OD->list[47]
+#define OD_ENTRY_H6090_velocityEncoderResolution &OD->list[48]
+#define OD_ENTRY_H6091_gearRatio &OD->list[49]
+#define OD_ENTRY_H6092_feedConstant &OD->list[50]
+#define OD_ENTRY_H6093_positionFactor &OD->list[51]
+#define OD_ENTRY_H6094_velocityEncoderFactor &OD->list[52]
+#define OD_ENTRY_H6095_velocityFactor1 &OD->list[53]
+#define OD_ENTRY_H6096_velocityFactor2 &OD->list[54]
+#define OD_ENTRY_H6097_accelerationFactor &OD->list[55]
+#define OD_ENTRY_H60F8_maxSlippage &OD->list[56]
+#define OD_ENTRY_H60FF_targetVelocity &OD->list[57]
+#define OD_ENTRY_H6502_supportedDriveModes &OD->list[58]
+#define OD_ENTRY_H67FF_singleDeviceType &OD->list[59]
 
 
 /*******************************************************************************
