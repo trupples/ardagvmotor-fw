@@ -31,14 +31,12 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     .x1012_COB_IDTimeStampObject = 0x00000100,
     .x1014_COB_ID_EMCY = 0x00000080,
     .x1015_inhibitTimeEMCY = 0x0000,
-    .x1016_consumerHeartbeatTime_sub0 = 0x08,
-    .x1016_consumerHeartbeatTime = {0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000},
     .x1017_producerHeartbeatTime = 0x0064,
     .x1018_identity = {
         .highestSub_indexSupported = 0x04,
-        .vendor_ID = 0x00000000,
+        .vendor_ID = 0xFFFF1234,
         .productCode = 0x00000000,
-        .revisionNumber = 0x00000000,
+        .revisionNumber = 0x00000002,
         .serialNumber = 0x00000000
     },
     .x1019_synchronousCounterOverflowValue = 0x00,
@@ -50,19 +48,19 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     },
     .x1400_RPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x05,
-        .COB_IDUsedByRPDO = 0x00000200,
+        .COB_IDUsedByRPDO = 0x00000280,
         .transmissionType = 0xFF,
         .eventTimer = 0x0000
     },
     .x1403_RPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x05,
-        .COB_IDUsedByRPDO = 0x00000500,
+        .COB_IDUsedByRPDO = 0x00000580,
         .transmissionType = 0xFF,
         .eventTimer = 0x0000
     },
     .x1600_RPDOMappingParameter = {
         .numberOfMappedApplicationObjectsInPDO = 0x01,
-        .applicationObject1 = 0x60400020,
+        .applicationObject1 = 0x60400010,
         .applicationObject2 = 0x00000000,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
@@ -73,7 +71,7 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     },
     .x1603_RPDOMappingParameter = {
         .numberOfMappedApplicationObjectsInPDO = 0x02,
-        .applicationObject1 = 0x60400020,
+        .applicationObject1 = 0x60400010,
         .applicationObject2 = 0x60FF0020,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
@@ -84,7 +82,7 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     },
     .x1800_TPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x06,
-        .COB_IDUsedByTPDO = 0x40000180,
+        .COB_IDUsedByTPDO = 0x40000200,
         .transmissionType = 0xFF,
         .inhibitTime = 0x000A,
         .eventTimer = 0x0000,
@@ -92,7 +90,7 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     },
     .x1803_TPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x06,
-        .COB_IDUsedByTPDO = 0x40000480,
+        .COB_IDUsedByTPDO = 0x40000500,
         .transmissionType = 0xFF,
         .inhibitTime = 0x0000,
         .eventTimer = 0x0000,
@@ -124,17 +122,21 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
 
 OD_ATTR_RAM OD_RAM_t OD_RAM = {
     .x1001_errorRegister = 0x00,
-    .x1010_storeParameters_sub0 = 0x04,
-    .x1010_storeParameters = {0x00000001, 0x00000001, 0x00000001, 0x00000001},
-    .x1011_restoreDefaultParameters_sub0 = 0x04,
-    .x1011_restoreDefaultParameters = {0x00000001, 0x00000001, 0x00000001, 0x00000001},
     .x1200_SDOServerParameter = {
         .highestSub_indexSupported = 0x02,
         .COB_IDClientToServerRx = 0x00000600,
         .COB_IDServerToClientTx = 0x00000580
     },
+    .x6040_controlword = 0x0000,
+    .x6041_statusword = 0x0000,
     .x6060_modesOfOperation = 3,
     .x6061_modesOfOperationDisplay = 3,
+    .x6063_positionActualValue = 0,
+    .x6069_velocitySensorActualValue = 0,
+    .x606B_velocityDemandValue = 0,
+    .x606C_velocityActualValue = 0,
+    .x6071_targetTorque = 0,
+    .x6072_maxTorque = 0x0000,
     .x607E_polarity = 0x00,
     .x6081_profileVelocity = 0x00000000,
     .x6083_profileAcceleration = 0x00000000,
@@ -189,6 +191,8 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .numerator = 0x00000001,
         .divisor = 0x00000001
     },
+    .x60F8_maxSlippage = 0,
+    .x60FF_targetVelocity = 0,
     .x6502_supportedDriveModes = 0x00000004,
     .x67FF_singleDeviceType = 0x00020192
 };
@@ -208,12 +212,9 @@ typedef struct {
     OD_obj_var_t o_1008_manufacturerDeviceName;
     OD_obj_var_t o_1009_manufacturerHardwareVersion;
     OD_obj_var_t o_100A_manufacturerSoftwareVersion;
-    OD_obj_array_t o_1010_storeParameters;
-    OD_obj_array_t o_1011_restoreDefaultParameters;
     OD_obj_var_t o_1012_COB_IDTimeStampObject;
     OD_obj_var_t o_1014_COB_ID_EMCY;
     OD_obj_var_t o_1015_inhibitTimeEMCY;
-    OD_obj_array_t o_1016_consumerHeartbeatTime;
     OD_obj_var_t o_1017_producerHeartbeatTime;
     OD_obj_record_t o_1018_identity[5];
     OD_obj_var_t o_1019_synchronousCounterOverflowValue;
@@ -310,22 +311,6 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .attribute = ODA_SDO_R | ODA_STR,
         .dataLength = 18
     },
-    .o_1010_storeParameters = {
-        .dataOrig0 = &OD_RAM.x1010_storeParameters_sub0,
-        .dataOrig = &OD_RAM.x1010_storeParameters[0],
-        .attribute0 = ODA_SDO_R,
-        .attribute = ODA_SDO_RW | ODA_MB,
-        .dataElementLength = 4,
-        .dataElementSizeof = sizeof(uint32_t)
-    },
-    .o_1011_restoreDefaultParameters = {
-        .dataOrig0 = &OD_RAM.x1011_restoreDefaultParameters_sub0,
-        .dataOrig = &OD_RAM.x1011_restoreDefaultParameters[0],
-        .attribute0 = ODA_SDO_R,
-        .attribute = ODA_SDO_RW | ODA_MB,
-        .dataElementLength = 4,
-        .dataElementSizeof = sizeof(uint32_t)
-    },
     .o_1012_COB_IDTimeStampObject = {
         .dataOrig = &OD_PERSIST_COMM.x1012_COB_IDTimeStampObject,
         .attribute = ODA_SDO_RW | ODA_MB,
@@ -340,14 +325,6 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .dataOrig = &OD_PERSIST_COMM.x1015_inhibitTimeEMCY,
         .attribute = ODA_SDO_RW | ODA_MB,
         .dataLength = 2
-    },
-    .o_1016_consumerHeartbeatTime = {
-        .dataOrig0 = &OD_PERSIST_COMM.x1016_consumerHeartbeatTime_sub0,
-        .dataOrig = &OD_PERSIST_COMM.x1016_consumerHeartbeatTime[0],
-        .attribute0 = ODA_SDO_R,
-        .attribute = ODA_SDO_RW | ODA_MB,
-        .dataElementLength = 4,
-        .dataElementSizeof = sizeof(uint32_t)
     },
     .o_1017_producerHeartbeatTime = {
         .dataOrig = &OD_PERSIST_COMM.x1017_producerHeartbeatTime,
@@ -790,12 +767,12 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         }
     },
     .o_6040_controlword = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x6040_controlword,
         .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
-        .dataLength = 4
+        .dataLength = 2
     },
     .o_6041_statusword = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x6041_statusword,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 2
     },
@@ -810,32 +787,32 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .dataLength = 1
     },
     .o_6063_positionActualValue = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x6063_positionActualValue,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 4
     },
     .o_6069_velocitySensorActualValue = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x6069_velocitySensorActualValue,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 4
     },
     .o_606B_velocityDemandValue = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x606B_velocityDemandValue,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 4
     },
     .o_606C_velocityActualValue = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x606C_velocityActualValue,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 4
     },
     .o_6071_targetTorque = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x6071_targetTorque,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 2
     },
     .o_6072_maxTorque = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x6072_maxTorque,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 2
     },
@@ -1065,12 +1042,12 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         }
     },
     .o_60F8_maxSlippage = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x60F8_maxSlippage,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 4
     },
     .o_60FF_targetVelocity = {
-        .dataOrig = NULL,
+        .dataOrig = &OD_RAM.x60FF_targetVelocity,
         .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
         .dataLength = 4
     },
@@ -1100,12 +1077,9 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1008, 0x01, ODT_VAR, &ODObjs.o_1008_manufacturerDeviceName, NULL},
     {0x1009, 0x01, ODT_VAR, &ODObjs.o_1009_manufacturerHardwareVersion, NULL},
     {0x100A, 0x01, ODT_VAR, &ODObjs.o_100A_manufacturerSoftwareVersion, NULL},
-    {0x1010, 0x05, ODT_ARR, &ODObjs.o_1010_storeParameters, NULL},
-    {0x1011, 0x05, ODT_ARR, &ODObjs.o_1011_restoreDefaultParameters, NULL},
     {0x1012, 0x01, ODT_VAR, &ODObjs.o_1012_COB_IDTimeStampObject, NULL},
     {0x1014, 0x01, ODT_VAR, &ODObjs.o_1014_COB_ID_EMCY, NULL},
     {0x1015, 0x01, ODT_VAR, &ODObjs.o_1015_inhibitTimeEMCY, NULL},
-    {0x1016, 0x09, ODT_ARR, &ODObjs.o_1016_consumerHeartbeatTime, NULL},
     {0x1017, 0x01, ODT_VAR, &ODObjs.o_1017_producerHeartbeatTime, NULL},
     {0x1018, 0x05, ODT_REC, &ODObjs.o_1018_identity, NULL},
     {0x1019, 0x01, ODT_VAR, &ODObjs.o_1019_synchronousCounterOverflowValue, NULL},

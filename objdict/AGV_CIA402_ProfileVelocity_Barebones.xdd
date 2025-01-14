@@ -15,12 +15,12 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModifiedBy="" fileModificationDate="2025-01-13" fileModificationTime="19:10:34.9341171+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModifiedBy="" fileModificationDate="2025-01-14" fileModificationTime="18:54:06.0565831+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Analog Devices Inc.</q1:vendorName>
-        <q1:vendorID></q1:vendorID>
+        <q1:vendorID>0xFFFF1234</q1:vendorID>
         <q1:productName>AGV Arduino Motor Control</q1:productName>
-        <q1:productID></q1:productID>
+        <q1:productID>123</q1:productID>
         <q1:version versionType="SW">0</q1:version>
         <q1:version versionType="FW">0</q1:version>
         <q1:version versionType="HW">0</q1:version>
@@ -621,6 +621,7 @@ The life time factor multiplied with the guard time gives the life time for the 
   * bit 0: If set, CANopen device saves parameters on command
 * Writing value 0x65766173 ('s','a','v','e' from LSB to MSB) stores corresponding data.</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_ARR_1010" />
+            <q1:property name="CO_disabled" value="true" />
             <q1:property name="CO_countLabel" value="STORAGE" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101000">
@@ -654,6 +655,7 @@ The life time factor multiplied with the guard time gives the life time for the 
   * bit 0: If set, CANopen device restores parameters
 * Writing value 0x64616F6C ('l','o','a','d' from LSB to MSB) restores corresponding data.</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_ARR_1011" />
+            <q1:property name="CO_disabled" value="true" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101100">
             <label lang="en">Highest sub-index supported</label>
@@ -717,6 +719,7 @@ The life time factor multiplied with the guard time gives the life time for the 
   * bit 16-23: Node ID of the monitored node. If 0 or greater than 127, sub-entry is not used.
   * bit 0-15: Heartbeat time in ms (if 0, sub-intry is not used). Value should be higher than the corresponding producer heartbeat time.</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_ARR_1016" />
+            <q1:property name="CO_disabled" value="true" />
             <q1:property name="CO_countLabel" value="HB_CONS" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
@@ -790,7 +793,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_101801">
             <label lang="en">Vendor-ID</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0xFFFF1234" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101802">
             <label lang="en">Product code</label>
@@ -800,7 +803,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_101803">
             <label lang="en">Revision number</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x00000002" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101804">
             <label lang="en">Serial number</label>
@@ -1124,7 +1127,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_140001" access="readWrite">
             <label lang="en">COB-ID used by RPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x200" />
+            <q1:defaultValue value="$NODEID+0x280" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140002" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -1159,7 +1162,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_140301" access="readWrite">
             <label lang="en">COB-ID used by RPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x500" />
+            <q1:defaultValue value="$NODEID+0x580" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140302" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -1191,7 +1194,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_160001" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60400020" />
+            <q1:defaultValue value="0x60400010" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160002" access="readWrite">
             <label lang="en">Application object 2</label>
@@ -1248,7 +1251,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_160301" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60400020" />
+            <q1:defaultValue value="0x60400010" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160302" access="readWrite">
             <label lang="en">Application object 2</label>
@@ -1314,7 +1317,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_180001" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x40000180" />
+            <q1:defaultValue value="$NODEID+0x40000200" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180002" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -1365,7 +1368,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_180301" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x40000480" />
+            <q1:defaultValue value="$NODEID+0x40000500" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180302" access="readWrite">
             <label lang="en">Transmission type</label>
@@ -1513,7 +1516,8 @@ The life time factor multiplied with the guard time gives the life time for the 
 * bit 2: Quick stop
 * bit 1: Enable voltage
 * bit 0: Switch on</description>
-            <UDINT />
+            <UINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6041">
             <description lang="en">Indicates the state of the CiA 402-1 state machine
@@ -1533,6 +1537,7 @@ The life time factor multiplied with the guard time gives the life time for the 
 * bit 15-14: Manufacturer specific
 </description>
             <UINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6060" access="readWrite">
             <description lang="en">* -1 ... -128: manufacturer specific modes of operation
@@ -1556,26 +1561,32 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_OBJ_6063">
             <label lang="en">Position actual value</label>
             <DINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6069">
             <label lang="en">Velocity sensor actual value</label>
             <DINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_606B">
             <description lang="en">Trajectory generator value. TMC9660 RAMP_VELOCITY</description>
             <DINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_606C">
             <description lang="en">TMC9660 ACTUAL_VELOCITY</description>
             <DINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6071">
             <label lang="en">Target torque</label>
             <INT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6072">
             <label lang="en">Max torque</label>
             <UINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_607E" access="readWrite">
             <label lang="en">Polarity</label>
@@ -1796,10 +1807,12 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_OBJ_60F8">
             <label lang="en">Max slippage</label>
             <DINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_60FF" access="readWrite">
             <label lang="en">Target velocity</label>
             <DINT />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6502" access="readWrite">
             <description lang="en">* bit 0: profile position
@@ -1836,7 +1849,7 @@ The life time factor multiplied with the guard time gives the life time for the 
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModificationDate="2025-01-13" fileModificationTime="19:10:34.9341171+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModificationDate="2025-01-14" fileModificationTime="18:54:06.0565831+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
