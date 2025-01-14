@@ -40,13 +40,19 @@ print("OPERATION ENABLED")
 time.sleep(2)
 
 for i in range(1000):
-	node.sdo['Target velocity'].write(int(i * 4000))
-	time.sleep(0.001)
-node.sdo['Target velocity'].write(987654321) # mAGIC STOP VALUE
+	try:
+		node.sdo['Target velocity'].write(int(i * 4000))
+	except:
+		pass
+	time.sleep(0.01)
+# node.sdo['Target velocity'].write(987654321) # mAGIC STOP VALUE
 
 for i in range(1000):
 	v = math.sin(i * 0.1) * 4000000
-	node.sdo['Target velocity'].write(int(v))
-	time.sleep(0.001)
+	try:
+		node.sdo['Target velocity'].write(int(v))
+	except:
+		pass
+	time.sleep(0.01)
 
 motor.to_switch_on_disabled()
