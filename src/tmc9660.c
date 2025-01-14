@@ -79,8 +79,9 @@ int tmc9660_tmcl_command(
         LOG_HEXDUMP_DBG(send, 8, "SPI send");
 
         spi_write_dt(dev->spi, &tx_bufs);
-        k_busy_wait(100);
+        k_usleep(10);
         spi_read_dt(dev->spi, &rx_bufs);
+        k_usleep(10);
 
         LOG_HEXDUMP_DBG(recv, 8, "SPI recv");
 
@@ -97,6 +98,7 @@ int tmc9660_tmcl_command(
         if(recv[7] != tmc9660_checksum(recv))
         {
             // bad checksum - rest of datagram will be malformed, incl the checksul
+            LOG_HEXDUMP_ERR(recv, 8, "Checksum error in received");
             return -EIO;
         }
     } while(retries-- > 0 && (spi_status == SPI_STATUS_NOT_READY || spi_status == SPI_STATUS_CHECKSUM_ERROR));
@@ -162,9 +164,9 @@ int tmc9660_init(
         spi_read_dt(dev->spi, &rx_bufs);
 
         LOG_HEXDUMP_DBG(rx, 8, "SPI recv");
-    } while(rx[0] != SPI_STATUS_FIRST_CMD && retries-- > 0);
+    } while(rx[0] != SPI_STATUS_FIRST_CMD && rx[0] != SPI_STATUS_OK && retries-- > 0);
     
-    if(rx[0] != SPI_STATUS_FIRST_CMD) {
+    if(rx[0] != SPI_STATUS_FIRST_CMD && rx[0] != SPI_STATUS_OK) {
         // Invalid wakeup
         return -1;
     }

@@ -1,3 +1,6 @@
+#ifndef TMC9660_H_
+#define TMC9660_H_
+
 #include <stdint.h>
 #include <zephyr/drivers/spi.h>
 
@@ -2305,3 +2308,5 @@ int tmc9660_get_gpio_digital(
 int tmc9660_motor_stop(
     struct tmc9660_dev *dev
 );
+
+#endif /* TMC9660_H_ */
