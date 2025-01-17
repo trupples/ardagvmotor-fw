@@ -186,167 +186,173 @@ void cia402_set_state(struct cia402* cia402, enum cia402_state state)
 
 #define MOTOR QSH4218
 
-void agv_init_params(struct tmc9660_dev *tmc9660)
-{
-	// Turn motor off
-	tmc9660_set_param(tmc9660, COMMUTATION_MODE, 0);
-
+#pragma pack(push,1) // ew alignment...
+const struct tmc9660_default_params {
+    uint16_t param_id;
+    uint32_t value;
+} params[] = {
 	// General motor setup
 #if MOTOR == QSH6018 || MOTOR == QSH5718 || MOTOR == QSH4218
-	tmc9660_set_param(tmc9660, MOTOR_TYPE, 2);
-	tmc9660_set_param(tmc9660, MOTOR_PWM_FREQUENCY, 25000);
-	tmc9660_set_param(tmc9660, MOTOR_POLE_PAIRS, 50);
-	tmc9660_set_param(tmc9660, ABN_1_STEPS, 40000);
+	{ .param_id = MOTOR_TYPE, .value = 2 },
+	{ .param_id = MOTOR_PWM_FREQUENCY, .value = 25000 },
+	{ .param_id = MOTOR_POLE_PAIRS, .value = 50 },
+	{ .param_id = ABN_1_STEPS, .value = 40000 },
 #else
 #error Unsupported motor!
 #endif
 
 #if MOTOR == QSH6018
-	tmc9660_set_param(tmc9660, RAMP_VMAX, 4200000); // Motor struggles to get to 4.2M internal velocity units, by construction. This limits the internal target so we don't get integral windup.
-	tmc9660_set_param(tmc9660, MAX_TORQUE, 4000); // mA
-	tmc9660_set_param(tmc9660, MAX_FLUX, 4000); // mA
-	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
-	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // proportional to VIN, 1638 = 10%
+	{ .param_id = RAMP_VMAX, .value = 4200000 }, // Motor struggles to get to 4.2M internal velocity units, by construction. This limits the internal target so we don't get integral windup.
+	{ .param_id = MAX_TORQUE, .value = 4000 }, // mA
+	{ .param_id = MAX_FLUX, .value = 4000 }, // mA
+	{ .param_id = OPENLOOP_CURRENT, .value = 500 }, // 500mA openloop (such as when initially homing ABN)
+	{ .param_id = OPENLOOP_VOLTAGE, .value = 1638 }, // proportional to VIN, 1638 = 10%
 #elif MOTOR == QSH5718
-	tmc9660_set_param(tmc9660, RAMP_VMAX, 4100000);
-	tmc9660_set_param(tmc9660, MAX_TORQUE, 4000); // mA
-	tmc9660_set_param(tmc9660, MAX_FLUX, 4000); // mA
-	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
-	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // proportional to VIN, 1638 = 10%
+	{ .param_id = RAMP_VMAX, .value = 4100000 },
+	{ .param_id = MAX_TORQUE, .value = 4000 }, // mA
+	{ .param_id = MAX_FLUX, .value = 4000 }, // mA
+	{ .param_id = OPENLOOP_CURRENT, .value = 500 }, // 500mA openloop (such as when initially homing ABN)
+	{ .param_id = OPENLOOP_VOLTAGE, .value = 1638 }, // proportional to VIN, 1638 = 10%
 #elif MOTOR == QSH4218
-	tmc9660_set_param(tmc9660, RAMP_VMAX, 1234);
-	tmc9660_set_param(tmc9660, MAX_TORQUE, 2000); // mA
-	tmc9660_set_param(tmc9660, MAX_FLUX, 2000); // mA
-	tmc9660_set_param(tmc9660, OPENLOOP_CURRENT, 500); // 500mA openloop (such as when initially homing ABN)
-	tmc9660_set_param(tmc9660, OPENLOOP_VOLTAGE, 1638); // proportional to VIN, 1638 = 10%
+	{ .param_id = RAMP_VMAX, .value = 1234 },
+	{ .param_id = MAX_TORQUE, .value = 2000 }, // mA
+	{ .param_id = MAX_FLUX, .value = 2000 }, // mA
+	{ .param_id = OPENLOOP_CURRENT, .value = 500 }, // 500mA openloop (such as when initially homing ABN)
+	{ .param_id = OPENLOOP_VOLTAGE, .value = 1638 }, // proportional to VIN, 1638 = 10%
 #endif
 
 	// General limits
-	tmc9660_set_param(tmc9660, OUTPUT_VOLTAGE_LIMIT, 20000); // proportional to VIN, 16383 = 100%, goes up to 200%
+	{ .param_id = OUTPUT_VOLTAGE_LIMIT, .value = 20000 }, // proportional to VIN, 16383 = 100%, goes up to 200%
 
 	// ADC Setup - depends on board, not motor!
-	tmc9660_set_param(tmc9660, ADC_SHUNT_TYPE, 4);
-	tmc9660_set_param(tmc9660, CSA_GAIN_ADC_I0_TO_ADC_I2, 1);
-	tmc9660_set_param(tmc9660, CSA_GAIN_ADC_I3, 1);
-	tmc9660_set_param(tmc9660, CURRENT_SCALING_FACTOR, 390);
-	tmc9660_set_param(tmc9660, ADC_I0_INVERTED, 1);
-	tmc9660_set_param(tmc9660, ADC_I1_INVERTED, 0);
-	tmc9660_set_param(tmc9660, ADC_I2_INVERTED, 1);
-	tmc9660_set_param(tmc9660, ADC_I3_INVERTED, 0);
+	{ .param_id = ADC_SHUNT_TYPE, .value = 4 },
+	{ .param_id = CSA_GAIN_ADC_I0_TO_ADC_I2, .value = 1 },
+	{ .param_id = CSA_GAIN_ADC_I3, .value = 1 },
+	{ .param_id = CURRENT_SCALING_FACTOR, .value = 390 },
+	{ .param_id = ADC_I0_INVERTED, .value = 1 },
+	{ .param_id = ADC_I1_INVERTED, .value = 0 },
+	{ .param_id = ADC_I2_INVERTED, .value = 1 },
+	{ .param_id = ADC_I3_INVERTED, .value = 0 },
 
 	// Gate driver settings - seem optional but their absence might be the cause of the 6A bug???
-	tmc9660_set_param(tmc9660, USE_ADAPTIVE_DRIVE_TIME_UVW, 1);
-	tmc9660_set_param(tmc9660, USE_ADAPTIVE_DRIVE_TIME_Y2, 1);
-	tmc9660_set_param(tmc9660, DRIVE_TIME_SINK_UVW, 40);
-	tmc9660_set_param(tmc9660, DRIVE_TIME_SOURCE_UVW, 40);
-	tmc9660_set_param(tmc9660, DRIVE_TIME_SINK_Y2, 40);
-	tmc9660_set_param(tmc9660, DRIVE_TIME_SOURCE_Y2, 40);
-	tmc9660_set_param(tmc9660, UVW_SINK_CURRENT, 10);
-	tmc9660_set_param(tmc9660, UVW_SOURCE_CURRENT, 5);
-	tmc9660_set_param(tmc9660, Y2_SINK_CURRENT, 10);
-	tmc9660_set_param(tmc9660, Y2_SOURCE_CURRENT, 5);
+	{ .param_id = USE_ADAPTIVE_DRIVE_TIME_UVW, .value = 1 },
+	{ .param_id = USE_ADAPTIVE_DRIVE_TIME_Y2, .value = 1 },
+	{ .param_id = DRIVE_TIME_SINK_UVW, .value = 40 },
+	{ .param_id = DRIVE_TIME_SOURCE_UVW, .value = 40 },
+	{ .param_id = DRIVE_TIME_SINK_Y2, .value = 40 },
+	{ .param_id = DRIVE_TIME_SOURCE_Y2, .value = 40 },
+	{ .param_id = UVW_SINK_CURRENT, .value = 10 },
+	{ .param_id = UVW_SOURCE_CURRENT, .value = 5 },
+	{ .param_id = Y2_SINK_CURRENT, .value = 10 },
+	{ .param_id = Y2_SOURCE_CURRENT, .value = 5 },
 
 	// Velocity ramp: set a max acceleration
 #if MOTOR == QSH6018
-	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
-	tmc9660_set_param(tmc9660, RAMP_AMAX, 100000);
-	tmc9660_set_param(tmc9660, RAMP_DMAX, 100000);
+	{ .param_id = RAMP_ENABLE, .value = 1 },
+	{ .param_id = RAMP_AMAX, .value = 100000 },
+	{ .param_id = RAMP_DMAX, .value = 100000 },
 #elif MOTOR == QSH5718
-	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
-	tmc9660_set_param(tmc9660, RAMP_AMAX, 500000);
-	tmc9660_set_param(tmc9660, RAMP_DMAX, 500000);
+	{ .param_id = RAMP_ENABLE, .value = 1 },
+	{ .param_id = RAMP_AMAX, .value = 500000 },
+	{ .param_id = RAMP_DMAX, .value = 500000 },
 #elif MOTOR == QSH4218
-	tmc9660_set_param(tmc9660, RAMP_ENABLE, 1);
-	tmc9660_set_param(tmc9660, RAMP_AMAX, 300000);
-	tmc9660_set_param(tmc9660, RAMP_DMAX, 300000);
+	{ .param_id = RAMP_ENABLE, .value = 1 },
+	{ .param_id = RAMP_AMAX, .value = 300000 },
+	{ .param_id = RAMP_DMAX, .value = 300000 },
 #endif
 
 	// Velocity biquad
 #if MOTOR == QSH6018 || MOTOR == QSH5718 || MOTOR == QSH4218
 	// Custom 1st order filter because wizard chooses an unstable one
 	// FIXME: talk to Trinamic people on how to get a nice filter here
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ENABLE, 1);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_1, 1038090);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_2, 0);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_0, 3491);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_1, 3491);
-	tmc9660_set_param(tmc9660, ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_2, 3491);
+	{ .param_id = ACTUAL_VELOCITY_BIQUAD_FILTER_ENABLE, .value = 1 },
+	{ .param_id = ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_1, .value = 1038090 },
+	{ .param_id = ACTUAL_VELOCITY_BIQUAD_FILTER_ACOEFF_2, .value = 0 },
+	{ .param_id = ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_0, .value = 3491 },
+	{ .param_id = ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_1, .value = 3491 },
+	{ .param_id = ACTUAL_VELOCITY_BIQUAD_FILTER_BCOEFF_2, .value = 3491 },
 #endif
 
 
 	// Tuning
 #if MOTOR == QSH6018
-	tmc9660_set_param(tmc9660, TORQUE_P, 521);
-	tmc9660_set_param(tmc9660, TORQUE_I, 1218);
-	tmc9660_set_param(tmc9660, FLUX_P, 521);
-	tmc9660_set_param(tmc9660, FLUX_I, 1218);
-	tmc9660_set_param(tmc9660, CURRENT_NORM_P, 0);
-	tmc9660_set_param(tmc9660, CURRENT_NORM_I, 1);
+	{ .param_id = TORQUE_P, .value = 521 },
+	{ .param_id = TORQUE_I, .value = 1218 },
+	{ .param_id = FLUX_P, .value = 521 },
+	{ .param_id = FLUX_I, .value = 1218 },
+	{ .param_id = CURRENT_NORM_P, .value = 0 },
+	{ .param_id = CURRENT_NORM_I, .value = 1 },
 	
-	tmc9660_set_param(tmc9660, VELOCITY_P, 315);
-	tmc9660_set_param(tmc9660, VELOCITY_I, 0);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_P, 1);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 3);
+	{ .param_id = VELOCITY_P, .value = 315 },
+	{ .param_id = VELOCITY_I, .value = 0 },
+	{ .param_id = VELOCITY_NORM_P, .value = 1 },
+	{ .param_id = VELOCITY_NORM_I, .value = 3 },
 	
-	tmc9660_set_param(tmc9660, POSITION_P, 10000);
-	tmc9660_set_param(tmc9660, POSITION_I, 0);
-	tmc9660_set_param(tmc9660, POSITION_NORM_P, 1);
-	tmc9660_set_param(tmc9660, POSITION_NORM_I, 1);
+	{ .param_id = POSITION_P, .value = 10000 },
+	{ .param_id = POSITION_I, .value = 0 },
+	{ .param_id = POSITION_NORM_P, .value = 1 },
+	{ .param_id = POSITION_NORM_I, .value = 1 },
 #elif MOTOR == QSH5718
-	tmc9660_set_param(tmc9660, TORQUE_P, 741);
-	tmc9660_set_param(tmc9660, TORQUE_I, 2258);
-	tmc9660_set_param(tmc9660, FLUX_P, 741);
-	tmc9660_set_param(tmc9660, FLUX_I, 2258);
-	tmc9660_set_param(tmc9660, CURRENT_NORM_P, 0);
-	tmc9660_set_param(tmc9660, CURRENT_NORM_I, 1);
+	{ .param_id = TORQUE_P, .value = 741 },
+	{ .param_id = TORQUE_I, .value = 2258 },
+	{ .param_id = FLUX_P, .value = 741 },
+	{ .param_id = FLUX_I, .value = 2258 },
+	{ .param_id = CURRENT_NORM_P, .value = 0 },
+	{ .param_id = CURRENT_NORM_I, .value = 1 },
 	
-	tmc9660_set_param(tmc9660, VELOCITY_P, 31718);
-	tmc9660_set_param(tmc9660, VELOCITY_I, 10000);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_P, 2);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 2);
+	{ .param_id = VELOCITY_P, .value = 31718 },
+	{ .param_id = VELOCITY_I, .value = 10000 },
+	{ .param_id = VELOCITY_NORM_P, .value = 2 },
+	{ .param_id = VELOCITY_NORM_I, .value = 2 },
 	
-	tmc9660_set_param(tmc9660, POSITION_P, 300);
-	tmc9660_set_param(tmc9660, POSITION_I, 0);
-	tmc9660_set_param(tmc9660, POSITION_NORM_P, 0);
-	tmc9660_set_param(tmc9660, POSITION_NORM_I, 1);
+	{ .param_id = POSITION_P, .value = 300 },
+	{ .param_id = POSITION_I, .value = 0 },
+	{ .param_id = POSITION_NORM_P, .value = 0 },
+	{ .param_id = POSITION_NORM_I, .value = 1 },
 #elif MOTOR == QSH4218
-	tmc9660_set_param(tmc9660, TORQUE_P, 3933);
-	tmc9660_set_param(tmc9660, TORQUE_I, 19526);
-	tmc9660_set_param(tmc9660, FLUX_P, 3933);
-	tmc9660_set_param(tmc9660, FLUX_I, 19526);
-	tmc9660_set_param(tmc9660, CURRENT_NORM_P, 0);
-	tmc9660_set_param(tmc9660, CURRENT_NORM_I, 1);
+	{ .param_id = TORQUE_P, .value = 3933 },
+	{ .param_id = TORQUE_I, .value = 19526 },
+	{ .param_id = FLUX_P, .value = 3933 },
+	{ .param_id = FLUX_I, .value = 19526 },
+	{ .param_id = CURRENT_NORM_P, .value = 0 },
+	{ .param_id = CURRENT_NORM_I, .value = 1 },
 	
-	tmc9660_set_param(tmc9660, VELOCITY_P, 26218);
-	tmc9660_set_param(tmc9660, VELOCITY_I, 100);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_P, 2);
-	tmc9660_set_param(tmc9660, VELOCITY_NORM_I, 1);
+	{ .param_id = VELOCITY_P, .value = 26218 },
+	{ .param_id = VELOCITY_I, .value = 100 },
+	{ .param_id = VELOCITY_NORM_P, .value = 2 },
+	{ .param_id = VELOCITY_NORM_I, .value = 1 },
 	
-	tmc9660_set_param(tmc9660, POSITION_P, 30);
-	tmc9660_set_param(tmc9660, POSITION_I, 0);
-	tmc9660_set_param(tmc9660, POSITION_NORM_P, 0);
-	tmc9660_set_param(tmc9660, POSITION_NORM_I, 1);
+	{ .param_id = POSITION_P, .value = 30 },
+	{ .param_id = POSITION_I, .value = 0 },
+	{ .param_id = POSITION_NORM_P, .value = 0 },
+	{ .param_id = POSITION_NORM_I, .value = 1 },
 #endif
 
 	// Protection - seems optional
-	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_UVW_LOW_SIDE_THRESHOLD, 1);
-	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_UVW_HIGH_SIDE_THRESHOLD, 2);
-	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_Y2_LOW_SIDE_THRESHOLD, 1);
-	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_Y2_HIGH_SIDE_THRESHOLD, 2);
-	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_UVW_LOW_SIDE_USE_VDS, 0);
-	tmc9660_set_param(tmc9660, OVERCURRENT_PROTECTION_Y2_LOW_SIDE_USE_VDS, 0);
-	tmc9660_set_param(tmc9660, GDRV_RETRY_BEHAVIOUR, 0);
-	tmc9660_set_param(tmc9660, DRIVE_FAULT_BEHAVIOUR, 0);
-	tmc9660_set_param(tmc9660, FAULT_HANDLER_NUMBER_OF_RETRIES, 5);
-	tmc9660_set_param(tmc9660, SUPPLY_OVERVOLTAGE_WARNING_THRESHOLD, 710);
-	tmc9660_set_param(tmc9660, SUPPLY_UNDERVOLTAGE_WARNING_THRESHOLD, 78);
-	tmc9660_set_param(tmc9660, EXTERNAL_TEMPERATURE_SHUTDOWN_THRESHOLD, 65535);
-	tmc9660_set_param(tmc9660, EXTERNAL_TEMPERATURE_WARNING_THRESHOLD, 65535);
+	{ .param_id = OVERCURRENT_PROTECTION_UVW_LOW_SIDE_THRESHOLD, .value = 1 },
+	{ .param_id = OVERCURRENT_PROTECTION_UVW_HIGH_SIDE_THRESHOLD, .value = 2 },
+	{ .param_id = OVERCURRENT_PROTECTION_Y2_LOW_SIDE_THRESHOLD, .value = 1 },
+	{ .param_id = OVERCURRENT_PROTECTION_Y2_HIGH_SIDE_THRESHOLD, .value = 2 },
+	{ .param_id = OVERCURRENT_PROTECTION_UVW_LOW_SIDE_USE_VDS, .value = 0 },
+	{ .param_id = OVERCURRENT_PROTECTION_Y2_LOW_SIDE_USE_VDS, .value = 0 },
+	{ .param_id = GDRV_RETRY_BEHAVIOUR, .value = 0 },
+	{ .param_id = DRIVE_FAULT_BEHAVIOUR, .value = 0 },
+	{ .param_id = FAULT_HANDLER_NUMBER_OF_RETRIES, .value = 5 },
+	{ .param_id = SUPPLY_OVERVOLTAGE_WARNING_THRESHOLD, .value = 710 },
+	{ .param_id = SUPPLY_UNDERVOLTAGE_WARNING_THRESHOLD, .value = 78 },
+	{ .param_id = EXTERNAL_TEMPERATURE_SHUTDOWN_THRESHOLD, .value = 65535 },
+	{ .param_id = EXTERNAL_TEMPERATURE_WARNING_THRESHOLD, .value = 65535 },
 
-    // tmc9660_set_param(tmc9660, EVENT_STOP_SETTINGS, 1); // DO_SOFT_STOP, might even set it to 5 or 7 for max slippage functionality (cia 402)
+    // { .param_id = EVENT_STOP_SETTINGS, .value = 1 }, // DO_SOFT_STOP, might even set it to 5 or 7 for max slippage functionality (cia 402)
+};
+#pragma pack(pop)
 
-	// Start FOC
-	// tmc9660_set_param(tmc9660, COMMUTATION_MODE, 5);
+void agv_init_params(struct tmc9660_dev *tmc9660) {
+    tmc9660_set_param(tmc9660, COMMUTATION_MODE, 0);
+
+    for(int i = 0; i < ARRAY_SIZE(params); i++) {
+        tmc9660_set_param(tmc9660, params[i].param_id, params[i].value);
+    }
 }
 
 int main()
