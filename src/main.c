@@ -72,12 +72,6 @@ int init_leds()
     return 0;
 }
 
-#define WATCH_YOUR_STEP
-#ifdef WATCH_YOUR_STEP
-    static int tdelta = 0;
-    static int tdelta_avg = 0, tdelta_avg_count = 0;
-#endif
-
 /* Called between processing SYNC RPDO and TPDO. Should send RPDO data (target
  * velocity, mainly) to TMC, read back current state, and write it to the OD for
  * the TPDO that immediately follows.
@@ -86,11 +80,7 @@ int init_leds()
  */
 void sync_callback(struct canopen *co, bool sync)
 {
-    #ifdef WATCH_YOUR_STEP
-    int t_start = k_cycle_get_32(), t_end;
-    #endif
-
-    if(!sync) goto nope;
+    /*if(!sync) return;
 
     int target_vel;
     int err = OD_get_i32(OD_ENTRY_H60FF_targetVelocity, 0, &target_vel, true);
@@ -132,19 +122,13 @@ void sync_callback(struct canopen *co, bool sync)
     {
         LOG_ERR("Could not write TMC status to OD");
         return;
-    }
-    nope:
-    #ifdef WATCH_YOUR_STEP
-    t_end = k_cycle_get_32();
-    tdelta = t_end - t_start; // wraparound of 32bit cycle count is irrelevant when doing deltas :D
-    tdelta_avg += tdelta;
-    tdelta_avg_count++;
-    #endif
+    }*/
 }
+
+#define VERY_BAD_FAULT() // TODO
 
 void cia402_set_state(struct cia402* cia402, enum cia402_state state)
 {
-    int err;
     LOG_INF("CiA 402 state: %s", 
         state == CIA402_NOT_READY_TO_SWITCH_ON ? "NOT_READY_TO_SWITCH_ON" : 
         state == CIA402_SWITCH_ON_DISABLED ? "SWITCH_ON_DISABLED" : 
@@ -190,10 +174,9 @@ void cia402_set_state(struct cia402* cia402, enum cia402_state state)
             break;
     }
 
-    err = OD_set_u16(OD_ENTRY_H6041_statusword, 0, statusword, true);
-    if(err != 0)
-    {
-        LOG_ERR("Could not set statusword!!! %d", err);
+    if(OD_set_u16(OD_ENTRY_H6041_statusword, 0, statusword, true)) {
+        LOG_ERR("Could not set Statusword");
+        VERY_BAD_FAULT();
     }
 }
 
@@ -415,6 +398,9 @@ int main()
                 continue;
             }
 
+            // Assure motor is stopped
+            tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
+
             LOG_INF("TMC9660 init OK");
 
             LOG_INF("Writing parameters");
@@ -430,7 +416,7 @@ int main()
             if(err != ODR_OK)
             {
                 LOG_ERR("Could not read OD Target Velocity");
-                return;
+                return -1;
             }
 
             //LOG_INF("Setting target velocity to %d", target_vel);
@@ -462,14 +448,14 @@ int main()
             if(err != ODR_OK)
             {
                 LOG_ERR("Could not write TMC status to OD");
-                return;
+                return -1;
             }
 
             k_msleep(1);
         }
 
         /******* CONTROLWORD TRANSITIONS *******/
-        int controlword;
+        uint16_t controlword;
         err = OD_get_u16(OD_ENTRY_H6040_controlword, 0, &controlword, true);
         if(err != ODR_OK) {
             LOG_ERR("Could not read controlword, %d", err);
@@ -527,7 +513,7 @@ int main()
                 nextState = CIA402_READY_TO_SWITCH_ON;
             } else if(tr_disablev) { // Transition 9
                 nextState = CIA402_SWITCH_ON_DISABLED;
-            } else if (tr_quickstp) { // Transition 11
+            } else if (tr_quickstp || cw_halt) { // Transition 11 + custom
                 nextState = CIA402_QUICK_STOP_ACTIVE;
             } else {
                 // LOG_WRN("Controlword %04X invalid for state OPERATION_ENABLED", controlword);
@@ -553,39 +539,34 @@ int main()
         if(nextState != cia402.state) {
             cia402_set_state(&cia402, nextState);
 
+            bool shouldMotorStop = false;
+
             if(nextState == CIA402_SWITCH_ON_DISABLED) {
+                shouldMotorStop = true;
                 tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 0);
             } else if(nextState == CIA402_READY_TO_SWITCH_ON) {
+                shouldMotorStop = true;
                 tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 0);
             } else if(nextState == CIA402_SWITCHED_ON) {
                 tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 5);
             } else if(nextState == CIA402_OPERATION_ENABLED) {
                 
             } else if(nextState == CIA402_QUICK_STOP_ACTIVE) {
+                shouldMotorStop = true;
                 tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
             } else if(nextState == CIA402_FAULT_REACTION_ACTIVE) {
+                shouldMotorStop = true;
                 tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
+            }
+
+            if(shouldMotorStop) {
+                // Also set OD target velocity so next time motor is enabled, it doesn't spring back to its last set velocity of a previous run
+                OD_set_i32(OD_ENTRY_H60FF_targetVelocity, 0, 0, true);
             }
         }
 
         k_msleep(1);
     }
-
-    /* Initialize CiA 402 and TMC9660 */
-
-
-    
-    
-
-    // LOG_INF("Initialization OK!");
-
-    // while(true)
-    // {
-    //     int avg = tdelta_avg / (tdelta_avg_count == 0 ? 1 : tdelta_avg_count);
-    //     LOG_INF("SYNC time (average of %d): %d us", tdelta_avg_count, k_cyc_to_us_near32(avg));
-    //     tdelta_avg = tdelta_avg_count = 0; // no problem if racing, this is just a quick debug thing
-    //     k_msleep(1000);
-    // }
 
     return 0;
 

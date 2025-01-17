@@ -104,7 +104,7 @@ int tmc9660_tmcl_command(
     } while(retries-- > 0 && (spi_status == SPI_STATUS_NOT_READY || spi_status == SPI_STATUS_CHECKSUM_ERROR));
     
     if(spi_status != 255 || tmcl_status != 100 || retries < 4)
-        LOG_WRN("spi_status = %d\ntmcl_status = %d\nreply_op = %d\ndata = %08x\nretries = %d\n", spi_status, tmcl_status, reply_operation, data, retries);
+        LOG_WRN("spi_status %d (expect 255), tmcl_status %d (expect 100), reply %d, data %08x, retries %d (expect 5)", spi_status, tmcl_status, reply_operation, data, retries);
 
     if(value_recv) *value_recv = data;
 
