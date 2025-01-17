@@ -4,7 +4,7 @@ board:
   vendor: adi
   revision:
     format: letter
-    default: A
+    default: B
     revisions:
     - name: A
     - name: B

@@ -1,14 +1,14 @@
 #include <zephyr/kernel.h>
-#include <zephyr/logging/log.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
 #include <zephyr/drivers/can.h>
-
 #include <canopennode.h> // zephyr module specific helpers!
 #include "OD.h"
 
 #include "tmc9660.h"
 #include "cia402.h"
+
+#include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
 
@@ -16,6 +16,10 @@ static const struct gpio_dt_spec led_green = GPIO_DT_SPEC_GET(DT_PATH(leds, led_
 static const struct gpio_dt_spec led_fault = GPIO_DT_SPEC_GET(DT_PATH(buttons, fault), gpios);
 static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660_spi), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
 static const struct device *can = DEVICE_DT_GET(DT_CHOSEN(zephyr_canbus));
+
+static const struct gpio_dt_spec dip1 = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(buttons, dip), gpios, 0);
+static const struct gpio_dt_spec dip2 = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(buttons, dip), gpios, 1);
+static const struct gpio_dt_spec dip3 = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(buttons, dip), gpios, 2);
 
 #define CAN_BITRATE (DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bitrate, \
 					  DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bus_speed, \
@@ -180,7 +184,7 @@ void cia402_set_state(struct cia402* cia402, enum cia402_state state)
     }
 }
 
-#define MOTOR QSH6018
+#define MOTOR QSH4218
 
 void agv_init_params(struct tmc9660_dev *tmc9660)
 {
@@ -356,8 +360,30 @@ int main()
         goto fail;
     }
 
+    // Read DIP switches for Node ID
+
+    err = gpio_pin_configure_dt(&dip1, GPIO_INPUT);
+    if(err < 0) {
+        LOG_ERR("Could not initialize DIP GPIO 1: %d", err);
+        goto fail;
+    }
+    err = gpio_pin_configure_dt(&dip2, GPIO_INPUT);
+    if(err < 0) {
+        LOG_ERR("Could not initialize DIP GPIO 2: %d", err);
+        goto fail;
+    }
+    err = gpio_pin_configure_dt(&dip3, GPIO_INPUT);
+    if(err < 0) {
+        LOG_ERR("Could not initialize DIP GPIO 3: %d", err);
+        goto fail;
+    }
+    
+    int dip_setting = (gpio_pin_get_dt(&dip1) << 2) | (gpio_pin_get_dt(&dip2) << 1) | (gpio_pin_get_dt(&dip3) << 0); // Looking at the DIP switch with "1 2 3" going left to right = reading the number in binary
+    LOG_INF("DIP switches set to %d", dip_setting);
+
     co.can_dev = can;
-    co.node_id = 0x10; // TODO read DIP switch for Node ID
+    co.node_id = 0x10 + dip_setting;
+    LOG_INF("CANopen node ID = %d", co.node_id);
     co.bitrate = CAN_BITRATE;
     co.nmt_control = 0;
     co.led_callback = led_callback;
@@ -419,7 +445,7 @@ int main()
                 return -1;
             }
 
-            //LOG_INF("Setting target velocity to %d", target_vel);
+            LOG_INF("Setting target velocity to %d", target_vel);
             tmc9660_set_param(&tmc9660, TARGET_VELOCITY, target_vel);
 
             int actual_pos, actual_vel, ramp_vel, target_torque, max_torque;

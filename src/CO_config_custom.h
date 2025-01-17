@@ -26,3 +26,7 @@
 // Won't use LSS - node config just via DIP switches
 #undef CO_CONFIG_LSS
 #define CO_CONFIG_LSS (0)
+
+
+#define CO_CONFIG_DEBUG (CO_CONFIG_DEBUG_COMMON | CO_CONFIG_DEBUG_SDO_SERVER | CO_CONFIG_DEBUG_SDO_CLIENT)
+#define CO_DEBUG_COMMON(...) LOG_INF(...)

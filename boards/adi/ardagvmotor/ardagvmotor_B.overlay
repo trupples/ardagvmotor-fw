@@ -1,7 +1,7 @@
 / {
     buttons {
         dip_sw: dip {
-            gpios = <&gpio0 15 0>, <&gpio0 18 0>, <&gpio0 19 0>;
+            gpios = <&gpio0 19 0>, <&gpio0 18 0>, <&gpio0 15 0>;
             label = "DIP Switch";
             status = "okay";
         };
