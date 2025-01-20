@@ -76,58 +76,6 @@ int init_leds()
     return 0;
 }
 
-/* Called between processing SYNC RPDO and TPDO. Should send RPDO data (target
- * velocity, mainly) to TMC, read back current state, and write it to the OD for
- * the TPDO that immediately follows.
- * MUST finish its work quickly and not block. It would be nice to do everything
- * in much less than 1ms.
- */
-void sync_callback(struct canopen *co, bool sync)
-{
-    /*if(!sync) return;
-
-    int target_vel;
-    int err = OD_get_i32(OD_ENTRY_H60FF_targetVelocity, 0, &target_vel, true);
-    if(err != ODR_OK)
-    {
-        LOG_ERR("Could not read OD Target Velocity");
-        return;
-    }
-
-    if(cia402.state == CIA402_OPERATION_ENABLED) {
-        LOG_INF("Setting target velocity to %d", target_vel);
-        tmc9660_set_param(&tmc9660, TARGET_VELOCITY, target_vel);
-    }
-
-    int actual_pos, actual_vel, ramp_vel, target_torque, max_torque;
-    err = tmc9660_get_param(&tmc9660, ACTUAL_POSITION, &actual_pos);
-    if(err) LOG_ERR("ACTUAL_POSITION");
-    err = tmc9660_get_param(&tmc9660, ACTUAL_VELOCITY, &actual_vel);
-    if(err) LOG_ERR("ACTUAL_VELOCITY");
-    err = tmc9660_get_param(&tmc9660, RAMP_VELOCITY, &ramp_vel);
-    if(err) LOG_ERR("RAMP_VELOCITY");
-    err = tmc9660_get_param(&tmc9660, TARGET_TORQUE, &target_torque);
-    if(err) LOG_ERR("TARGET_TORQUE");
-    err = tmc9660_get_param(&tmc9660, MAX_TORQUE, &max_torque);
-    if(err) LOG_ERR("MAX_TORQUE");
-
-    err = OD_set_i32(OD_ENTRY_H6063_positionActualValue, 0, actual_pos, true);
-    if(err) LOG_ERR("actual_pos");
-    err = OD_set_i32(OD_ENTRY_H606C_velocityActualValue, 0, actual_vel, true);
-    if(err) LOG_ERR("actual_vel");
-    err = OD_set_i32(OD_ENTRY_H606B_velocityDemandValue, 0, ramp_vel, true);
-    if(err) LOG_ERR("ramp_vel");
-    err = OD_set_i16(OD_ENTRY_H6071_targetTorque, 0, target_torque, true);
-    if(err) LOG_ERR("target_torque");
-    err = OD_set_u16(OD_ENTRY_H6072_maxTorque, 0, max_torque, true);
-    if(err) LOG_ERR("max_torque");
-
-    if(err != ODR_OK)
-    {
-        LOG_ERR("Could not write TMC status to OD");
-        return;
-    }*/
-}
 
 #define VERY_BAD_FAULT() // TODO
 
@@ -387,13 +335,15 @@ int main()
     int dip_setting = (gpio_pin_get_dt(&dip1) << 2) | (gpio_pin_get_dt(&dip2) << 1) | (gpio_pin_get_dt(&dip3) << 0); // Looking at the DIP switch with "1 2 3" going left to right = reading the number in binary
     LOG_INF("DIP switches set to %d", dip_setting);
 
+    k_msleep(dip_setting * 5); // Delay each node's bringup differently to reduce initial clashes
+
     co.can_dev = can;
     co.node_id = 0x10 + dip_setting;
     LOG_INF("CANopen node ID = %d", co.node_id);
     co.bitrate = CAN_BITRATE;
     co.nmt_control = 0;
     co.led_callback = led_callback;
-    co.sync_callback = sync_callback;
+    // co.sync_callback = sync_callback;
     err = canopen_init(&co);
     if(err < 0)
     {
