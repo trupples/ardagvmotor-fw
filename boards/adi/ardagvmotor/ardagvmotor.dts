@@ -5,13 +5,22 @@
 #include <zephyr/dt-bindings/gpio/adi-max32-gpio.h>
 
 / {
+	soc {
+		sram_all: memory@20000000 {
+			compatible = "mmio-sram";
+			reg = <0x20000000 DT_SIZE_K(80)>;
+		};
+    };
+};
+
+/ {
     model = "Analog Devices Arduino AGV Motor Control";
     compatible = "adi,ardagvmotor";
 
     chosen {
         zephyr,console = &uart0;
         zephyr,shell-uart = &uart0;
-        zephyr,sram = &sram2;
+        zephyr,sram = &sram_all;
         zephyr,flash = &flash0;
         zephyr,canbus = &can0;
     };
