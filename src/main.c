@@ -9,6 +9,7 @@
 #include "cia402.h"
 
 #include <zephyr/logging/log.h>
+#include <zephyr/logging/log_ctrl.h>
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
 
@@ -76,9 +77,6 @@ int init_leds()
     return 0;
 }
 
-
-#define VERY_BAD_FAULT() // TODO
-
 void cia402_set_state(struct cia402* cia402, enum cia402_state state)
 {
     LOG_INF("CiA 402 state: %s", 
@@ -128,7 +126,8 @@ void cia402_set_state(struct cia402* cia402, enum cia402_state state)
 
     if(OD_set_u16(OD_ENTRY_H6041_statusword, 0, statusword, true)) {
         LOG_ERR("Could not set Statusword");
-        VERY_BAD_FAULT();
+        LOG_PANIC();
+        k_oops();
     }
 }
 
@@ -291,7 +290,7 @@ const struct tmc9660_default_params {
 	{ .param_id = EXTERNAL_TEMPERATURE_SHUTDOWN_THRESHOLD, .value = 65535 },
 	{ .param_id = EXTERNAL_TEMPERATURE_WARNING_THRESHOLD, .value = 65535 },
 
-    // { .param_id = EVENT_STOP_SETTINGS, .value = 1 }, // DO_SOFT_STOP, might even set it to 5 or 7 for max slippage functionality (cia 402)
+    { .param_id = EVENT_STOP_SETTINGS, .value = 1 }, // DO_SOFT_STOP, might even set it to 5 or 7 for max slippage functionality (cia 402)
 };
 #pragma pack(pop)
 
@@ -301,6 +300,41 @@ void agv_init_params(struct tmc9660_dev *tmc9660) {
     for(int i = 0; i < ARRAY_SIZE(params); i++) {
         tmc9660_set_param(tmc9660, params[i].param_id, params[i].value);
     }
+}
+
+void pretty_error_counts(const struct device *can) {
+    static int prev_tx_err_cnt = 0, prev_rx_err_cnt = 0;
+    static enum can_state prev_state = CAN_STATE_STOPPED;
+	struct can_bus_err_cnt err_cnt;
+	enum can_state state;
+	int err;
+
+	err = can_get_state(can, &state, &err_cnt);
+	if (err != 0) {
+		LOG_ERR("failed to get CAN controller state (err %d)", err);
+		return;
+	}
+    if(prev_tx_err_cnt != err_cnt.tx_err_cnt || prev_rx_err_cnt != err_cnt.rx_err_cnt || prev_state != state) {
+		LOG_DBG("CAN TEC = %d\tREC = %d\tstate = %s", err_cnt.tx_err_cnt, err_cnt.rx_err_cnt,
+            state == CAN_STATE_ERROR_ACTIVE ? "ACTIVE" :
+            state == CAN_STATE_ERROR_WARNING ? "WARNING" :
+            state == CAN_STATE_ERROR_PASSIVE ? "PASSIVE" :
+            state == CAN_STATE_BUS_OFF ? "BUS_OFF" :
+            state == CAN_STATE_STOPPED ? "STOPPED" : "???"
+        );
+    }
+
+    if(state == CAN_STATE_BUS_OFF) {
+        // TODO rate limit, if it goes into bus off a lot, stop resetting and just leave it in the fault state
+        LOG_ERR("Bus-off: killing motor");
+        CO_NMT_sendInternalCommand(co.CO->NMT, CO_NMT_ENTER_STOPPED);
+        cia402_set_state(&cia402, CIA402_FAULT);
+        tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
+    }
+    
+    prev_tx_err_cnt = err_cnt.tx_err_cnt;
+    prev_rx_err_cnt = err_cnt.rx_err_cnt;
+    prev_state = state;
 }
 
 int main()
@@ -354,11 +388,33 @@ int main()
     cia402.co = &co;
     cia402_set_state(&cia402, CIA402_NOT_READY_TO_SWITCH_ON); // Transition 0
 
+    LOG_INF("Initializing TMC9660");
+    err = tmc9660_init(&tmc9660, &spi0);
+    if(err < 0)
+    {
+        LOG_ERR("TMC9660 init failed");
+        cia402_set_state(&cia402, CIA402_FAULT);
+        CO_errorReport(co.CO->em, CO_ERR_REG_GENERIC_ERR, CO_EMC_HARDWARE, 9660);
+        CO_NMT_sendInternalCommand(co.CO->NMT, CO_NMT_ENTER_STOPPED);
+        return;
+    }
+
+    // Assure motor is stopped
+    tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
+
+    LOG_INF("TMC9660 init OK");
+
     while(true)
     {
+        pretty_error_counts(co.can_dev);
+
         if(co.CO->NMT->operatingState == CO_NMT_STOPPED) {
-            cia402_set_state(&cia402, CIA402_FAULT); // Special transition
-            k_msleep(100);
+            cia402_set_state(&cia402, CIA402_FAULT);
+            LOG_INF("NMT STOPPED");
+            while(co.CO->NMT->operatingState == CO_NMT_STOPPED) { // No point in doing anything until the canopen thread takes us out of the stopped state
+                k_msleep(1);
+            }
+            LOG_INF("NMT un-stopped");
             continue;
         }
         
@@ -368,24 +424,7 @@ int main()
         }
 
         if(cia402.state == CIA402_NOT_READY_TO_SWITCH_ON) {
-            LOG_INF("Initializing TMC9660");
-
-            err = tmc9660_init(&tmc9660, &spi0);
-            if(err < 0)
-            {
-                LOG_ERR("TMC9660 init failed");
-                cia402_set_state(&cia402, CIA402_FAULT);
-                CO_errorReport(co.CO->em, CO_ERR_REG_GENERIC_ERR, CO_EMC_HARDWARE, 9660);
-                CO_NMT_sendInternalCommand(co.CO->NMT, CO_NMT_ENTER_STOPPED);
-                continue;
-            }
-
-            // Assure motor is stopped
-            tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
-
-            LOG_INF("TMC9660 init OK");
-
-            LOG_INF("Writing parameters");
+            LOG_INF("Writing TMC9660 default parameters");
             agv_init_params(&tmc9660);
 
             cia402_set_state(&cia402, CIA402_SWITCH_ON_DISABLED); // Transition 1
@@ -528,20 +567,19 @@ int main()
                 tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 0);
             } else if(nextState == CIA402_READY_TO_SWITCH_ON) {
                 shouldMotorStop = true;
-                tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 0);
             } else if(nextState == CIA402_SWITCHED_ON) {
                 tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 5);
             } else if(nextState == CIA402_OPERATION_ENABLED) {
                 
             } else if(nextState == CIA402_QUICK_STOP_ACTIVE) {
                 shouldMotorStop = true;
-                tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
             } else if(nextState == CIA402_FAULT_REACTION_ACTIVE) {
                 shouldMotorStop = true;
-                tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
             }
 
             if(shouldMotorStop) {
+                tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
+
                 // Also set OD target velocity so next time motor is enabled, it doesn't spring back to its last set velocity of a previous run
                 OD_set_i32(OD_ENTRY_H60FF_targetVelocity, 0, 0, true);
             }
