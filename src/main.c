@@ -131,6 +131,9 @@ void cia402_set_state(struct cia402* cia402, enum cia402_state state)
     }
 }
 
+#define QSH6018 1
+#define QSH5718 2
+#define QSH4218 3
 #define MOTOR QSH4218
 
 #pragma pack(push,1) // ew alignment...
@@ -161,7 +164,7 @@ const struct tmc9660_default_params {
 	{ .param_id = OPENLOOP_CURRENT, .value = 500 }, // 500mA openloop (such as when initially homing ABN)
 	{ .param_id = OPENLOOP_VOLTAGE, .value = 1638 }, // proportional to VIN, 1638 = 10%
 #elif MOTOR == QSH4218
-	{ .param_id = RAMP_VMAX, .value = 1234 },
+	{ .param_id = RAMP_VMAX, .value = 6000000 },
 	{ .param_id = MAX_TORQUE, .value = 2000 }, // mA
 	{ .param_id = MAX_FLUX, .value = 2000 }, // mA
 	{ .param_id = OPENLOOP_CURRENT, .value = 500 }, // 500mA openloop (such as when initially homing ABN)
@@ -290,7 +293,7 @@ const struct tmc9660_default_params {
 	{ .param_id = EXTERNAL_TEMPERATURE_SHUTDOWN_THRESHOLD, .value = 65535 },
 	{ .param_id = EXTERNAL_TEMPERATURE_WARNING_THRESHOLD, .value = 65535 },
 
-    { .param_id = EVENT_STOP_SETTINGS, .value = 1 }, // DO_SOFT_STOP, might even set it to 5 or 7 for max slippage functionality (cia 402)
+    // { .param_id = EVENT_STOP_SETTINGS, .value = 1 }, // DO_SOFT_STOP, might even set it to 5 or 7 for max slippage functionality (cia 402)
 };
 #pragma pack(pop)
 
