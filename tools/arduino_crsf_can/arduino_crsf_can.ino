@@ -13,21 +13,24 @@ void startDrive(int nodeId) {
   // NMT: set operational
   uint8_t nmt_set_operational_buf[8] = { 1, nodeId };
   CanMsg nmt_set_operational(0, 2, nmt_set_operational_buf);
+  delay(100);
   CAN.write(nmt_set_operational);
+  delay(200);
 
   // CANopen CiA 402 bodge:
 
   // Switch on disabled -> ready to switch on 2
   uint8_t transition2[] = {0b00110, 0};
   RXPDO(nodeId, 1, 2, transition2);
-  delay(100);
+  delay(200);
   // Ready to switch on -> switched on 3
   uint8_t transition3[] = {0b00111, 0};
   RXPDO(nodeId, 1, 2, transition3);
-  delay(100);
+  delay(200);
   // Switched on -> operation enable 4
   uint8_t transition4[] = {0b01111, 0};
   RXPDO(nodeId, 1, 2, transition4);
+  delay(200);
 }
 
 void setDriveSpeed(int nodeId, int speed) {
@@ -66,11 +69,20 @@ void setup()
     for (;;) {}
   }
 
+  
+  // This prevents it from starting if there is no RC connection
+  Serial.println("Waiting for a (0,0) command");
+  while(crsf.getChannel(1) != 1500 && crsf.getChannel(2) != 1500) {
+    crsf.update();
+    delay(1);
+  }
+
   Serial.println("Starting CAN nodes");
   startDrive(0x15);
   startDrive(0x16);
 
   Serial.println("Init done!");
+
 }
 
 void loop()
@@ -123,7 +135,7 @@ void loop()
       if (throttle < 0 && spdTgtR < throttle)
         spdTgtR = throttle;
     }
-    spdTgtR = spdTgtR * (-1); // motors are mirrored
+    spdTgtL = spdTgtL * (-1); // motors are mirrored
 
     Serial.print("Speed:\t");
     Serial.print(spdTgtL);
@@ -131,7 +143,7 @@ void loop()
     Serial.print(spdTgtR);
     Serial.println();
 
-    setDriveSpeed(0x15, spdTgtL * 20000);
-    setDriveSpeed(0x16, spdTgtR * 20000);
+    setDriveSpeed(0x16, spdTgtL * 20000);
+    setDriveSpeed(0x15, spdTgtR * 20000);
   }
 }
