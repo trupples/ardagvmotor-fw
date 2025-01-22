@@ -8,6 +8,7 @@ project(motor_control)
 
 zephyr_include_directories(src)
 
-target_sources(app PRIVATE src/main.c src/tmc9660.c objdict/OD.c)
-zephyr_include_directories(objdict)
+#target_sources(app PRIVATE src/main.c src/tmc9660.c objdict/OD.c)
+#zephyr_include_directories(objdict)
 
+target_sources(app PRIVATE src/i2cmain.c)

@@ -399,7 +399,7 @@ int main()
         cia402_set_state(&cia402, CIA402_FAULT);
         CO_errorReport(co.CO->em, CO_ERR_REG_GENERIC_ERR, CO_EMC_HARDWARE, 9660);
         CO_NMT_sendInternalCommand(co.CO->NMT, CO_NMT_ENTER_STOPPED);
-        return;
+        return -1;
     }
 
     // Assure motor is stopped
