@@ -86,7 +86,9 @@
 };
 
 &i2c0 {
-    status = "okay";
+	status = "okay";
+	pinctrl-0 = <&i2c0a_scl_p0_12 &i2c0a_sda_p0_13>;
+	pinctrl-names = "default";
 
     max31827@1a {
         compatible = "adi,max31827";
