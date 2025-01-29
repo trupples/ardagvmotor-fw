@@ -440,7 +440,7 @@ int main()
 
         if(cia402.state == CIA402_OPERATION_ENABLED) {
             int target_vel;
-            int err = OD_get_i32(OD_ENTRY_H60FF_targetVelocity, 0, &target_vel, true);
+            int err = OD_get_i32(OD_ENTRY_H60FF_targetVelocity, 0, &target_vel, false);
             if(err != ODR_OK)
             {
                 LOG_ERR("Could not read OD Target Velocity");
@@ -462,15 +462,15 @@ int main()
             err = tmc9660_get_param(&tmc9660, MAX_TORQUE, &max_torque);
             if(err) LOG_ERR("MAX_TORQUE %d", err);
 
-            err = OD_set_i32(OD_ENTRY_H6063_positionActualValue, 0, actual_pos, true);
+            err = OD_set_i32(OD_ENTRY_H6063_positionActualValue, 0, actual_pos, false);
             if(err) LOG_ERR("actual_pos");
-            err = OD_set_i32(OD_ENTRY_H606C_velocityActualValue, 0, actual_vel, true);
+            err = OD_set_i32(OD_ENTRY_H606C_velocityActualValue, 0, actual_vel, false);
             if(err) LOG_ERR("actual_vel");
-            err = OD_set_i32(OD_ENTRY_H606B_velocityDemandValue, 0, ramp_vel, true);
+            err = OD_set_i32(OD_ENTRY_H606B_velocityDemandValue, 0, ramp_vel, false);
             if(err) LOG_ERR("ramp_vel");
-            err = OD_set_i16(OD_ENTRY_H6071_targetTorque, 0, target_torque, true);
+            err = OD_set_i16(OD_ENTRY_H6071_targetTorque, 0, target_torque, false);
             if(err) LOG_ERR("target_torque");
-            err = OD_set_u16(OD_ENTRY_H6072_maxTorque, 0, max_torque, true);
+            err = OD_set_u16(OD_ENTRY_H6072_maxTorque, 0, max_torque, false);
             if(err) LOG_ERR("max_torque");
 
             if(err != ODR_OK)
@@ -484,7 +484,7 @@ int main()
 
         /******* CONTROLWORD TRANSITIONS *******/
         uint16_t controlword;
-        err = OD_get_u16(OD_ENTRY_H6040_controlword, 0, &controlword, true);
+        err = OD_get_u16(OD_ENTRY_H6040_controlword, 0, &controlword, false);
         if(err != ODR_OK) {
             LOG_ERR("Could not read controlword, %d", err);
             break;
