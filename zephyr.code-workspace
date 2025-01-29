@@ -1,0 +1,27 @@
+{
+    "folders": [
+        { "name": "ardagvmotor", "path": "." },
+        { "name": "zephyr", "path": "../zephyr" },
+        { "name": "canopennode", "path": "../modules/canopennode" }
+    ],
+    "settings": {
+        // Hush CMake
+        "cmake.configureOnOpen": false,
+
+        // IntelliSense
+        "C_Cpp.default.compilerPath" : "${userHome}/zephyr-sdk-0.17.0/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
+        "C_Cpp.default.compileCommands": "${workspaceFolder:ardagvmotor}/build/compile_commands.json",
+
+        "files.associations": {
+            "*.h": "c",
+            "*.ipp": "c"
+        },
+
+        "C_Cpp.default.includePath": [
+            "${workspaceFolder:zephyr}/include"
+        ],
+
+        "kconfig.python": "${workspaceFolder:zephyr}/../.venv/bin",
+        "kconfig.zephyr.base": "${workspaceFolder:zephyr}"
+    }
+}
