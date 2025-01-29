@@ -79,7 +79,7 @@
     tmc9660_spi: tmc9660-spi@0 {
         compatible = "vnd,spi-device";
         reg = <0>;
-        spi-max-frequency = <1000000>;
+        spi-max-frequency = <10000000>;
         label = "TMC9660";
         status = "okay";
     };

@@ -44,6 +44,9 @@ int tmc9660_tmcl_command(
     uint32_t *value_recv
 )
 {
+    uint8_t noop[8] = {
+        GetInfo, 0, 0, 0, 0, 0, 0, GetInfo
+    };
     uint8_t send[8] = {
         operation,
         (type & 0xff),
@@ -68,6 +71,12 @@ int tmc9660_tmcl_command(
     struct spi_buf_set rx_bufs = {
         .buffers = rx_buf, .count = 1
     };
+    struct spi_buf noop_buf[2] = {
+        { .buf = noop, .len = 8 },
+    };
+    struct spi_buf_set noop_bufs = {
+        .buffers = noop_buf, .count = 1
+    };
 
     send[7] = tmc9660_checksum(send);
     
@@ -76,35 +85,55 @@ int tmc9660_tmcl_command(
 
     int retries = 5;
     do {
-        LOG_HEXDUMP_DBG(send, 8, "SPI send");
+        spi_transceive_dt(dev->spi, &tx_bufs, &rx_bufs);
 
-        spi_write_dt(dev->spi, &tx_bufs);
-        k_usleep(10);
-        spi_read_dt(dev->spi, &rx_bufs);
-        k_usleep(10);
-
-        LOG_HEXDUMP_DBG(recv, 8, "SPI recv");
-
-        spi_status = recv[0];
-        tmcl_status = recv[1];
-        reply_operation = recv[2];
-        data = (recv[3] << 24) | (recv[4] << 16) | (recv[5] << 8) | recv[6];
-        
-        if(spi_status == SPI_STATUS_NOT_READY)
-        {
-            continue;
+        if(recv[0] == SPI_STATUS_CHECKSUM_ERROR) {
+            LOG_DBG("Previously sent bad checksum...");
+            LOG_HEXDUMP_DBG(send, 8, "SPI send");
+            LOG_HEXDUMP_DBG(recv, 8, "SPI recv");
         }
-
-        if(recv[7] != tmc9660_checksum(recv))
-        {
-            // bad checksum - rest of datagram will be malformed, incl the checksul
-            LOG_HEXDUMP_ERR(recv, 8, "Checksum error in received");
-            return -EIO;
+        if(recv[0] == SPI_STATUS_NOT_READY) {
+            k_usleep(20);
         }
-    } while(retries-- > 0 && (spi_status == SPI_STATUS_NOT_READY || spi_status == SPI_STATUS_CHECKSUM_ERROR));
+    }
+    while((recv[0] == SPI_STATUS_NOT_READY || recv[0] == SPI_STATUS_CHECKSUM_ERROR) && retries-- > 0);
     
-    if(spi_status != 255 || tmcl_status != 100 || retries < 4)
+    k_usleep(10);
+
+    if(retries <= 0) {
+        LOG_WRN("TMC9660 took 5 retries for submitting a command");
+        return -1;
+    }
+
+    retries = 5;
+    do {
+        spi_transceive_dt(dev->spi, &noop_bufs, &rx_bufs);
+        if(recv[0] == SPI_STATUS_NOT_READY) {
+            k_usleep(10);
+        }
+    } while(recv[0] == SPI_STATUS_NOT_READY && retries-- > 0);
+    
+    if(retries <= 0) {
+        LOG_WRN("TMC9660 took 5 retries for answering a command");
+        return -1;
+    }
+
+    spi_status = recv[0];
+    tmcl_status = recv[1];
+    reply_operation = recv[2];
+    data = (recv[3] << 24) | (recv[4] << 16) | (recv[5] << 8) | recv[6];
+
+    if(recv[7] != tmc9660_checksum(recv))
+    {
+        // bad checksum - rest of datagram will be malformed, incl the checksul
+        LOG_HEXDUMP_ERR(recv, 8, "Checksum error in received");
+        return -EIO;
+    }
+    
+    if(spi_status != SPI_STATUS_OK || tmcl_status != 100 || retries < 4) {
+        LOG_HEXDUMP_DBG(recv, 8, "SPI recv");
         LOG_WRN("spi_status %d (expect 255), tmcl_status %d (expect 100), reply %d, data %08x, retries %d (expect 5)", spi_status, tmcl_status, reply_operation, data, retries);
+    }
 
     if(value_recv) *value_recv = data;
 
@@ -162,12 +191,14 @@ int tmc9660_init(
         spi_write_dt(dev->spi, &tx_bufs);
         k_busy_wait(100);
         spi_read_dt(dev->spi, &rx_bufs);
+        k_busy_wait(100);
 
         LOG_HEXDUMP_DBG(rx, 8, "SPI recv");
-    } while(rx[0] != SPI_STATUS_FIRST_CMD && rx[0] != SPI_STATUS_OK && retries-- > 0);
+    } while(!(rx[0] == SPI_STATUS_FIRST_CMD || rx[0] == SPI_STATUS_OK) && retries-- > 0);
     
     if(rx[0] != SPI_STATUS_FIRST_CMD && rx[0] != SPI_STATUS_OK) {
         // Invalid wakeup
+        LOG_ERR("Invalid TMC wakeup");
         return -1;
     }
 
