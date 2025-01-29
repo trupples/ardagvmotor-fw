@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModifiedBy="" fileModificationDate="2025-01-28" fileModificationTime="17:47:37.1456834+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModifiedBy="" fileModificationDate="2025-01-29" fileModificationTime="12:54:23.2119963+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Analog Devices Inc.</q1:vendorName>
         <q1:vendorID>0xFFFF1234</q1:vendorID>
@@ -2088,6 +2088,11 @@ The life time factor multiplied with the guard time gives the life time for the 
             <UDINT />
             <q1:defaultValue value="0x00000000" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_2122">
+            <description lang="en">Parameter mode SUPPLY_VOLTAGE (290). 1 unit = 0.1 Volt</description>
+            <UINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6040" access="readWrite">
             <description lang="en">Controls the CiA 402-1 state machine
 * bit 15-11: manufacturer specific
@@ -2433,7 +2438,7 @@ The life time factor multiplied with the guard time gives the life time for the 
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModificationDate="2025-01-28" fileModificationTime="17:47:37.1456834+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModificationDate="2025-01-29" fileModificationTime="12:54:23.2119963+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -2711,6 +2716,7 @@ The life time factor multiplied with the guard time gives the life time for the 
             <CANopenSubObject subIndex="07" name="Application object 7" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0307" />
             <CANopenSubObject subIndex="08" name="Application object 8" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0308" />
           </CANopenObject>
+          <CANopenObject index="2122" name="TMC9660 SUPPLY_VOLTAGE" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_2122" />
           <CANopenObject index="6040" name="Controlword" objectType="7" PDOmapping="optional" uniqueIDRef="UID_OBJ_6040" />
           <CANopenObject index="6041" name="Statusword" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6041" />
           <CANopenObject index="6060" name="Modes of operation" objectType="7" PDOmapping="optional" uniqueIDRef="UID_OBJ_6060" />

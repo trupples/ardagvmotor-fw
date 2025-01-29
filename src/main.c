@@ -411,6 +411,10 @@ int main()
     {
         pretty_error_counts(co.can_dev);
 
+        int supply_voltage;
+        tmc9660_get_param(&tmc9660, SUPPLY_VOLTAGE, &supply_voltage);
+        OD_set_u16(OD_ENTRY_H2122_TMC9660SUPPLY_VOLTAGE, 0, (uint16_t) supply_voltage, false);
+
         if(co.CO->NMT->operatingState == CO_NMT_STOPPED) {
             cia402_set_state(&cia402, CIA402_FAULT);
             LOG_INF("NMT STOPPED");

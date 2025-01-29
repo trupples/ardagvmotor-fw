@@ -199,6 +199,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .COB_IDClientToServerRx = 0x00000600,
         .COB_IDServerToClientTx = 0x00000580
     },
+    .x2122_TMC9660SUPPLY_VOLTAGE = 0x0000,
     .x6040_controlword = 0x0000,
     .x6041_statusword = 0x0000,
     .x6060_modesOfOperation = 3,
@@ -308,6 +309,7 @@ typedef struct {
     OD_obj_record_t o_1A01_TPDOMappingParameter[9];
     OD_obj_record_t o_1A02_TPDOMappingParameter[9];
     OD_obj_record_t o_1A03_TPDOMappingParameter[9];
+    OD_obj_var_t o_2122_TMC9660SUPPLY_VOLTAGE;
     OD_obj_var_t o_6040_controlword;
     OD_obj_var_t o_6041_statusword;
     OD_obj_var_t o_6060_modesOfOperation;
@@ -1198,6 +1200,11 @@ static CO_PROGMEM ODObjs_t ODObjs = {
             .dataLength = 4
         }
     },
+    .o_2122_TMC9660SUPPLY_VOLTAGE = {
+        .dataOrig = &OD_RAM.x2122_TMC9660SUPPLY_VOLTAGE,
+        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
+        .dataLength = 2
+    },
     .o_6040_controlword = {
         .dataOrig = &OD_RAM.x6040_controlword,
         .attribute = ODA_SDO_RW | ODA_TRPDO | ODA_MB,
@@ -1533,6 +1540,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x1A01, 0x09, ODT_REC, &ODObjs.o_1A01_TPDOMappingParameter, NULL},
     {0x1A02, 0x09, ODT_REC, &ODObjs.o_1A02_TPDOMappingParameter, NULL},
     {0x1A03, 0x09, ODT_REC, &ODObjs.o_1A03_TPDOMappingParameter, NULL},
+    {0x2122, 0x01, ODT_VAR, &ODObjs.o_2122_TMC9660SUPPLY_VOLTAGE, NULL},
     {0x6040, 0x01, ODT_VAR, &ODObjs.o_6040_controlword, NULL},
     {0x6041, 0x01, ODT_VAR, &ODObjs.o_6041_statusword, NULL},
     {0x6060, 0x01, ODT_VAR, &ODObjs.o_6060_modesOfOperation, NULL},

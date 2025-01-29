@@ -8,8 +8,8 @@ Description=
 CreationTime=11:03AM
 CreationDate=01-13-2025
 CreatedBy=
-ModificationTime=5:47PM
-ModificationDate=01-28-2025
+ModificationTime=12:54PM
+ModificationDate=01-29-2025
 ModifiedBy=
 
 [DeviceInfo]
@@ -2131,5 +2131,15 @@ DefaultValue=0x00020192
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=0
+SupportedObjects=1
+1=0x2122
+
+[2122]
+ParameterName=TMC9660 SUPPLY_VOLTAGE
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0006
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
 
