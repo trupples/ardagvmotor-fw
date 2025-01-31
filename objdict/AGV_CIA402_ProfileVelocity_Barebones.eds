@@ -8,8 +8,8 @@ Description=
 CreationTime=11:03AM
 CreationDate=01-13-2025
 CreatedBy=
-ModificationTime=12:54PM
-ModificationDate=01-29-2025
+ModificationTime=6:46PM
+ModificationDate=01-31-2025
 ModifiedBy=
 
 [DeviceInfo]
@@ -1632,7 +1632,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=0xFFFF
 PDOMapping=1
 
 [6041]

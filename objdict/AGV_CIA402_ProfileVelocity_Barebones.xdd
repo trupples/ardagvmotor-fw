@@ -15,7 +15,7 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModifiedBy="" fileModificationDate="2025-01-29" fileModificationTime="12:54:23.2119963+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModifiedBy="" fileModificationDate="2025-01-31" fileModificationTime="18:46:20.0457287+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Analog Devices Inc.</q1:vendorName>
         <q1:vendorID>0xFFFF1234</q1:vendorID>
@@ -2106,7 +2106,7 @@ The life time factor multiplied with the guard time gives the life time for the 
 * bit 1: Enable voltage
 * bit 0: Switch on</description>
             <UINT />
-            <q1:defaultValue value="0" />
+            <q1:defaultValue value="0xFFFF" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_6041">
             <description lang="en">Indicates the state of the CiA 402-1 state machine
@@ -2438,7 +2438,7 @@ The life time factor multiplied with the guard time gives the life time for the 
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModificationDate="2025-01-29" fileModificationTime="12:54:23.2119963+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModificationDate="2025-01-31" fileModificationTime="18:46:20.0457287+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />

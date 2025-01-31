@@ -200,7 +200,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
         .COB_IDServerToClientTx = 0x00000580
     },
     .x2122_TMC9660SUPPLY_VOLTAGE = 0x0000,
-    .x6040_controlword = 0x0000,
+    .x6040_controlword = 0xFFFF,
     .x6041_statusword = 0x0000,
     .x6060_modesOfOperation = 3,
     .x6061_modesOfOperationDisplay = 3,

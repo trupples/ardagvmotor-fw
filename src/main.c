@@ -77,6 +77,22 @@ int init_leds()
     return 0;
 }
 
+void cia402_init(struct cia402* cia402) {
+    cia402->statusword_extension.read = OD_readOriginal;
+    cia402->statusword_extension.write = OD_writeOriginal;
+    cia402->mod_extension.read = OD_readOriginal;
+    cia402->mod_extension.write = OD_writeOriginal;
+    cia402->vel_extension.read = OD_readOriginal;
+    cia402->vel_extension.write = OD_writeOriginal;
+    cia402->pos_extension.read = OD_readOriginal;
+    cia402->pos_extension.write = OD_writeOriginal;
+
+    OD_extension_init(OD_ENTRY_H6041_statusword, &cia402->statusword_extension);
+    OD_extension_init(OD_ENTRY_H6061_modesOfOperationDisplay, &cia402->mod_extension);
+    OD_extension_init(OD_ENTRY_H606C_velocityActualValue, &cia402->vel_extension);
+    OD_extension_init(OD_ENTRY_H6063_positionActualValue, &cia402->pos_extension);
+}
+
 void cia402_set_state(struct cia402* cia402, enum cia402_state state)
 {
     LOG_INF("CiA 402 state: %s", 
@@ -124,6 +140,8 @@ void cia402_set_state(struct cia402* cia402, enum cia402_state state)
             break;
     }
 
+    LOG_DBG("Setting statusword to %04X", statusword);
+    OD_requestTPDO(OD_getFlagsPDO(OD_ENTRY_H6041_statusword), 0);
     if(OD_set_u16(OD_ENTRY_H6041_statusword, 0, statusword, true)) {
         LOG_ERR("Could not set Statusword");
         LOG_PANIC();
@@ -389,6 +407,7 @@ int main()
     }
 
     cia402.co = &co;
+    cia402_init(&cia402);
     cia402_set_state(&cia402, CIA402_NOT_READY_TO_SWITCH_ON); // Transition 0
 
     LOG_INF("Initializing TMC9660");
@@ -489,6 +508,16 @@ int main()
             LOG_ERR("Could not read controlword, %d", err);
             break;
         }
+
+        if(controlword == 0xffff) {
+            // No write
+            continue;
+        }
+
+        LOG_DBG("Controlword was set to %04X", controlword);
+
+        // Set internal controlword to 0xFFFF so we can easily detect the next write w/o a callback
+        OD_set_u16(OD_ENTRY_H6040_controlword, 0, 0xFFFF, true);
 
         bool cw_halt = (controlword >> 8) & 1;
         bool cw_fault_reset = (controlword >> 7) & 1;
@@ -592,7 +621,7 @@ int main()
             }
         }
 
-        k_msleep(1);
+        OD_requestTPDO(OD_getFlagsPDO(OD_ENTRY_H6041_statusword), 0);
     }
 
     return 0;

@@ -30,6 +30,13 @@ enum cia402_state {
 struct cia402 {
     struct canopen *co;
     enum cia402_state state;
+
+    // CANopenNode does not want to handle TPDO requests unless the entries have extensions...
+    // awful
+    OD_extension_t statusword_extension;
+    OD_extension_t mod_extension;
+    OD_extension_t vel_extension;
+    OD_extension_t pos_extension;
 };
 
 #endif
