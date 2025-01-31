@@ -83,6 +83,8 @@ int tmc9660_tmcl_command(
     uint8_t spi_status, tmcl_status, reply_operation;
     uint32_t data;
 
+    k_usleep(20);
+
     int retries = 5;
     do {
         spi_transceive_dt(dev->spi, &tx_bufs, &rx_bufs);
@@ -186,14 +188,12 @@ int tmc9660_init(
 
     int retries = 5;
     do {
-        LOG_HEXDUMP_DBG(tx, 8, "SPI send");
+        LOG_HEXDUMP_DBG(tx, 8, "Init SPI send");
 
-        spi_write_dt(dev->spi, &tx_bufs);
-        k_busy_wait(100);
-        spi_read_dt(dev->spi, &rx_bufs);
+        spi_transceive_dt(dev->spi, &tx_bufs, &rx_bufs);
         k_busy_wait(100);
 
-        LOG_HEXDUMP_DBG(rx, 8, "SPI recv");
+        LOG_HEXDUMP_DBG(rx, 8, "Init SPI recv");
     } while(!(rx[0] == SPI_STATUS_FIRST_CMD || rx[0] == SPI_STATUS_OK) && retries-- > 0);
     
     if(rx[0] != SPI_STATUS_FIRST_CMD && rx[0] != SPI_STATUS_OK) {
