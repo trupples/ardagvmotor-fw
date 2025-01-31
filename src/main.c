@@ -11,7 +11,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
 
-LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 static const struct gpio_dt_spec led_green = GPIO_DT_SPEC_GET(DT_PATH(leds, led_status), gpios);
 static const struct gpio_dt_spec led_fault = GPIO_DT_SPEC_GET(DT_PATH(buttons, fault), gpios);
@@ -95,7 +95,7 @@ void cia402_init(struct cia402* cia402) {
 
 void cia402_set_state(struct cia402* cia402, enum cia402_state state)
 {
-    LOG_INF("CiA 402 state: %s", 
+    LOG_INF("Setting CiA 402 state: %s", 
         state == CIA402_NOT_READY_TO_SWITCH_ON ? "NOT_READY_TO_SWITCH_ON" : 
         state == CIA402_SWITCH_ON_DISABLED ? "SWITCH_ON_DISABLED" : 
         state == CIA402_READY_TO_SWITCH_ON ? "READY_TO_SWITCH_ON" : 
@@ -466,7 +466,7 @@ int main()
                 return -1;
             }
 
-            LOG_INF("Setting target velocity to %d", target_vel);
+            LOG_DBG("Setting target velocity to %d", target_vel);
             tmc9660_set_param(&tmc9660, TARGET_VELOCITY, target_vel);
 
             int actual_pos, actual_vel, ramp_vel, target_torque, max_torque;
