@@ -80,7 +80,7 @@ don't understand going on and it only flashes every other try.
 
 ## Example code
 
-`src/main.c` contains a bunch of examples, in their own functions:
+`src/demos.c` contains a bunch of examples, in their own functions:
 
 - `demo_blink_fault()` - uses the fault pin as an output to blink the fault LED. Normally, the fault pin is an input to monitor the TMC.
 - `demo_uart_control()` - simple UART commands to spin the motor in position / velocity / torque control modes.
@@ -90,13 +90,13 @@ don't understand going on and it only flashes every other try.
 
 ## Project structure
 
-- `boards/adi/ardagvmotor`: board definition for both revA (default) and revB. Especially relevant files:
+- `boards/adi/ardagvmotor`: board definition for both revA and revB (default). Especially relevant files:
     - `ardagvmotor_defconfig`: default kconfig enabling all board functionality
     - `ardagvmotor.dts`: base device tree
     - `ardagvmotor_X.overlay`: revision overlays
 - `src`
     - `tmc9660.c/h`: TMC9660 parameter mode SPI driver
     - `main.c`
-- `objdict`: Will be relevant for CANOpenNode
+- `objdict`: CANOpenNode object dictionary, EDS, XDD
 - `prj.conf`: Additional kconfig settings
 - `west.yml`: West manifest file. Useful for replacing the mainline repos with our custom in-dev branches
