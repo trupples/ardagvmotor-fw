@@ -362,6 +362,8 @@ int main()
 {
     int err;
 
+    LOG_INF("Firmware git revision %s", GIT_REVISION_STR);
+
 	err = init_leds();
     if(err < 0)
     {
