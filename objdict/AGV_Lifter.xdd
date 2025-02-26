@@ -15,12 +15,12 @@
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModifiedBy="" fileModificationDate="2025-02-26" fileModificationTime="13:50:52.8803287+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q1="http://www.canopen.org/xml/1.1" xsi:type="q1:ProfileBody_Device_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_Lifter.xdd" fileCreator="" fileCreationDate="2025-02-25" fileCreationTime="16:32:10.0000000+02:00" fileModifiedBy="" fileModificationDate="2025-02-25" fileModificationTime="18:31:20.4113477+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <q1:DeviceIdentity>
         <q1:vendorName>Analog Devices Inc.</q1:vendorName>
         <q1:vendorID>0xFFFF1234</q1:vendorID>
-        <q1:productName>AGV Arduino Motor Control</q1:productName>
-        <q1:productID>123</q1:productID>
+        <q1:productName>Lifter</q1:productName>
+        <q1:productID>124</q1:productID>
         <q1:version versionType="SW">0</q1:version>
         <q1:version versionType="FW">0</q1:version>
         <q1:version versionType="HW">0</q1:version>
@@ -78,6 +78,10 @@
           </q1:array>
           <q1:array name="Error behavior object" uniqueID="UID_ARR_1029">
             <q1:subrange lowerLimit="0" upperLimit="2" />
+            <USINT />
+          </q1:array>
+          <q1:array name="LEDS" uniqueID="UID_ARR_2003">
+            <q1:subrange lowerLimit="0" upperLimit="210" />
             <USINT />
           </q1:array>
           <q1:struct name="Identity" uniqueID="UID_REC_1018">
@@ -532,114 +536,13 @@
               <UDINT />
             </q1:varDeclaration>
           </q1:struct>
-          <q1:struct name="Position encoder resolution" uniqueID="UID_REC_608F">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_608F00">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Encoder increments" uniqueID="UID_RECSUB_608F01">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Motor revolutions" uniqueID="UID_RECSUB_608F02">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="Velocity encoder resolution" uniqueID="UID_REC_6090">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_609000">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Encoder increments per second" uniqueID="UID_RECSUB_609001">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Motor revolutions per second" uniqueID="UID_RECSUB_609002">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="Gear ratio" uniqueID="UID_REC_6091">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_609100">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Motor revolutions" uniqueID="UID_RECSUB_609101">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Shaft revolutions" uniqueID="UID_RECSUB_609102">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="Feed constant" uniqueID="UID_REC_6092">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_609200">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Feed" uniqueID="UID_RECSUB_609201">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Shaft revolutions" uniqueID="UID_RECSUB_609202">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="Position factor" uniqueID="UID_REC_6093">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_609300">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Numerator" uniqueID="UID_RECSUB_609301">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Feed constant" uniqueID="UID_RECSUB_609302">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="Velocity encoder factor" uniqueID="UID_REC_6094">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_609400">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Numerator" uniqueID="UID_RECSUB_609401">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Divisor" uniqueID="UID_RECSUB_609402">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="Velocity factor 1" uniqueID="UID_REC_6095">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_609500">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Numerator" uniqueID="UID_RECSUB_609501">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Divisor" uniqueID="UID_RECSUB_609502">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="Velocity factor 2" uniqueID="UID_REC_6096">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_609600">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Numerator" uniqueID="UID_RECSUB_609601">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Divisor" uniqueID="UID_RECSUB_609602">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
-          <q1:struct name="Acceleration factor" uniqueID="UID_REC_6097">
-            <q1:varDeclaration name="Highest sub-index supported" uniqueID="UID_RECSUB_609700">
-              <USINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Numerator" uniqueID="UID_RECSUB_609701">
-              <UDINT />
-            </q1:varDeclaration>
-            <q1:varDeclaration name="Divisor" uniqueID="UID_RECSUB_609702">
-              <UDINT />
-            </q1:varDeclaration>
-          </q1:struct>
         </q1:dataTypeList>
         <q1:parameterList>
           <q1:parameter uniqueID="UID_OBJ_1000">
             <description lang="en">* bit 16-31: Additional information
-* bit 0-15: Device profile number
-
-Configured as: CiA 402-1 Servo drive</description>
+* bit 0-15: Device profile number</description>
             <UDINT />
-            <q1:defaultValue value="0x00020192" />
+            <q1:defaultValue value="0x00000000" />
             <q1:property name="CO_countLabel" value="NMT" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
@@ -763,19 +666,19 @@ Configured as: CiA 402-1 Servo drive</description>
           <q1:parameter uniqueID="UID_OBJ_1008">
             <label lang="en">Manufacturer device name</label>
             <STRING />
-            <q1:defaultValue value="AGV ARD MOTOR CONTROL" />
+            <q1:property name="CO_disabled" value="true" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1009">
             <label lang="en">Manufacturer hardware version</label>
             <STRING />
-            <q1:defaultValue value="RevB" />
+            <q1:property name="CO_disabled" value="true" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_100A">
             <label lang="en">Manufacturer software version</label>
             <STRING />
-            <q1:defaultValue value="FIXME_GIT_REVISION" />
+            <q1:property name="CO_disabled" value="true" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_100C" access="readWrite">
@@ -805,7 +708,6 @@ The life time factor multiplied with the guard time gives the life time for the 
   * bit 0: If set, CANopen device saves parameters on command
 * Writing value 0x65766173 ('s','a','v','e' from LSB to MSB) stores corresponding data.</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_ARR_1010" />
-            <q1:property name="CO_disabled" value="true" />
             <q1:property name="CO_countLabel" value="STORAGE" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101000">
@@ -839,7 +741,6 @@ The life time factor multiplied with the guard time gives the life time for the 
   * bit 0: If set, CANopen device restores parameters
 * Writing value 0x64616F6C ('l','o','a','d' from LSB to MSB) restores corresponding data.</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_ARR_1011" />
-            <q1:property name="CO_disabled" value="true" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101100">
             <label lang="en">Highest sub-index supported</label>
@@ -903,7 +804,6 @@ The life time factor multiplied with the guard time gives the life time for the 
   * bit 16-23: Node ID of the monitored node. If 0 or greater than 127, sub-entry is not used.
   * bit 0-15: Heartbeat time in ms (if 0, sub-intry is not used). Value should be higher than the corresponding producer heartbeat time.</description>
             <q1:dataTypeIDRef uniqueIDRef="UID_ARR_1016" />
-            <q1:property name="CO_disabled" value="true" />
             <q1:property name="CO_countLabel" value="HB_CONS" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
@@ -955,7 +855,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_OBJ_1017" access="readWrite">
             <description lang="en">Heartbeat producer time in ms (0 = disable transmission).</description>
             <UINT />
-            <q1:defaultValue value="100" />
+            <q1:defaultValue value="0" />
             <q1:property name="CO_countLabel" value="HB_PROD" />
             <q1:property name="CO_storageGroup" value="PERSIST_COMM" />
           </q1:parameter>
@@ -977,7 +877,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_101801">
             <label lang="en">Vendor-ID</label>
             <UDINT />
-            <q1:defaultValue value="0xFFFF1234" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101802">
             <label lang="en">Product code</label>
@@ -987,7 +887,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_101803">
             <label lang="en">Revision number</label>
             <UDINT />
-            <q1:defaultValue value="0x00000002" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_101804">
             <label lang="en">Serial number</label>
@@ -1311,12 +1211,12 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_140001" access="readWrite">
             <label lang="en">COB-ID used by RPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x200" />
+            <q1:defaultValue value="$NODEID+0x80000200" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140002" access="readWrite">
             <label lang="en">Transmission type</label>
             <USINT />
-            <q1:defaultValue value="255" />
+            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140005" access="readWrite">
             <label lang="en">Event timer</label>
@@ -1346,12 +1246,12 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_140101" access="readWrite">
             <label lang="en">COB-ID used by RPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x300" />
+            <q1:defaultValue value="$NODEID+0x80000300" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140102" access="readWrite">
             <label lang="en">Transmission type</label>
             <USINT />
-            <q1:defaultValue value="255" />
+            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140105" access="readWrite">
             <label lang="en">Event timer</label>
@@ -1381,12 +1281,12 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_140201" access="readWrite">
             <label lang="en">COB-ID used by RPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x400" />
+            <q1:defaultValue value="$NODEID+0x80000400" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140202" access="readWrite">
             <label lang="en">Transmission type</label>
             <USINT />
-            <q1:defaultValue value="255" />
+            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140205" access="readWrite">
             <label lang="en">Event timer</label>
@@ -1416,12 +1316,12 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_140301" access="readWrite">
             <label lang="en">COB-ID used by RPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x500" />
+            <q1:defaultValue value="$NODEID+0x80000500" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140302" access="readWrite">
             <label lang="en">Transmission type</label>
             <USINT />
-            <q1:defaultValue value="255" />
+            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_140305" access="readWrite">
             <label lang="en">Event timer</label>
@@ -1448,7 +1348,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_160001" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60400010" />
+            <q1:defaultValue value="0x20010008" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160002" access="readWrite">
             <label lang="en">Application object 2</label>
@@ -1500,47 +1400,47 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_160100" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="2" />
+            <q1:defaultValue value="8" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160101" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60400010" />
+            <q1:defaultValue value="0x20030108" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160102" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60600008" />
+            <q1:defaultValue value="0x20030408" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160103" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030708" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160104" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030A08" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160105" access="readWrite">
             <label lang="en">Application object 5</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030D08" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160106" access="readWrite">
             <label lang="en">Application object 6</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031008" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160107" access="readWrite">
             <label lang="en">Application object 7</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031308" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160108" access="readWrite">
             <label lang="en">Application object 8</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031608" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1602">
             <description lang="en">* Number of mapped application objects in PDO:
@@ -1557,47 +1457,47 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_160200" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="1" />
+            <q1:defaultValue value="8" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160201" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60400010" />
+            <q1:defaultValue value="0x20030208" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160202" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030508" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160203" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030808" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160204" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030B08" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160205" access="readWrite">
             <label lang="en">Application object 5</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030E08" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160206" access="readWrite">
             <label lang="en">Application object 6</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031108" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160207" access="readWrite">
             <label lang="en">Application object 7</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031408" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160208" access="readWrite">
             <label lang="en">Application object 8</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031708" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1603">
             <description lang="en">* Number of mapped application objects in PDO:
@@ -1614,47 +1514,47 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_160300" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="2" />
+            <q1:defaultValue value="8" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160301" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60400010" />
+            <q1:defaultValue value="0x20030308" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160302" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60FF0020" />
+            <q1:defaultValue value="0x20030608" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160303" access="readWrite">
             <label lang="en">Application object 3</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030908" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160304" access="readWrite">
             <label lang="en">Application object 4</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030C08" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160305" access="readWrite">
             <label lang="en">Application object 5</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20030F08" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160306" access="readWrite">
             <label lang="en">Application object 6</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031208" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160307" access="readWrite">
             <label lang="en">Application object 7</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031508" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_160308" access="readWrite">
             <label lang="en">Application object 8</label>
             <UDINT />
-            <q1:defaultValue value="0x00000000" />
+            <q1:defaultValue value="0x20031808" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_1800">
             <description lang="en">* COB-ID used by RPDO:
@@ -1685,17 +1585,17 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_180001" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x40000180" />
+            <q1:defaultValue value="$NODEID+0xC0000180" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180002" access="readWrite">
             <label lang="en">Transmission type</label>
             <USINT />
-            <q1:defaultValue value="255" />
+            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180003" access="readWrite">
             <label lang="en">Inhibit time</label>
             <UINT />
-            <q1:defaultValue value="10" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180005" access="readWrite">
             <label lang="en">Event timer</label>
@@ -1736,12 +1636,12 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_180101" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x40000280" />
+            <q1:defaultValue value="$NODEID+0xC0000280" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180102" access="readWrite">
             <label lang="en">Transmission type</label>
             <USINT />
-            <q1:defaultValue value="255" />
+            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180103" access="readWrite">
             <label lang="en">Inhibit time</label>
@@ -1787,12 +1687,12 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_180201" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x40000380" />
+            <q1:defaultValue value="$NODEID+0xC0000380" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180202" access="readWrite">
             <label lang="en">Transmission type</label>
             <USINT />
-            <q1:defaultValue value="255" />
+            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180203" access="readWrite">
             <label lang="en">Inhibit time</label>
@@ -1838,12 +1738,12 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_180301" access="readWrite">
             <label lang="en">COB-ID used by TPDO</label>
             <UDINT />
-            <q1:defaultValue value="$NODEID+0x40000480" />
+            <q1:defaultValue value="$NODEID+0xC0000480" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180302" access="readWrite">
             <label lang="en">Transmission type</label>
             <USINT />
-            <q1:defaultValue value="255" />
+            <q1:defaultValue value="254" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_180303" access="readWrite">
             <label lang="en">Inhibit time</label>
@@ -1880,7 +1780,7 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_1A0001" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60410010" />
+            <q1:defaultValue value="0x20020008" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0002" access="readWrite">
             <label lang="en">Application object 2</label>
@@ -1932,17 +1832,17 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_1A0100" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="2" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0101" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60410010" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0102" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60610008" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0103" access="readWrite">
             <label lang="en">Application object 3</label>
@@ -1989,17 +1889,17 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_1A0200" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="2" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0201" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60410010" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0202" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x60640020" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0203" access="readWrite">
             <label lang="en">Application object 3</label>
@@ -2046,17 +1946,17 @@ The life time factor multiplied with the guard time gives the life time for the 
           <q1:parameter uniqueID="UID_SUB_1A0300" access="readWrite">
             <label lang="en">Number of mapped application objects in PDO</label>
             <USINT />
-            <q1:defaultValue value="2" />
+            <q1:defaultValue value="0" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0301" access="readWrite">
             <label lang="en">Application object 1</label>
             <UDINT />
-            <q1:defaultValue value="0x60410010" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0302" access="readWrite">
             <label lang="en">Application object 2</label>
             <UDINT />
-            <q1:defaultValue value="0x606C0020" />
+            <q1:defaultValue value="0x00000000" />
           </q1:parameter>
           <q1:parameter uniqueID="UID_SUB_1A0303" access="readWrite">
             <label lang="en">Application object 3</label>
@@ -2088,343 +1988,1086 @@ The life time factor multiplied with the guard time gives the life time for the 
             <UDINT />
             <q1:defaultValue value="0x00000000" />
           </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_2001" access="readWrite">
+            <description lang="en">0 = noop
+1 = go up
+2 = go down</description>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_2002">
+            <description lang="en">0 = noop
+1 = going up
+2 = going down
+3 = arrived up
+4 = arrived down
+</description>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_OBJ_2003">
+            <description lang="en">Array of RGB values for LED strip</description>
+            <q1:dataTypeIDRef uniqueIDRef="UID_ARR_2003" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200300">
+            <label lang="en">Highest sub-index supported</label>
+            <USINT />
+            <q1:defaultValue value="210" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200301" access="readWrite">
+            <label lang="en">LED 0 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200302" access="readWrite">
+            <label lang="en">LED 0 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200303" access="readWrite">
+            <label lang="en">LED 0 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200304" access="readWrite">
+            <label lang="en">LED 1 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200305" access="readWrite">
+            <label lang="en">LED 1 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200306" access="readWrite">
+            <label lang="en">LED 1 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200307" access="readWrite">
+            <label lang="en">LED 2 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200308" access="readWrite">
+            <label lang="en">LED 2 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200309" access="readWrite">
+            <label lang="en">LED 2 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20030A" access="readWrite">
+            <label lang="en">LED 3 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20030B" access="readWrite">
+            <label lang="en">LED 3 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20030C" access="readWrite">
+            <label lang="en">LED 3 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20030D" access="readWrite">
+            <label lang="en">LED 4 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20030E" access="readWrite">
+            <label lang="en">LED 4 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20030F" access="readWrite">
+            <label lang="en">LED 4 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200310" access="readWrite">
+            <label lang="en">LED 5 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200311" access="readWrite">
+            <label lang="en">LED 5 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200312" access="readWrite">
+            <label lang="en">LED 5 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200313" access="readWrite">
+            <label lang="en">LED 6 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200314" access="readWrite">
+            <label lang="en">LED 6 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200315" access="readWrite">
+            <label lang="en">LED 6 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200316" access="readWrite">
+            <label lang="en">LED 7 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200317" access="readWrite">
+            <label lang="en">LED 7 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200318" access="readWrite">
+            <label lang="en">LED 7 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200319" access="readWrite">
+            <label lang="en">LED 8 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20031A" access="readWrite">
+            <label lang="en">LED 8 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20031B" access="readWrite">
+            <label lang="en">LED 8 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20031C" access="readWrite">
+            <label lang="en">LED 9 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20031D" access="readWrite">
+            <label lang="en">LED 9 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20031E" access="readWrite">
+            <label lang="en">LED 9 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20031F" access="readWrite">
+            <label lang="en">LED 10 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200320" access="readWrite">
+            <label lang="en">LED 10 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200321" access="readWrite">
+            <label lang="en">LED 10 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200322" access="readWrite">
+            <label lang="en">LED 11 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200323" access="readWrite">
+            <label lang="en">LED 11 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200324" access="readWrite">
+            <label lang="en">LED 11 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200325" access="readWrite">
+            <label lang="en">LED 12 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200326" access="readWrite">
+            <label lang="en">LED 12 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200327" access="readWrite">
+            <label lang="en">LED 12 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200328" access="readWrite">
+            <label lang="en">LED 13 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200329" access="readWrite">
+            <label lang="en">LED 13 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20032A" access="readWrite">
+            <label lang="en">LED 13 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20032B" access="readWrite">
+            <label lang="en">LED 14 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20032C" access="readWrite">
+            <label lang="en">LED 14 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20032D" access="readWrite">
+            <label lang="en">LED 14 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20032E" access="readWrite">
+            <label lang="en">LED 15 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20032F" access="readWrite">
+            <label lang="en">LED 15 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200330" access="readWrite">
+            <label lang="en">LED 15 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200331" access="readWrite">
+            <label lang="en">LED 16 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200332" access="readWrite">
+            <label lang="en">LED 16 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200333" access="readWrite">
+            <label lang="en">LED 16 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200334" access="readWrite">
+            <label lang="en">LED 17 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200335" access="readWrite">
+            <label lang="en">LED 17 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200336" access="readWrite">
+            <label lang="en">LED 17 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200337" access="readWrite">
+            <label lang="en">LED 18 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200338" access="readWrite">
+            <label lang="en">LED 18 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200339" access="readWrite">
+            <label lang="en">LED 18 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20033A" access="readWrite">
+            <label lang="en">LED 19 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20033B" access="readWrite">
+            <label lang="en">LED 19 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20033C" access="readWrite">
+            <label lang="en">LED 19 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20033D" access="readWrite">
+            <label lang="en">LED 20 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20033E" access="readWrite">
+            <label lang="en">LED 20 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20033F" access="readWrite">
+            <label lang="en">LED 20 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200340" access="readWrite">
+            <label lang="en">LED 21 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200341" access="readWrite">
+            <label lang="en">LED 21 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200342" access="readWrite">
+            <label lang="en">LED 21 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200343" access="readWrite">
+            <label lang="en">LED 22 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200344" access="readWrite">
+            <label lang="en">LED 22 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200345" access="readWrite">
+            <label lang="en">LED 22 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200346" access="readWrite">
+            <label lang="en">LED 23 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200347" access="readWrite">
+            <label lang="en">LED 23 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200348" access="readWrite">
+            <label lang="en">LED 23 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200349" access="readWrite">
+            <label lang="en">LED 24 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20034A" access="readWrite">
+            <label lang="en">LED 24 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20034B" access="readWrite">
+            <label lang="en">LED 24 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20034C" access="readWrite">
+            <label lang="en">LED 25 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20034D" access="readWrite">
+            <label lang="en">LED 25 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20034E" access="readWrite">
+            <label lang="en">LED 25 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20034F" access="readWrite">
+            <label lang="en">LED 26 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200350" access="readWrite">
+            <label lang="en">LED 26 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200351" access="readWrite">
+            <label lang="en">LED 26 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200352" access="readWrite">
+            <label lang="en">LED 27 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200353" access="readWrite">
+            <label lang="en">LED 27 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200354" access="readWrite">
+            <label lang="en">LED 27 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200355" access="readWrite">
+            <label lang="en">LED 28 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200356" access="readWrite">
+            <label lang="en">LED 28 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200357" access="readWrite">
+            <label lang="en">LED 28 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200358" access="readWrite">
+            <label lang="en">LED 29 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200359" access="readWrite">
+            <label lang="en">LED 29 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20035A" access="readWrite">
+            <label lang="en">LED 29 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20035B" access="readWrite">
+            <label lang="en">LED 30 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20035C" access="readWrite">
+            <label lang="en">LED 30 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20035D" access="readWrite">
+            <label lang="en">LED 30 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20035E" access="readWrite">
+            <label lang="en">LED 31 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20035F" access="readWrite">
+            <label lang="en">LED 31 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200360" access="readWrite">
+            <label lang="en">LED 31 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200361" access="readWrite">
+            <label lang="en">LED 32 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200362" access="readWrite">
+            <label lang="en">LED 32 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200363" access="readWrite">
+            <label lang="en">LED 32 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200364" access="readWrite">
+            <label lang="en">LED 33 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200365" access="readWrite">
+            <label lang="en">LED 33 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200366" access="readWrite">
+            <label lang="en">LED 33 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200367" access="readWrite">
+            <label lang="en">LED 34 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200368" access="readWrite">
+            <label lang="en">LED 34 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200369" access="readWrite">
+            <label lang="en">LED 34 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20036A" access="readWrite">
+            <label lang="en">LED 35 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20036B" access="readWrite">
+            <label lang="en">LED 35 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20036C" access="readWrite">
+            <label lang="en">LED 35 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20036D" access="readWrite">
+            <label lang="en">LED 36 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20036E" access="readWrite">
+            <label lang="en">LED 36 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20036F" access="readWrite">
+            <label lang="en">LED 36 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200370" access="readWrite">
+            <label lang="en">LED 37 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200371" access="readWrite">
+            <label lang="en">LED 37 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200372" access="readWrite">
+            <label lang="en">LED 37 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200373" access="readWrite">
+            <label lang="en">LED 38 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200374" access="readWrite">
+            <label lang="en">LED 38 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200375" access="readWrite">
+            <label lang="en">LED 38 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200376" access="readWrite">
+            <label lang="en">LED 39 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200377" access="readWrite">
+            <label lang="en">LED 39 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200378" access="readWrite">
+            <label lang="en">LED 39 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200379" access="readWrite">
+            <label lang="en">LED 40 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20037A" access="readWrite">
+            <label lang="en">LED 40 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20037B" access="readWrite">
+            <label lang="en">LED 40 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20037C" access="readWrite">
+            <label lang="en">LED 41 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20037D" access="readWrite">
+            <label lang="en">LED 41 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20037E" access="readWrite">
+            <label lang="en">LED 41 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20037F" access="readWrite">
+            <label lang="en">LED 42 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200380" access="readWrite">
+            <label lang="en">LED 42 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200381" access="readWrite">
+            <label lang="en">LED 42 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200382" access="readWrite">
+            <label lang="en">LED 43 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200383" access="readWrite">
+            <label lang="en">LED 43 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200384" access="readWrite">
+            <label lang="en">LED 43 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200385" access="readWrite">
+            <label lang="en">LED 44 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200386" access="readWrite">
+            <label lang="en">LED 44 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200387" access="readWrite">
+            <label lang="en">LED 44 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200388" access="readWrite">
+            <label lang="en">LED 45 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200389" access="readWrite">
+            <label lang="en">LED 45 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20038A" access="readWrite">
+            <label lang="en">LED 45 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20038B" access="readWrite">
+            <label lang="en">LED 46 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20038C" access="readWrite">
+            <label lang="en">LED 46 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20038D" access="readWrite">
+            <label lang="en">LED 46 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20038E" access="readWrite">
+            <label lang="en">LED 47 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20038F" access="readWrite">
+            <label lang="en">LED 47 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200390" access="readWrite">
+            <label lang="en">LED 47 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200391" access="readWrite">
+            <label lang="en">LED 48 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200392" access="readWrite">
+            <label lang="en">LED 48 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200393" access="readWrite">
+            <label lang="en">LED 48 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200394" access="readWrite">
+            <label lang="en">LED 49 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200395" access="readWrite">
+            <label lang="en">LED 49 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200396" access="readWrite">
+            <label lang="en">LED 49 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200397" access="readWrite">
+            <label lang="en">LED 50 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200398" access="readWrite">
+            <label lang="en">LED 50 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_200399" access="readWrite">
+            <label lang="en">LED 50 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20039A" access="readWrite">
+            <label lang="en">LED 51 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20039B" access="readWrite">
+            <label lang="en">LED 51 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20039C" access="readWrite">
+            <label lang="en">LED 51 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20039D" access="readWrite">
+            <label lang="en">LED 52 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20039E" access="readWrite">
+            <label lang="en">LED 52 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_20039F" access="readWrite">
+            <label lang="en">LED 52 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A0" access="readWrite">
+            <label lang="en">LED 53 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A1" access="readWrite">
+            <label lang="en">LED 53 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A2" access="readWrite">
+            <label lang="en">LED 53 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A3" access="readWrite">
+            <label lang="en">LED 54 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A4" access="readWrite">
+            <label lang="en">LED 54 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A5" access="readWrite">
+            <label lang="en">LED 54 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A6" access="readWrite">
+            <label lang="en">LED 55 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A7" access="readWrite">
+            <label lang="en">LED 55 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A8" access="readWrite">
+            <label lang="en">LED 55 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003A9" access="readWrite">
+            <label lang="en">LED 56 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003AA" access="readWrite">
+            <label lang="en">LED 56 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003AB" access="readWrite">
+            <label lang="en">LED 56 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003AC" access="readWrite">
+            <label lang="en">LED 57 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003AD" access="readWrite">
+            <label lang="en">LED 57 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003AE" access="readWrite">
+            <label lang="en">LED 57 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003AF" access="readWrite">
+            <label lang="en">LED 58 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B0" access="readWrite">
+            <label lang="en">LED 58 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B1" access="readWrite">
+            <label lang="en">LED 58 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B2" access="readWrite">
+            <label lang="en">LED 59 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B3" access="readWrite">
+            <label lang="en">LED 59 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B4" access="readWrite">
+            <label lang="en">LED 59 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B5" access="readWrite">
+            <label lang="en">LED 60 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B6" access="readWrite">
+            <label lang="en">LED 60 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B7" access="readWrite">
+            <label lang="en">LED 60 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B8" access="readWrite">
+            <label lang="en">LED 61 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003B9" access="readWrite">
+            <label lang="en">LED 61 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003BA" access="readWrite">
+            <label lang="en">LED 61 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003BB" access="readWrite">
+            <label lang="en">LED 62 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003BC" access="readWrite">
+            <label lang="en">LED 62 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003BD" access="readWrite">
+            <label lang="en">LED 62 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003BE" access="readWrite">
+            <label lang="en">LED 63 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003BF" access="readWrite">
+            <label lang="en">LED 63 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C0" access="readWrite">
+            <label lang="en">LED 63 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C1" access="readWrite">
+            <label lang="en">LED 64 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C2" access="readWrite">
+            <label lang="en">LED 64 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C3" access="readWrite">
+            <label lang="en">LED 64 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C4" access="readWrite">
+            <label lang="en">LED 65 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C5" access="readWrite">
+            <label lang="en">LED 65 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C6" access="readWrite">
+            <label lang="en">LED 65 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C7" access="readWrite">
+            <label lang="en">LED 66 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C8" access="readWrite">
+            <label lang="en">LED 66 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003C9" access="readWrite">
+            <label lang="en">LED 66 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003CA" access="readWrite">
+            <label lang="en">LED 67 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003CB" access="readWrite">
+            <label lang="en">LED 67 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003CC" access="readWrite">
+            <label lang="en">LED 67 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003CD" access="readWrite">
+            <label lang="en">LED 68 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003CE" access="readWrite">
+            <label lang="en">LED 68 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003CF" access="readWrite">
+            <label lang="en">LED 68 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003D0" access="readWrite">
+            <label lang="en">LED 69 R</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003D1" access="readWrite">
+            <label lang="en">LED 69 G</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
+          <q1:parameter uniqueID="UID_SUB_2003D2" access="readWrite">
+            <label lang="en">LED 69 B</label>
+            <USINT />
+            <q1:defaultValue value="0" />
+          </q1:parameter>
           <q1:parameter uniqueID="UID_OBJ_2122">
             <description lang="en">Parameter mode SUPPLY_VOLTAGE (290). 1 unit = 0.1 Volt</description>
             <UINT />
             <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6040" access="readWrite">
-            <description lang="en">Controls the CiA 402-1 state machine
-* bit 15-11: manufacturer specific
-* bit 10-9: reserved, set to zero
-* bit 8: halt
-* bit 7: Fault reset
-* bit 6-4: Operation mode specific
-  * Profile velocity mode: unused
-* bit 3: Enable operation
-* bit 2: Quick stop
-* bit 1: Enable voltage
-* bit 0: Switch on</description>
-            <UINT />
-            <q1:defaultValue value="0xFFFF" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6041">
-            <description lang="en">Indicates the state of the CiA 402-1 state machine
-* bit 0: Ready to switch on
-* bit 1: Switched on
-* bit 2: Operation enabled
-* bit 3: Fault
-* bit 4: Voltage enabled
-* bit 5: Quick stop
-* bit 6: Switch on disabled
-* bit 7: Warning
-* bit 8: Manufacturer specific
-* bit 9: Remote
-* bit 10: Target reached
-* bit 11: Internal limit active
-* bit 12-13: Operation mode specific
-* bit 15-14: Manufacturer specific
-</description>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6060" access="readWrite">
-            <description lang="en">* -1 ... -128: manufacturer specific modes of operation
-* 0: reserved
-* 1: Profile Position Mode
-* 2: Velocity Mode
-* 3: Profile Velocity Mode
-* 4: Torque Profile Mode
-* 5: reserved
-* 6: Homing Mode
-* 7: Interpolated Position Mode
-* 8 ... 127: reserved</description>
-            <SINT />
-            <q1:defaultValue value="3" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6061">
-            <description lang="en">Current mode of operation. May differ from the value written to 0x6060 Modes of operation. Same data description as 0x6060.</description>
-            <SINT />
-            <q1:defaultValue value="3" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6063">
-            <label lang="en">Position actual value*</label>
-            <DINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6064">
-            <label lang="en">Position actual value</label>
-            <DINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6069">
-            <label lang="en">Velocity sensor actual value</label>
-            <DINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_606B">
-            <description lang="en">Trajectory generator value. TMC9660 RAMP_VELOCITY</description>
-            <DINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_606C">
-            <description lang="en">TMC9660 ACTUAL_VELOCITY</description>
-            <DINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6071">
-            <label lang="en">Target torque</label>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6072">
-            <label lang="en">Max torque</label>
-            <UINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_607E" access="readWrite">
-            <label lang="en">Polarity</label>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6081" access="readWrite">
-            <description lang="en">TMC9660 vmax / target vel</description>
-            <UDINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6083" access="readWrite">
-            <description lang="en">TMC9660 target acceleration</description>
-            <UDINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6084" access="readWrite">
-            <description lang="en">TMC9660 target deceleration</description>
-            <UDINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6086" access="readWrite">
-            <description lang="en">* 0 = linear ramp / trapezoidal profile</description>
-            <INT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6089" access="readWrite">
-            <label lang="en">Position notation index</label>
-            <STRING />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_608A" access="readWrite">
-            <description lang="en">FIXME set an actual unit</description>
-            <USINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_608B" access="readWrite">
-            <label lang="en">Velocity notation index</label>
-            <SINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_608C" access="readWrite">
-            <label lang="en">Velocity dimension index</label>
-            <SINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_608F">
-            <label lang="en">Position encoder resolution</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_608F" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_608F00">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_608F01" access="readWrite">
-            <label lang="en">Encoder increments</label>
-            <UDINT />
-            <q1:defaultValue value="40000" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_608F02" access="readWrite">
-            <label lang="en">Motor revolutions</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6090">
-            <label lang="en">Velocity encoder resolution</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6090" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609000">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609001" access="readWrite">
-            <label lang="en">Encoder increments per second</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609002" access="readWrite">
-            <label lang="en">Motor revolutions per second</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6091">
-            <label lang="en">Gear ratio</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6091" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609100">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609101" access="readWrite">
-            <label lang="en">Motor revolutions</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609102" access="readWrite">
-            <label lang="en">Shaft revolutions</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6092">
-            <label lang="en">Feed constant</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6092" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609200">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609201" access="readWrite">
-            <label lang="en">Feed</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609202" access="readWrite">
-            <label lang="en">Shaft revolutions</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6093">
-            <label lang="en">Position factor</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6093" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609300">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609301" access="readWrite">
-            <label lang="en">Numerator</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609302" access="readWrite">
-            <label lang="en">Feed constant</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6094">
-            <label lang="en">Velocity encoder factor</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6094" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609400">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609401" access="readWrite">
-            <label lang="en">Numerator</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609402" access="readWrite">
-            <label lang="en">Divisor</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6095">
-            <label lang="en">Velocity factor 1</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6095" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609500">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609501" access="readWrite">
-            <label lang="en">Numerator</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609502" access="readWrite">
-            <label lang="en">Divisor</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6096">
-            <label lang="en">Velocity factor 2</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6096" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609600">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609601" access="readWrite">
-            <label lang="en">Numerator</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609602" access="readWrite">
-            <label lang="en">Divisor</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6097">
-            <label lang="en">Acceleration factor</label>
-            <q1:dataTypeIDRef uniqueIDRef="UID_REC_6097" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609700">
-            <label lang="en">Highest sub-index supported</label>
-            <USINT />
-            <q1:defaultValue value="2" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609701" access="readWrite">
-            <label lang="en">Numerator</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_SUB_609702" access="readWrite">
-            <label lang="en">Divisor</label>
-            <UDINT />
-            <q1:defaultValue value="1" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_60F8">
-            <label lang="en">Max slippage</label>
-            <DINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_60FF" access="readWrite">
-            <label lang="en">Target velocity</label>
-            <DINT />
-            <q1:defaultValue value="0" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_6502" access="readWrite">
-            <description lang="en">* bit 0: profile position
-* bit 1: velocity
-* bit 2: profile velocity &lt;&lt;&lt;&lt;&lt; we have this
-* bit 3: torque
-* bit 4: reserved
-* bit 5: homing
-* bit 6: interpolated position
-* bit 7-15: reserved
-* bit 16-31: manufacturer specific</description>
-            <UDINT />
-            <q1:defaultValue value="0x00000004" />
-          </q1:parameter>
-          <q1:parameter uniqueID="UID_OBJ_67FF">
-            <description lang="en">CiA 402-1</description>
-            <UDINT />
-            <q1:defaultValue value="0x00020192" />
           </q1:parameter>
         </q1:parameterList>
       </q1:ApplicationProcess>
@@ -2443,7 +3086,7 @@ The life time factor multiplied with the guard time gives the life time for the 
         <ProfileTechnology>CANopen</ProfileTechnology>
       </ISO15745Reference>
     </ProfileHeader>
-    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_CIA402_ProfileVelocity_Barebones.xdd" fileCreator="" fileCreationDate="2025-01-13" fileCreationTime="11:03:07.0000000+02:00" fileModificationDate="2025-02-26" fileModificationTime="13:50:52.8803287+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
+    <ProfileBody xmlns:q2="http://www.canopen.org/xml/1.1" xsi:type="q2:ProfileBody_CommunicationNetwork_CANopen" formatName="CANopen" formatVersion="1.0" fileName="AGV_Lifter.xdd" fileCreator="" fileCreationDate="2025-02-25" fileCreationTime="16:32:10.0000000+02:00" fileModificationDate="2025-02-25" fileModificationTime="18:31:20.4113477+02:00" fileVersion="1" supportedLanguages="en" xmlns="">
       <ApplicationLayers>
         <q2:CANopenObjectList>
           <CANopenObject index="1000" name="Device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_1000" />
@@ -2721,76 +3364,222 @@ The life time factor multiplied with the guard time gives the life time for the 
             <CANopenSubObject subIndex="07" name="Application object 7" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0307" />
             <CANopenSubObject subIndex="08" name="Application object 8" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_1A0308" />
           </CANopenObject>
+          <CANopenObject index="2001" name="Lifter target" objectType="7" PDOmapping="optional" uniqueIDRef="UID_OBJ_2001" />
+          <CANopenObject index="2002" name="Lifter status" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_2002" />
+          <CANopenObject index="2003" name="LEDS" objectType="8" uniqueIDRef="UID_OBJ_2003" subNumber="211">
+            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_200300" />
+            <CANopenSubObject subIndex="01" name="LED 0 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200301" />
+            <CANopenSubObject subIndex="02" name="LED 0 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200302" />
+            <CANopenSubObject subIndex="03" name="LED 0 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200303" />
+            <CANopenSubObject subIndex="04" name="LED 1 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200304" />
+            <CANopenSubObject subIndex="05" name="LED 1 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200305" />
+            <CANopenSubObject subIndex="06" name="LED 1 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200306" />
+            <CANopenSubObject subIndex="07" name="LED 2 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200307" />
+            <CANopenSubObject subIndex="08" name="LED 2 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200308" />
+            <CANopenSubObject subIndex="09" name="LED 2 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200309" />
+            <CANopenSubObject subIndex="0A" name="LED 3 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20030A" />
+            <CANopenSubObject subIndex="0B" name="LED 3 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20030B" />
+            <CANopenSubObject subIndex="0C" name="LED 3 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20030C" />
+            <CANopenSubObject subIndex="0D" name="LED 4 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20030D" />
+            <CANopenSubObject subIndex="0E" name="LED 4 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20030E" />
+            <CANopenSubObject subIndex="0F" name="LED 4 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20030F" />
+            <CANopenSubObject subIndex="10" name="LED 5 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200310" />
+            <CANopenSubObject subIndex="11" name="LED 5 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200311" />
+            <CANopenSubObject subIndex="12" name="LED 5 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200312" />
+            <CANopenSubObject subIndex="13" name="LED 6 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200313" />
+            <CANopenSubObject subIndex="14" name="LED 6 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200314" />
+            <CANopenSubObject subIndex="15" name="LED 6 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200315" />
+            <CANopenSubObject subIndex="16" name="LED 7 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200316" />
+            <CANopenSubObject subIndex="17" name="LED 7 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200317" />
+            <CANopenSubObject subIndex="18" name="LED 7 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200318" />
+            <CANopenSubObject subIndex="19" name="LED 8 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200319" />
+            <CANopenSubObject subIndex="1A" name="LED 8 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20031A" />
+            <CANopenSubObject subIndex="1B" name="LED 8 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20031B" />
+            <CANopenSubObject subIndex="1C" name="LED 9 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20031C" />
+            <CANopenSubObject subIndex="1D" name="LED 9 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20031D" />
+            <CANopenSubObject subIndex="1E" name="LED 9 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20031E" />
+            <CANopenSubObject subIndex="1F" name="LED 10 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20031F" />
+            <CANopenSubObject subIndex="20" name="LED 10 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200320" />
+            <CANopenSubObject subIndex="21" name="LED 10 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200321" />
+            <CANopenSubObject subIndex="22" name="LED 11 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200322" />
+            <CANopenSubObject subIndex="23" name="LED 11 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200323" />
+            <CANopenSubObject subIndex="24" name="LED 11 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200324" />
+            <CANopenSubObject subIndex="25" name="LED 12 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200325" />
+            <CANopenSubObject subIndex="26" name="LED 12 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200326" />
+            <CANopenSubObject subIndex="27" name="LED 12 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200327" />
+            <CANopenSubObject subIndex="28" name="LED 13 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200328" />
+            <CANopenSubObject subIndex="29" name="LED 13 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200329" />
+            <CANopenSubObject subIndex="2A" name="LED 13 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20032A" />
+            <CANopenSubObject subIndex="2B" name="LED 14 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20032B" />
+            <CANopenSubObject subIndex="2C" name="LED 14 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20032C" />
+            <CANopenSubObject subIndex="2D" name="LED 14 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20032D" />
+            <CANopenSubObject subIndex="2E" name="LED 15 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20032E" />
+            <CANopenSubObject subIndex="2F" name="LED 15 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20032F" />
+            <CANopenSubObject subIndex="30" name="LED 15 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200330" />
+            <CANopenSubObject subIndex="31" name="LED 16 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200331" />
+            <CANopenSubObject subIndex="32" name="LED 16 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200332" />
+            <CANopenSubObject subIndex="33" name="LED 16 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200333" />
+            <CANopenSubObject subIndex="34" name="LED 17 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200334" />
+            <CANopenSubObject subIndex="35" name="LED 17 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200335" />
+            <CANopenSubObject subIndex="36" name="LED 17 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200336" />
+            <CANopenSubObject subIndex="37" name="LED 18 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200337" />
+            <CANopenSubObject subIndex="38" name="LED 18 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200338" />
+            <CANopenSubObject subIndex="39" name="LED 18 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200339" />
+            <CANopenSubObject subIndex="3A" name="LED 19 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20033A" />
+            <CANopenSubObject subIndex="3B" name="LED 19 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20033B" />
+            <CANopenSubObject subIndex="3C" name="LED 19 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20033C" />
+            <CANopenSubObject subIndex="3D" name="LED 20 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20033D" />
+            <CANopenSubObject subIndex="3E" name="LED 20 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20033E" />
+            <CANopenSubObject subIndex="3F" name="LED 20 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20033F" />
+            <CANopenSubObject subIndex="40" name="LED 21 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200340" />
+            <CANopenSubObject subIndex="41" name="LED 21 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200341" />
+            <CANopenSubObject subIndex="42" name="LED 21 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200342" />
+            <CANopenSubObject subIndex="43" name="LED 22 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200343" />
+            <CANopenSubObject subIndex="44" name="LED 22 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200344" />
+            <CANopenSubObject subIndex="45" name="LED 22 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200345" />
+            <CANopenSubObject subIndex="46" name="LED 23 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200346" />
+            <CANopenSubObject subIndex="47" name="LED 23 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200347" />
+            <CANopenSubObject subIndex="48" name="LED 23 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200348" />
+            <CANopenSubObject subIndex="49" name="LED 24 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200349" />
+            <CANopenSubObject subIndex="4A" name="LED 24 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20034A" />
+            <CANopenSubObject subIndex="4B" name="LED 24 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20034B" />
+            <CANopenSubObject subIndex="4C" name="LED 25 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20034C" />
+            <CANopenSubObject subIndex="4D" name="LED 25 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20034D" />
+            <CANopenSubObject subIndex="4E" name="LED 25 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20034E" />
+            <CANopenSubObject subIndex="4F" name="LED 26 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20034F" />
+            <CANopenSubObject subIndex="50" name="LED 26 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200350" />
+            <CANopenSubObject subIndex="51" name="LED 26 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200351" />
+            <CANopenSubObject subIndex="52" name="LED 27 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200352" />
+            <CANopenSubObject subIndex="53" name="LED 27 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200353" />
+            <CANopenSubObject subIndex="54" name="LED 27 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200354" />
+            <CANopenSubObject subIndex="55" name="LED 28 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200355" />
+            <CANopenSubObject subIndex="56" name="LED 28 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200356" />
+            <CANopenSubObject subIndex="57" name="LED 28 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200357" />
+            <CANopenSubObject subIndex="58" name="LED 29 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200358" />
+            <CANopenSubObject subIndex="59" name="LED 29 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200359" />
+            <CANopenSubObject subIndex="5A" name="LED 29 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20035A" />
+            <CANopenSubObject subIndex="5B" name="LED 30 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20035B" />
+            <CANopenSubObject subIndex="5C" name="LED 30 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20035C" />
+            <CANopenSubObject subIndex="5D" name="LED 30 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20035D" />
+            <CANopenSubObject subIndex="5E" name="LED 31 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20035E" />
+            <CANopenSubObject subIndex="5F" name="LED 31 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20035F" />
+            <CANopenSubObject subIndex="60" name="LED 31 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200360" />
+            <CANopenSubObject subIndex="61" name="LED 32 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200361" />
+            <CANopenSubObject subIndex="62" name="LED 32 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200362" />
+            <CANopenSubObject subIndex="63" name="LED 32 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200363" />
+            <CANopenSubObject subIndex="64" name="LED 33 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200364" />
+            <CANopenSubObject subIndex="65" name="LED 33 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200365" />
+            <CANopenSubObject subIndex="66" name="LED 33 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200366" />
+            <CANopenSubObject subIndex="67" name="LED 34 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200367" />
+            <CANopenSubObject subIndex="68" name="LED 34 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200368" />
+            <CANopenSubObject subIndex="69" name="LED 34 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200369" />
+            <CANopenSubObject subIndex="6A" name="LED 35 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20036A" />
+            <CANopenSubObject subIndex="6B" name="LED 35 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20036B" />
+            <CANopenSubObject subIndex="6C" name="LED 35 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20036C" />
+            <CANopenSubObject subIndex="6D" name="LED 36 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20036D" />
+            <CANopenSubObject subIndex="6E" name="LED 36 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20036E" />
+            <CANopenSubObject subIndex="6F" name="LED 36 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20036F" />
+            <CANopenSubObject subIndex="70" name="LED 37 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200370" />
+            <CANopenSubObject subIndex="71" name="LED 37 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200371" />
+            <CANopenSubObject subIndex="72" name="LED 37 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200372" />
+            <CANopenSubObject subIndex="73" name="LED 38 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200373" />
+            <CANopenSubObject subIndex="74" name="LED 38 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200374" />
+            <CANopenSubObject subIndex="75" name="LED 38 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200375" />
+            <CANopenSubObject subIndex="76" name="LED 39 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200376" />
+            <CANopenSubObject subIndex="77" name="LED 39 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200377" />
+            <CANopenSubObject subIndex="78" name="LED 39 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200378" />
+            <CANopenSubObject subIndex="79" name="LED 40 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200379" />
+            <CANopenSubObject subIndex="7A" name="LED 40 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20037A" />
+            <CANopenSubObject subIndex="7B" name="LED 40 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20037B" />
+            <CANopenSubObject subIndex="7C" name="LED 41 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20037C" />
+            <CANopenSubObject subIndex="7D" name="LED 41 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20037D" />
+            <CANopenSubObject subIndex="7E" name="LED 41 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20037E" />
+            <CANopenSubObject subIndex="7F" name="LED 42 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20037F" />
+            <CANopenSubObject subIndex="80" name="LED 42 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200380" />
+            <CANopenSubObject subIndex="81" name="LED 42 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200381" />
+            <CANopenSubObject subIndex="82" name="LED 43 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200382" />
+            <CANopenSubObject subIndex="83" name="LED 43 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200383" />
+            <CANopenSubObject subIndex="84" name="LED 43 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200384" />
+            <CANopenSubObject subIndex="85" name="LED 44 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200385" />
+            <CANopenSubObject subIndex="86" name="LED 44 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200386" />
+            <CANopenSubObject subIndex="87" name="LED 44 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200387" />
+            <CANopenSubObject subIndex="88" name="LED 45 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200388" />
+            <CANopenSubObject subIndex="89" name="LED 45 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200389" />
+            <CANopenSubObject subIndex="8A" name="LED 45 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20038A" />
+            <CANopenSubObject subIndex="8B" name="LED 46 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20038B" />
+            <CANopenSubObject subIndex="8C" name="LED 46 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20038C" />
+            <CANopenSubObject subIndex="8D" name="LED 46 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20038D" />
+            <CANopenSubObject subIndex="8E" name="LED 47 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20038E" />
+            <CANopenSubObject subIndex="8F" name="LED 47 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20038F" />
+            <CANopenSubObject subIndex="90" name="LED 47 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200390" />
+            <CANopenSubObject subIndex="91" name="LED 48 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200391" />
+            <CANopenSubObject subIndex="92" name="LED 48 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200392" />
+            <CANopenSubObject subIndex="93" name="LED 48 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200393" />
+            <CANopenSubObject subIndex="94" name="LED 49 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200394" />
+            <CANopenSubObject subIndex="95" name="LED 49 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200395" />
+            <CANopenSubObject subIndex="96" name="LED 49 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200396" />
+            <CANopenSubObject subIndex="97" name="LED 50 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200397" />
+            <CANopenSubObject subIndex="98" name="LED 50 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200398" />
+            <CANopenSubObject subIndex="99" name="LED 50 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_200399" />
+            <CANopenSubObject subIndex="9A" name="LED 51 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20039A" />
+            <CANopenSubObject subIndex="9B" name="LED 51 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20039B" />
+            <CANopenSubObject subIndex="9C" name="LED 51 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20039C" />
+            <CANopenSubObject subIndex="9D" name="LED 52 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20039D" />
+            <CANopenSubObject subIndex="9E" name="LED 52 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20039E" />
+            <CANopenSubObject subIndex="9F" name="LED 52 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_20039F" />
+            <CANopenSubObject subIndex="A0" name="LED 53 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A0" />
+            <CANopenSubObject subIndex="A1" name="LED 53 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A1" />
+            <CANopenSubObject subIndex="A2" name="LED 53 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A2" />
+            <CANopenSubObject subIndex="A3" name="LED 54 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A3" />
+            <CANopenSubObject subIndex="A4" name="LED 54 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A4" />
+            <CANopenSubObject subIndex="A5" name="LED 54 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A5" />
+            <CANopenSubObject subIndex="A6" name="LED 55 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A6" />
+            <CANopenSubObject subIndex="A7" name="LED 55 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A7" />
+            <CANopenSubObject subIndex="A8" name="LED 55 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A8" />
+            <CANopenSubObject subIndex="A9" name="LED 56 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003A9" />
+            <CANopenSubObject subIndex="AA" name="LED 56 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003AA" />
+            <CANopenSubObject subIndex="AB" name="LED 56 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003AB" />
+            <CANopenSubObject subIndex="AC" name="LED 57 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003AC" />
+            <CANopenSubObject subIndex="AD" name="LED 57 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003AD" />
+            <CANopenSubObject subIndex="AE" name="LED 57 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003AE" />
+            <CANopenSubObject subIndex="AF" name="LED 58 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003AF" />
+            <CANopenSubObject subIndex="B0" name="LED 58 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B0" />
+            <CANopenSubObject subIndex="B1" name="LED 58 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B1" />
+            <CANopenSubObject subIndex="B2" name="LED 59 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B2" />
+            <CANopenSubObject subIndex="B3" name="LED 59 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B3" />
+            <CANopenSubObject subIndex="B4" name="LED 59 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B4" />
+            <CANopenSubObject subIndex="B5" name="LED 60 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B5" />
+            <CANopenSubObject subIndex="B6" name="LED 60 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B6" />
+            <CANopenSubObject subIndex="B7" name="LED 60 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B7" />
+            <CANopenSubObject subIndex="B8" name="LED 61 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B8" />
+            <CANopenSubObject subIndex="B9" name="LED 61 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003B9" />
+            <CANopenSubObject subIndex="BA" name="LED 61 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003BA" />
+            <CANopenSubObject subIndex="BB" name="LED 62 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003BB" />
+            <CANopenSubObject subIndex="BC" name="LED 62 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003BC" />
+            <CANopenSubObject subIndex="BD" name="LED 62 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003BD" />
+            <CANopenSubObject subIndex="BE" name="LED 63 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003BE" />
+            <CANopenSubObject subIndex="BF" name="LED 63 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003BF" />
+            <CANopenSubObject subIndex="C0" name="LED 63 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C0" />
+            <CANopenSubObject subIndex="C1" name="LED 64 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C1" />
+            <CANopenSubObject subIndex="C2" name="LED 64 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C2" />
+            <CANopenSubObject subIndex="C3" name="LED 64 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C3" />
+            <CANopenSubObject subIndex="C4" name="LED 65 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C4" />
+            <CANopenSubObject subIndex="C5" name="LED 65 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C5" />
+            <CANopenSubObject subIndex="C6" name="LED 65 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C6" />
+            <CANopenSubObject subIndex="C7" name="LED 66 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C7" />
+            <CANopenSubObject subIndex="C8" name="LED 66 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C8" />
+            <CANopenSubObject subIndex="C9" name="LED 66 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003C9" />
+            <CANopenSubObject subIndex="CA" name="LED 67 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003CA" />
+            <CANopenSubObject subIndex="CB" name="LED 67 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003CB" />
+            <CANopenSubObject subIndex="CC" name="LED 67 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003CC" />
+            <CANopenSubObject subIndex="CD" name="LED 68 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003CD" />
+            <CANopenSubObject subIndex="CE" name="LED 68 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003CE" />
+            <CANopenSubObject subIndex="CF" name="LED 68 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003CF" />
+            <CANopenSubObject subIndex="D0" name="LED 69 R" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003D0" />
+            <CANopenSubObject subIndex="D1" name="LED 69 G" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003D1" />
+            <CANopenSubObject subIndex="D2" name="LED 69 B" objectType="7" PDOmapping="optional" uniqueIDRef="UID_SUB_2003D2" />
+          </CANopenObject>
           <CANopenObject index="2122" name="TMC9660 SUPPLY_VOLTAGE" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_2122" />
-          <CANopenObject index="6040" name="Controlword" objectType="7" PDOmapping="optional" uniqueIDRef="UID_OBJ_6040" />
-          <CANopenObject index="6041" name="Statusword" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6041" />
-          <CANopenObject index="6060" name="Modes of operation" objectType="7" PDOmapping="optional" uniqueIDRef="UID_OBJ_6060" />
-          <CANopenObject index="6061" name="Modes of operation display" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6061" />
-          <CANopenObject index="6063" name="Position actual value*" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6063" />
-          <CANopenObject index="6064" name="Position actual value" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6064" />
-          <CANopenObject index="6069" name="Velocity sensor actual value" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6069" />
-          <CANopenObject index="606B" name="Velocity demand value" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_606B" />
-          <CANopenObject index="606C" name="Velocity actual value" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_606C" />
-          <CANopenObject index="6071" name="Target torque" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6071" />
-          <CANopenObject index="6072" name="Max torque" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_6072" />
-          <CANopenObject index="607E" name="Polarity" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_607E" />
-          <CANopenObject index="6081" name="Profile velocity" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6081" />
-          <CANopenObject index="6083" name="Profile acceleration" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6083" />
-          <CANopenObject index="6084" name="Profile deceleration" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6084" />
-          <CANopenObject index="6086" name="Motion profile type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6086" />
-          <CANopenObject index="6089" name="Position notation index" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6089" />
-          <CANopenObject index="608A" name="Position dimension index" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_608A" />
-          <CANopenObject index="608B" name="Velocity notation index" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_608B" />
-          <CANopenObject index="608C" name="Velocity dimension index" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_608C" />
-          <CANopenObject index="608F" name="Position encoder resolution" objectType="9" uniqueIDRef="UID_OBJ_608F" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_608F00" />
-            <CANopenSubObject subIndex="01" name="Encoder increments" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_608F01" />
-            <CANopenSubObject subIndex="02" name="Motor revolutions" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_608F02" />
-          </CANopenObject>
-          <CANopenObject index="6090" name="Velocity encoder resolution" objectType="9" uniqueIDRef="UID_OBJ_6090" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609000" />
-            <CANopenSubObject subIndex="01" name="Encoder increments per second" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609001" />
-            <CANopenSubObject subIndex="02" name="Motor revolutions per second" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609002" />
-          </CANopenObject>
-          <CANopenObject index="6091" name="Gear ratio" objectType="9" uniqueIDRef="UID_OBJ_6091" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609100" />
-            <CANopenSubObject subIndex="01" name="Motor revolutions" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609101" />
-            <CANopenSubObject subIndex="02" name="Shaft revolutions" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609102" />
-          </CANopenObject>
-          <CANopenObject index="6092" name="Feed constant" objectType="9" uniqueIDRef="UID_OBJ_6092" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609200" />
-            <CANopenSubObject subIndex="01" name="Feed" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609201" />
-            <CANopenSubObject subIndex="02" name="Shaft revolutions" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609202" />
-          </CANopenObject>
-          <CANopenObject index="6093" name="Position factor" objectType="9" uniqueIDRef="UID_OBJ_6093" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609300" />
-            <CANopenSubObject subIndex="01" name="Numerator" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609301" />
-            <CANopenSubObject subIndex="02" name="Feed constant" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609302" />
-          </CANopenObject>
-          <CANopenObject index="6094" name="Velocity encoder factor" objectType="9" uniqueIDRef="UID_OBJ_6094" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609400" />
-            <CANopenSubObject subIndex="01" name="Numerator" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609401" />
-            <CANopenSubObject subIndex="02" name="Divisor" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609402" />
-          </CANopenObject>
-          <CANopenObject index="6095" name="Velocity factor 1" objectType="9" uniqueIDRef="UID_OBJ_6095" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609500" />
-            <CANopenSubObject subIndex="01" name="Numerator" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609501" />
-            <CANopenSubObject subIndex="02" name="Divisor" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609502" />
-          </CANopenObject>
-          <CANopenObject index="6096" name="Velocity factor 2" objectType="9" uniqueIDRef="UID_OBJ_6096" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609600" />
-            <CANopenSubObject subIndex="01" name="Numerator" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609601" />
-            <CANopenSubObject subIndex="02" name="Divisor" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609602" />
-          </CANopenObject>
-          <CANopenObject index="6097" name="Acceleration factor" objectType="9" uniqueIDRef="UID_OBJ_6097" subNumber="3">
-            <CANopenSubObject subIndex="00" name="Highest sub-index supported" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609700" />
-            <CANopenSubObject subIndex="01" name="Numerator" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609701" />
-            <CANopenSubObject subIndex="02" name="Divisor" objectType="7" PDOmapping="no" uniqueIDRef="UID_SUB_609702" />
-          </CANopenObject>
-          <CANopenObject index="60F8" name="Max slippage" objectType="7" PDOmapping="TPDO" uniqueIDRef="UID_OBJ_60F8" />
-          <CANopenObject index="60FF" name="Target velocity" objectType="7" PDOmapping="optional" uniqueIDRef="UID_OBJ_60FF" />
-          <CANopenObject index="6502" name="Supported drive modes" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_6502" />
-          <CANopenObject index="67FF" name="Single device type" objectType="7" PDOmapping="no" uniqueIDRef="UID_OBJ_67FF" />
         </q2:CANopenObjectList>
         <dummyUsage>
           <dummy entry="Dummy0001=0" />

@@ -90,7 +90,7 @@ void cia402_init(struct cia402* cia402) {
     OD_extension_init(OD_ENTRY_H6041_statusword, &cia402->statusword_extension);
     OD_extension_init(OD_ENTRY_H6061_modesOfOperationDisplay, &cia402->mod_extension);
     OD_extension_init(OD_ENTRY_H606C_velocityActualValue, &cia402->vel_extension);
-    OD_extension_init(OD_ENTRY_H6063_positionActualValue, &cia402->pos_extension);
+    OD_extension_init(OD_ENTRY_H6064_positionActualValue, &cia402->pos_extension);
 }
 
 void cia402_set_state(struct cia402* cia402, enum cia402_state state)
@@ -398,7 +398,7 @@ int main()
     co.node_id = 0x10 + dip_setting;
     LOG_INF("CANopen node ID = %d", co.node_id);
     co.bitrate = CAN_BITRATE;
-    co.nmt_control = 0;
+    co.nmt_control = CO_NMT_STARTUP_TO_OPERATIONAL;
     co.led_callback = led_callback;
     // co.sync_callback = sync_callback;
     err = canopen_init(&co);
@@ -483,7 +483,7 @@ int main()
             err = tmc9660_get_param(&tmc9660, MAX_TORQUE, &max_torque);
             if(err) LOG_ERR("MAX_TORQUE %d", err);
 
-            err = OD_set_i32(OD_ENTRY_H6063_positionActualValue, 0, actual_pos, false);
+            err = OD_set_i32(OD_ENTRY_H6064_positionActualValue, 0, actual_pos, false);
             if(err) LOG_ERR("actual_pos");
             err = OD_set_i32(OD_ENTRY_H606C_velocityActualValue, 0, actual_vel, false);
             if(err) LOG_ERR("actual_vel");
@@ -493,6 +493,9 @@ int main()
             if(err) LOG_ERR("target_torque");
             err = OD_set_u16(OD_ENTRY_H6072_maxTorque, 0, max_torque, false);
             if(err) LOG_ERR("max_torque");
+
+            OD_requestTPDO(OD_getFlagsPDO(OD_ENTRY_H606C_velocityActualValue), 0);
+            OD_requestTPDO(OD_getFlagsPDO(OD_ENTRY_H6064_positionActualValue), 0);
 
             if(err != ODR_OK)
             {
@@ -573,7 +576,7 @@ int main()
             } else if(tr_disablev) { // Transition 9
                 nextState = CIA402_SWITCH_ON_DISABLED;
             } else if (tr_quickstp || cw_halt) { // Transition 11 + custom
-                nextState = CIA402_QUICK_STOP_ACTIVE;
+                // XXX nextState = CIA402_QUICK_STOP_ACTIVE;
             } else {
                 // LOG_WRN("Controlword %04X invalid for state OPERATION_ENABLED", controlword);
             }

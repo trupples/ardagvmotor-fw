@@ -171,7 +171,7 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     .x1A02_TPDOMappingParameter = {
         .numberOfMappedApplicationObjectsInPDO = 0x02,
         .applicationObject1 = 0x60410010,
-        .applicationObject2 = 0x60630020,
+        .applicationObject2 = 0x60640020,
         .applicationObject3 = 0x00000000,
         .applicationObject4 = 0x00000000,
         .applicationObject5 = 0x00000000,
@@ -205,6 +205,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
     .x6060_modesOfOperation = 3,
     .x6061_modesOfOperationDisplay = 3,
     .x6063_positionActualValue = 0,
+    .x6064_positionActualValue = 0,
     .x6069_velocitySensorActualValue = 0,
     .x606B_velocityDemandValue = 0,
     .x606C_velocityActualValue = 0,
@@ -315,6 +316,7 @@ typedef struct {
     OD_obj_var_t o_6060_modesOfOperation;
     OD_obj_var_t o_6061_modesOfOperationDisplay;
     OD_obj_var_t o_6063_positionActualValue;
+    OD_obj_var_t o_6064_positionActualValue;
     OD_obj_var_t o_6069_velocitySensorActualValue;
     OD_obj_var_t o_606B_velocityDemandValue;
     OD_obj_var_t o_606C_velocityActualValue;
@@ -1230,6 +1232,11 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 4
     },
+    .o_6064_positionActualValue = {
+        .dataOrig = &OD_RAM.x6064_positionActualValue,
+        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
+        .dataLength = 4
+    },
     .o_6069_velocitySensorActualValue = {
         .dataOrig = &OD_RAM.x6069_velocitySensorActualValue,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
@@ -1546,6 +1553,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x6060, 0x01, ODT_VAR, &ODObjs.o_6060_modesOfOperation, NULL},
     {0x6061, 0x01, ODT_VAR, &ODObjs.o_6061_modesOfOperationDisplay, NULL},
     {0x6063, 0x01, ODT_VAR, &ODObjs.o_6063_positionActualValue, NULL},
+    {0x6064, 0x01, ODT_VAR, &ODObjs.o_6064_positionActualValue, NULL},
     {0x6069, 0x01, ODT_VAR, &ODObjs.o_6069_velocitySensorActualValue, NULL},
     {0x606B, 0x01, ODT_VAR, &ODObjs.o_606B_velocityDemandValue, NULL},
     {0x606C, 0x01, ODT_VAR, &ODObjs.o_606C_velocityActualValue, NULL},

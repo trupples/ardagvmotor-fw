@@ -8,8 +8,8 @@ Description=
 CreationTime=11:03AM
 CreationDate=01-13-2025
 CreatedBy=
-ModificationTime=6:46PM
-ModificationDate=01-31-2025
+ModificationTime=1:50PM
+ModificationDate=02-26-2025
 ModifiedBy=
 
 [DeviceInfo]
@@ -125,7 +125,7 @@ DefaultValue=0x00000000
 PDOMapping=0
 
 [OptionalObjects]
-SupportedObjects=62
+SupportedObjects=63
 1=0x1003
 2=0x1005
 3=0x1006
@@ -161,33 +161,34 @@ SupportedObjects=62
 33=0x6060
 34=0x6061
 35=0x6063
-36=0x6069
-37=0x606B
-38=0x606C
-39=0x6071
-40=0x6072
-41=0x607E
-42=0x6081
-43=0x6083
-44=0x6084
-45=0x6086
-46=0x6089
-47=0x608A
-48=0x608B
-49=0x608C
-50=0x608F
-51=0x6090
-52=0x6091
-53=0x6092
-54=0x6093
-55=0x6094
-56=0x6095
-57=0x6096
-58=0x6097
-59=0x60F8
-60=0x60FF
-61=0x6502
-62=0x67FF
+36=0x6064
+37=0x6069
+38=0x606B
+39=0x606C
+40=0x6071
+41=0x6072
+42=0x607E
+43=0x6081
+44=0x6083
+45=0x6084
+46=0x6086
+47=0x6089
+48=0x608A
+49=0x608B
+50=0x608C
+51=0x608F
+52=0x6090
+53=0x6091
+54=0x6092
+55=0x6093
+56=0x6094
+57=0x6095
+58=0x6096
+59=0x6097
+60=0x60F8
+61=0x60FF
+62=0x6502
+63=0x67FF
 
 [1003]
 ParameterName=Pre-defined error field
@@ -1482,7 +1483,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x60630020
+DefaultValue=0x60640020
 PDOMapping=0
 
 [1A02sub3]
@@ -1663,6 +1664,15 @@ DefaultValue=3
 PDOMapping=1
 
 [6063]
+ParameterName=Position actual value*
+ObjectType=0x7
+;StorageLocation=RAM
+DataType=0x0004
+AccessType=ro
+DefaultValue=0
+PDOMapping=1
+
+[6064]
 ParameterName=Position actual value
 ObjectType=0x7
 ;StorageLocation=RAM
