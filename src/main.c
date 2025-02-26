@@ -2,32 +2,26 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/spi.h>
 #include <zephyr/drivers/can.h>
-#include <canopennode.h> // zephyr module specific helpers!
+#include <canopennode.h>
 #include "OD.h"
 
 #include "tmc9660.h"
-#include "cia402.h"
 
 #include <zephyr/logging/log.h>
 #include <zephyr/logging/log_ctrl.h>
 
-LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(main, LOG_LEVEL_DBG);
 
 static const struct gpio_dt_spec led_green = GPIO_DT_SPEC_GET(DT_PATH(leds, led_status), gpios);
 static const struct gpio_dt_spec led_fault = GPIO_DT_SPEC_GET(DT_PATH(buttons, fault), gpios);
 static const struct spi_dt_spec spi0 = SPI_DT_SPEC_GET(DT_NODELABEL(tmc9660_spi), SPI_MODE_CPHA | SPI_MODE_CPOL | SPI_WORD_SET(8), 0);
 static const struct device *can = DEVICE_DT_GET(DT_CHOSEN(zephyr_canbus));
 
-static const struct gpio_dt_spec dip1 = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(buttons, dip), gpios, 0);
-static const struct gpio_dt_spec dip2 = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(buttons, dip), gpios, 1);
-static const struct gpio_dt_spec dip3 = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(buttons, dip), gpios, 2);
-
 #define CAN_BITRATE (DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bitrate, \
 					  DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bus_speed, \
 						     CONFIG_CAN_DEFAULT_BITRATE)) / 1000)
 
 struct tmc9660_dev tmc9660;
-struct cia402 cia402;
 struct canopen co;
 
 /* Indicator LEDs */
@@ -77,82 +71,11 @@ int init_leds()
     return 0;
 }
 
-void cia402_init(struct cia402* cia402) {
-    cia402->statusword_extension.read = OD_readOriginal;
-    cia402->statusword_extension.write = OD_writeOriginal;
-    cia402->mod_extension.read = OD_readOriginal;
-    cia402->mod_extension.write = OD_writeOriginal;
-    cia402->vel_extension.read = OD_readOriginal;
-    cia402->vel_extension.write = OD_writeOriginal;
-    cia402->pos_extension.read = OD_readOriginal;
-    cia402->pos_extension.write = OD_writeOriginal;
-
-    OD_extension_init(OD_ENTRY_H6041_statusword, &cia402->statusword_extension);
-    OD_extension_init(OD_ENTRY_H6061_modesOfOperationDisplay, &cia402->mod_extension);
-    OD_extension_init(OD_ENTRY_H606C_velocityActualValue, &cia402->vel_extension);
-    OD_extension_init(OD_ENTRY_H6063_positionActualValue, &cia402->pos_extension);
-}
-
-void cia402_set_state(struct cia402* cia402, enum cia402_state state)
-{
-    LOG_INF("Setting CiA 402 state: %s", 
-        state == CIA402_NOT_READY_TO_SWITCH_ON ? "NOT_READY_TO_SWITCH_ON" : 
-        state == CIA402_SWITCH_ON_DISABLED ? "SWITCH_ON_DISABLED" : 
-        state == CIA402_READY_TO_SWITCH_ON ? "READY_TO_SWITCH_ON" : 
-        state == CIA402_SWITCHED_ON ? "SWITCHED_ON" : 
-        state == CIA402_OPERATION_ENABLED ? "OPERATION_ENABLED" : 
-        state == CIA402_QUICK_STOP_ACTIVE ? "QUICK_STOP_ACTIVE" : 
-        state == CIA402_FAULT_REACTION_ACTIVE ? "FAULT_REACTION_ACTIVE" : 
-        state == CIA402_FAULT ? "FAULT" : "???"
-    );
-
-    cia402->state = state;
-
-    int statusword;
-    switch(state)
-    {
-        default:
-            cia402->state = CIA402_FAULT;
-        case CIA402_FAULT:
-            statusword = CIA402_BIT_FAULT;
-            break;
-
-        case CIA402_NOT_READY_TO_SWITCH_ON:
-            statusword = 0;
-            break;
-        case CIA402_SWITCH_ON_DISABLED:
-            statusword = CIA402_BIT_SWITCHONDISABLED;
-            break;
-        case CIA402_READY_TO_SWITCH_ON:
-            statusword = CIA402_BIT_QUICKSTOP | CIA402_BIT_READYTOSWITCHON;
-            break;
-        case CIA402_SWITCHED_ON:
-            statusword = CIA402_BIT_QUICKSTOP | CIA402_BIT_READYTOSWITCHON | CIA402_BIT_SWITCHON;
-            break;
-        case CIA402_OPERATION_ENABLED:
-            statusword = CIA402_BIT_QUICKSTOP | CIA402_BIT_READYTOSWITCHON | CIA402_BIT_SWITCHON | CIA402_BIT_OPERATIONEN;
-            break;
-        case CIA402_QUICK_STOP_ACTIVE:
-            statusword = CIA402_BIT_READYTOSWITCHON | CIA402_BIT_SWITCHON | CIA402_BIT_OPERATIONEN;
-            break;
-        case CIA402_FAULT_REACTION_ACTIVE:
-            statusword = CIA402_BIT_FAULT | CIA402_BIT_READYTOSWITCHON | CIA402_BIT_SWITCHON | CIA402_BIT_OPERATIONEN;
-            break;
-    }
-
-    LOG_DBG("Setting statusword to %04X", statusword);
-    OD_requestTPDO(OD_getFlagsPDO(OD_ENTRY_H6041_statusword), 0);
-    if(OD_set_u16(OD_ENTRY_H6041_statusword, 0, statusword, true)) {
-        LOG_ERR("Could not set Statusword");
-        LOG_PANIC();
-        k_oops();
-    }
-}
-
 #define QSH6018 1
 #define QSH5718 2
 #define QSH4218 3
-#define MOTOR QSH4218
+#define DC_BASIC 4
+#define MOTOR DC_BASIC
 
 #pragma pack(push,1) // ew alignment...
 const struct tmc9660_default_params {
@@ -165,6 +88,20 @@ const struct tmc9660_default_params {
 	{ .param_id = MOTOR_PWM_FREQUENCY, .value = 25000 },
 	{ .param_id = MOTOR_POLE_PAIRS, .value = 50 },
 	{ .param_id = ABN_1_STEPS, .value = 40000 },
+#elif MOTOR == DC_BASIC
+    { .param_id = MOTOR_TYPE, .value = 1 },
+    { .param_id = MOTOR_PWM_FREQUENCY, .value = 25000 },
+    { .param_id = MOTOR_POLE_PAIRS, .value = 1 },
+	{ .param_id = OPENLOOP_CURRENT, .value = 1000 },
+	{ .param_id = OPENLOOP_VOLTAGE, .value = 16383 },
+    { .param_id = OUTPUT_VOLTAGE_LIMIT, .value = 20000 }, // proportional to VIN, 16383 = 100%, goes up to 200%
+    
+	{ .param_id = TORQUE_P, .value = 2500 },
+	{ .param_id = TORQUE_I, .value = 0 },
+	{ .param_id = FLUX_P, .value = 2500 },
+	{ .param_id = FLUX_I, .value = 0 },
+	{ .param_id = CURRENT_NORM_P, .value = 0 },
+	{ .param_id = CURRENT_NORM_I, .value = 0 },
 #else
 #error Unsupported motor!
 #endif
@@ -177,8 +114,8 @@ const struct tmc9660_default_params {
 	{ .param_id = OPENLOOP_VOLTAGE, .value = 1638 }, // proportional to VIN, 1638 = 10%
 #elif MOTOR == QSH5718
 	{ .param_id = RAMP_VMAX, .value = 4100000 },
-	{ .param_id = MAX_TORQUE, .value = 4000 }, // mA
-	{ .param_id = MAX_FLUX, .value = 4000 }, // mA
+	{ .param_id = MAX_TORQUE, .value = 10000 }, // mA
+	{ .param_id = MAX_FLUX, .value = 10000 }, // mA
 	{ .param_id = OPENLOOP_CURRENT, .value = 500 }, // 500mA openloop (such as when initially homing ABN)
 	{ .param_id = OPENLOOP_VOLTAGE, .value = 1638 }, // proportional to VIN, 1638 = 10%
 #elif MOTOR == QSH4218
@@ -315,7 +252,7 @@ const struct tmc9660_default_params {
 };
 #pragma pack(pop)
 
-void agv_init_params(struct tmc9660_dev *tmc9660) {
+void init_params(struct tmc9660_dev *tmc9660) {
     tmc9660_set_param(tmc9660, COMMUTATION_MODE, 0);
 
     for(int i = 0; i < ARRAY_SIZE(params); i++) {
@@ -349,7 +286,6 @@ void pretty_error_counts(const struct device *can) {
         // TODO rate limit, if it goes into bus off a lot, stop resetting and just leave it in the fault state
         LOG_ERR("Bus-off: killing motor");
         CO_NMT_sendInternalCommand(co.CO->NMT, CO_NMT_ENTER_STOPPED);
-        cia402_set_state(&cia402, CIA402_FAULT);
         tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
     }
     
@@ -358,11 +294,27 @@ void pretty_error_counts(const struct device *can) {
     prev_state = state;
 }
 
+enum LIFTER_COMMAND {
+    LIFTER_COMMAND_NOOP = 0,
+    LIFTER_COMMAND_GO_UP = 1,
+    LIFTER_COMMAND_GO_DOWN = 2
+};
+
+enum LIFTER_STATUS {
+    LIFTER_STATUS_NOOP = 0,
+    LIFTER_STATUS_GOING_UP = 1,
+    LIFTER_STATUS_GOING_DOWN = 2,
+    LIFTER_STATUS_ARRIVED_UP = 3,
+    LIFTER_STATUS_ARRIVED_DOWN = 4,
+};
+
+#define MOVE_CURRENT 500 // mA, configure for load. FIXME larger current in the first few moments of moving from down to up
+
 int main()
 {
     int err;
 
-    LOG_INF("Firmware git revision %s", GIT_REVISION_STR);
+    LOG_INF("Lifter firmware, git revision %s", GIT_REVISION_STR);
 
 	err = init_leds();
     if(err < 0)
@@ -372,34 +324,13 @@ int main()
     }
 
     // Read DIP switches for Node ID
-
-    err = gpio_pin_configure_dt(&dip1, GPIO_INPUT);
-    if(err < 0) {
-        LOG_ERR("Could not initialize DIP GPIO 1: %d", err);
-        goto fail;
-    }
-    err = gpio_pin_configure_dt(&dip2, GPIO_INPUT);
-    if(err < 0) {
-        LOG_ERR("Could not initialize DIP GPIO 2: %d", err);
-        goto fail;
-    }
-    err = gpio_pin_configure_dt(&dip3, GPIO_INPUT);
-    if(err < 0) {
-        LOG_ERR("Could not initialize DIP GPIO 3: %d", err);
-        goto fail;
-    }
-    
-    int dip_setting = (gpio_pin_get_dt(&dip1) << 2) | (gpio_pin_get_dt(&dip2) << 1) | (gpio_pin_get_dt(&dip3) << 0); // Looking at the DIP switch with "1 2 3" going left to right = reading the number in binary
-    LOG_INF("DIP switches set to %d", dip_setting);
-
-    k_msleep(dip_setting * 5); // Delay each node's bringup differently to reduce initial clashes
-
     co.can_dev = can;
-    co.node_id = 0x10 + dip_setting;
+    co.node_id = 0x18;
     LOG_INF("CANopen node ID = %d", co.node_id);
     co.bitrate = CAN_BITRATE;
     co.nmt_control = 0;
     co.led_callback = led_callback;
+    co.nmt_control = CO_NMT_ERR_FREE_TO_OPERATIONAL;
     // co.sync_callback = sync_callback;
     err = canopen_init(&co);
     if(err < 0)
@@ -408,23 +339,18 @@ int main()
         goto fail;
     }
 
-    cia402.co = &co;
-    cia402_init(&cia402);
-    cia402_set_state(&cia402, CIA402_NOT_READY_TO_SWITCH_ON); // Transition 0
-
     LOG_INF("Initializing TMC9660");
     err = tmc9660_init(&tmc9660, &spi0);
     if(err < 0)
     {
         LOG_ERR("TMC9660 init failed");
-        cia402_set_state(&cia402, CIA402_FAULT);
         CO_errorReport(co.CO->em, CO_ERR_REG_GENERIC_ERR, CO_EMC_HARDWARE, 9660);
         CO_NMT_sendInternalCommand(co.CO->NMT, CO_NMT_ENTER_STOPPED);
-        return;
+        return -1;
     }
 
-    // Assure motor is stopped
-    tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
+    init_params(&tmc9660);
+    tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 4);
 
     LOG_INF("TMC9660 init OK");
 
@@ -432,12 +358,12 @@ int main()
     {
         pretty_error_counts(co.can_dev);
 
-        int supply_voltage;
+        int supply_voltage, comm;
         tmc9660_get_param(&tmc9660, SUPPLY_VOLTAGE, &supply_voltage);
+        tmc9660_get_param(&tmc9660, COMMUTATION_MODE, &comm);
         OD_set_u16(OD_ENTRY_H2122_TMC9660SUPPLY_VOLTAGE, 0, (uint16_t) supply_voltage, false);
 
         if(co.CO->NMT->operatingState == CO_NMT_STOPPED) {
-            cia402_set_state(&cia402, CIA402_FAULT);
             LOG_INF("NMT STOPPED");
             while(co.CO->NMT->operatingState == CO_NMT_STOPPED) { // No point in doing anything until the canopen thread takes us out of the stopped state
                 k_msleep(1);
@@ -451,179 +377,61 @@ int main()
             continue;
         }
 
-        if(cia402.state == CIA402_NOT_READY_TO_SWITCH_ON) {
-            LOG_INF("Writing TMC9660 default parameters");
-            agv_init_params(&tmc9660);
+        int switch1, switch2;
+        tmc9660_get_gpio_digital(&tmc9660, 2, &switch1);
+        tmc9660_get_gpio_digital(&tmc9660, 15, &switch2);
 
-            cia402_set_state(&cia402, CIA402_SWITCH_ON_DISABLED); // Transition 1
-            continue;
-        }
+        uint8_t command = 0, status = 0;
+        OD_get_u8(OD_ENTRY_H2001_lifterCommand, 0, &command, false);
 
-        if(cia402.state == CIA402_OPERATION_ENABLED) {
-            int target_vel;
-            int err = OD_get_i32(OD_ENTRY_H60FF_targetVelocity, 0, &target_vel, false);
-            if(err != ODR_OK)
-            {
-                LOG_ERR("Could not read OD Target Velocity");
-                return -1;
+        switch(command) {
+        case LIFTER_COMMAND_NOOP:
+            status = LIFTER_STATUS_NOOP;
+            tmc9660_set_param(&tmc9660, TARGET_TORQUE, 0);
+            break;
+
+        case LIFTER_COMMAND_GO_UP:
+            if(!switch1) {
+                if(comm != 4) {
+                    tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 4);
+                }
+                tmc9660_set_param(&tmc9660, TARGET_TORQUE, MOVE_CURRENT);
+                status = LIFTER_STATUS_GOING_UP;
+            } else {
+                tmc9660_set_param(&tmc9660, TARGET_TORQUE, 0);
+                status = LIFTER_STATUS_ARRIVED_UP;
             }
-
-            LOG_DBG("Setting target velocity to %d", target_vel);
-            tmc9660_set_param(&tmc9660, TARGET_VELOCITY, target_vel);
-
-            int actual_pos, actual_vel, ramp_vel, target_torque, max_torque;
-            err = tmc9660_get_param(&tmc9660, ACTUAL_POSITION, &actual_pos);
-            if(err) LOG_ERR("ACTUAL_POSITION %d", err);
-            err = tmc9660_get_param(&tmc9660, ACTUAL_VELOCITY, &actual_vel);
-            if(err) LOG_ERR("ACTUAL_VELOCITY %d", err);
-            err = tmc9660_get_param(&tmc9660, RAMP_VELOCITY, &ramp_vel);
-            if(err) LOG_ERR("RAMP_VELOCITY %d", err);
-            err = tmc9660_get_param(&tmc9660, TARGET_TORQUE, &target_torque);
-            if(err) LOG_ERR("TARGET_TORQUE %d", err);
-            err = tmc9660_get_param(&tmc9660, MAX_TORQUE, &max_torque);
-            if(err) LOG_ERR("MAX_TORQUE %d", err);
-
-            err = OD_set_i32(OD_ENTRY_H6063_positionActualValue, 0, actual_pos, false);
-            if(err) LOG_ERR("actual_pos");
-            err = OD_set_i32(OD_ENTRY_H606C_velocityActualValue, 0, actual_vel, false);
-            if(err) LOG_ERR("actual_vel");
-            err = OD_set_i32(OD_ENTRY_H606B_velocityDemandValue, 0, ramp_vel, false);
-            if(err) LOG_ERR("ramp_vel");
-            err = OD_set_i16(OD_ENTRY_H6071_targetTorque, 0, target_torque, false);
-            if(err) LOG_ERR("target_torque");
-            err = OD_set_u16(OD_ENTRY_H6072_maxTorque, 0, max_torque, false);
-            if(err) LOG_ERR("max_torque");
-
-            if(err != ODR_OK)
-            {
-                LOG_ERR("Could not write TMC status to OD");
-                return -1;
+            break;
+        
+        case LIFTER_COMMAND_GO_DOWN:
+            if(!switch2) {
+                if(comm != 4) {
+                    tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 4);
+                }
+                tmc9660_set_param(&tmc9660, TARGET_TORQUE, -MOVE_CURRENT);
+                status = LIFTER_STATUS_GOING_DOWN;
+            } else {
+                tmc9660_set_param(&tmc9660, TARGET_TORQUE, 0);
+                status = LIFTER_STATUS_ARRIVED_DOWN;
             }
-
-            k_msleep(1);
-        }
-
-        /******* CONTROLWORD TRANSITIONS *******/
-        uint16_t controlword;
-        err = OD_get_u16(OD_ENTRY_H6040_controlword, 0, &controlword, false);
-        if(err != ODR_OK) {
-            LOG_ERR("Could not read controlword, %d", err);
             break;
         }
 
-        if(controlword == 0xffff) {
-            // No write
-            continue;
+        int prev_status;
+        OD_get_u8(OD_ENTRY_H2002_lifterStatus, 0, &prev_status, false);
+        OD_set_u8(OD_ENTRY_H2002_lifterStatus, 0, status, false);
+        
+        if(status != prev_status) {
+            OD_requestTPDO(OD_getFlagsPDO(OD_ENTRY_H2002_lifterStatus), 0);
         }
 
-        LOG_DBG("Controlword was set to %04X", controlword);
-
-        // Set internal controlword to 0xFFFF so we can easily detect the next write w/o a callback
-        OD_set_u16(OD_ENTRY_H6040_controlword, 0, 0xFFFF, true);
-
-        bool cw_halt = (controlword >> 8) & 1;
-        bool cw_fault_reset = (controlword >> 7) & 1;
-        bool cw_enable_operation = (controlword >> 3) & 1;
-        bool cw_quick_stop = (controlword >> 2) & 1;
-        bool cw_enable_voltage = (controlword >> 1) & 1;
-        bool cw_switch_on = (controlword >> 0) & 1;
-
-        bool tr_shutdown = cw_quick_stop && cw_enable_voltage && !cw_switch_on;
-        bool tr_switchon = cw_quick_stop && cw_enable_voltage && cw_switch_on;
-        bool tr_disablev = !cw_enable_voltage;
-        bool tr_quickstp = !cw_quick_stop && cw_enable_voltage;
-        bool tr_disableo = !cw_enable_operation && cw_quick_stop && cw_enable_voltage && cw_switch_on;
-        bool tr_enableop = cw_enable_operation && cw_quick_stop && cw_enable_voltage && cw_switch_on;
-
-        enum cia402_state nextState = cia402.state; // By default, don't change state
-        int flags;
-        tmc9660_get_param(&tmc9660, GENERAL_STATUS_FLAGS, &flags);
-        bool velocity_reached = flags & 1024;
-        bool regulation_stopped = flags & 1;
-
-        if(cia402.state == CIA402_SWITCH_ON_DISABLED) {
-            if(tr_shutdown) { // Transition 2
-                nextState = CIA402_READY_TO_SWITCH_ON;
-            } else {
-                // LOG_WRN("Controlword %04X invalid for state SWITCH_ON_DISABLED", controlword);
-            }
-        } else if(cia402.state == CIA402_READY_TO_SWITCH_ON) {
-            if(tr_switchon) { // Transition 3
-                nextState = CIA402_SWITCHED_ON;
-            } else if(tr_disablev || tr_quickstp) { // Transition 7
-                nextState = CIA402_SWITCH_ON_DISABLED;
-            } else {
-                // LOG_WRN("Controlword %04X invalid for state READY_TO_SWITCH_ON", controlword);
-            }
-        } else if(cia402.state == CIA402_SWITCHED_ON) {
-            if(tr_enableop) { // Transition 4
-                nextState = CIA402_OPERATION_ENABLED;
-            } else if(tr_shutdown) { // Transition 6
-                nextState = CIA402_READY_TO_SWITCH_ON;
-            } else if(tr_disablev || tr_quickstp) { // Transition 10
-                nextState = CIA402_SWITCH_ON_DISABLED;
-            } else {
-                // LOG_WRN("Controlword %04X invalid for state SWITCHED_ON", controlword);
-            }
-        } else if(cia402.state == CIA402_OPERATION_ENABLED) {
-            if(tr_disableo) { // Transition 5
-                nextState = CIA402_SWITCHED_ON;
-            } else if(tr_shutdown) { // Transition 8
-                nextState = CIA402_READY_TO_SWITCH_ON;
-            } else if(tr_disablev) { // Transition 9
-                nextState = CIA402_SWITCH_ON_DISABLED;
-            } else if (tr_quickstp || cw_halt) { // Transition 11 + custom
-                nextState = CIA402_QUICK_STOP_ACTIVE;
-            } else {
-                // LOG_WRN("Controlword %04X invalid for state OPERATION_ENABLED", controlword);
-            }
-        } else if(cia402.state == CIA402_QUICK_STOP_ACTIVE) {
-            if(tr_disablev || velocity_reached || regulation_stopped) { // Transition 12
-                nextState = CIA402_SWITCH_ON_DISABLED;
-            }
-            // TODO Transition 16
-        } else if(cia402.state == CIA402_FAULT_REACTION_ACTIVE) {
-            if(velocity_reached || regulation_stopped) { // Transition 14
-                nextState = CIA402_FAULT;
-            }
-        } else if(cia402.state == CIA402_FAULT) {
-            if(cw_fault_reset) { // Transition 15
-                nextState = CIA402_SWITCH_ON_DISABLED;
-            }
-        } else {
-            LOG_ERR("Invalid state %d", cia402.state);
-        }
-
-        /***************** STATE UPDATE AND SETUP *******************/
-        if(nextState != cia402.state) {
-            cia402_set_state(&cia402, nextState);
-
-            bool shouldMotorStop = false;
-
-            if(nextState == CIA402_SWITCH_ON_DISABLED) {
-                shouldMotorStop = true;
-                tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 0);
-            } else if(nextState == CIA402_READY_TO_SWITCH_ON) {
-                shouldMotorStop = true;
-            } else if(nextState == CIA402_SWITCHED_ON) {
-                tmc9660_set_param(&tmc9660, COMMUTATION_MODE, 5);
-            } else if(nextState == CIA402_OPERATION_ENABLED) {
-                
-            } else if(nextState == CIA402_QUICK_STOP_ACTIVE) {
-                shouldMotorStop = true;
-            } else if(nextState == CIA402_FAULT_REACTION_ACTIVE) {
-                shouldMotorStop = true;
-            }
-
-            if(shouldMotorStop) {
-                tmc9660_tmcl_command(&tmc9660, MST, 0, 0, 0, NULL);
-
-                // Also set OD target velocity so next time motor is enabled, it doesn't spring back to its last set velocity of a previous run
-                OD_set_i32(OD_ENTRY_H60FF_targetVelocity, 0, 0, true);
-            }
-        }
-
-        OD_requestTPDO(OD_getFlagsPDO(OD_ENTRY_H6041_statusword), 0);
+        LOG_DBG("CMD %s, switches %d %d => STATUS %s",
+            command == 0 ? "NOOP" : command == 1 ? "UP" : command == 2 ? "DOWN" : "???",
+            switch1, switch2,
+            status == 0 ? "NOOP" : status == 1 ? "GOING UP" : status == 2 ? "GOING DOWN" : status == 3 ? "ARRIVED UP" : status == 4 ? "ARRIVED DOWN" : "???"
+        );
+        
+        k_msleep(10);
     }
 
     return 0;

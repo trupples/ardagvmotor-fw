@@ -3,7 +3,7 @@
 #include <zephyr/logging/log.h>
 #include "tmc9660.h"
 
-LOG_MODULE_REGISTER(tmc9660, LOG_LEVEL_INF);
+LOG_MODULE_REGISTER(tmc9660, LOG_LEVEL_DBG);
 
 enum tmc9660_spi_status {
     SPI_STATUS_OK = 0xff,

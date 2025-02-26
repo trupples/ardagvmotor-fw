@@ -11,19 +11,19 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: AGV_CIA402_ProfileVelocity_Barebones.xdd
+        Project File: AGV_Lifter.xdd
         File Version: 1
 
-        Created:      2025-01-13 11:03:07 AM
+        Created:      2025-02-26 03:08:21 PM
         Created By:   
-        Modified:     2025-01-31 06:46:10 PM
+        Modified:     2025-02-26 03:12:19 PM
         Modified By:  
 
     Device Info:
         Vendor Name:  Analog Devices Inc.
         Vendor ID:    0xFFFF1234
-        Product Name: AGV Arduino Motor Control
-        Product ID:   123
+        Product Name: Lifter
+        Product ID:   124
 
         Description:  
 *******************************************************************************/
@@ -37,8 +37,10 @@
 #define OD_CNT_EM 1
 #define OD_CNT_SYNC 1
 #define OD_CNT_SYNC_PROD 1
+#define OD_CNT_STORAGE 1
 #define OD_CNT_TIME 1
 #define OD_CNT_EM_PROD 1
+#define OD_CNT_HB_CONS 1
 #define OD_CNT_HB_PROD 1
 #define OD_CNT_SDO_SRV 1
 #define OD_CNT_SDO_CLI 1
@@ -50,6 +52,9 @@
     Sizes of OD arrays
 *******************************************************************************/
 #define OD_CNT_ARR_1003 16
+#define OD_CNT_ARR_1010 4
+#define OD_CNT_ARR_1011 4
+#define OD_CNT_ARR_1016 8
 
 
 /*******************************************************************************
@@ -60,12 +65,11 @@ typedef struct {
     uint32_t x1005_COB_ID_SYNCMessage;
     uint32_t x1006_communicationCyclePeriod;
     uint32_t x1007_synchronousWindowLength;
-    char x1008_manufacturerDeviceName[22];
-    char x1009_manufacturerHardwareVersion[5];
-    char x100A_manufacturerSoftwareVersion[19];
     uint32_t x1012_COB_IDTimeStampObject;
     uint32_t x1014_COB_ID_EMCY;
     uint16_t x1015_inhibitTimeEMCY;
+    uint8_t x1016_consumerHeartbeatTime_sub0;
+    uint32_t x1016_consumerHeartbeatTime[OD_CNT_ARR_1016];
     uint16_t x1017_producerHeartbeatTime;
     struct {
         uint8_t highestSub_indexSupported;
@@ -229,80 +233,18 @@ typedef struct {
 
 typedef struct {
     uint8_t x1001_errorRegister;
+    uint8_t x1010_storeParameters_sub0;
+    uint32_t x1010_storeParameters[OD_CNT_ARR_1010];
+    uint8_t x1011_restoreDefaultParameters_sub0;
+    uint32_t x1011_restoreDefaultParameters[OD_CNT_ARR_1011];
     struct {
         uint8_t highestSub_indexSupported;
         uint32_t COB_IDClientToServerRx;
         uint32_t COB_IDServerToClientTx;
     } x1200_SDOServerParameter;
+    uint8_t x2001_lifterCommand;
+    uint8_t x2002_lifterStatus;
     uint16_t x2122_TMC9660SUPPLY_VOLTAGE;
-    uint16_t x6040_controlword;
-    uint16_t x6041_statusword;
-    int8_t x6060_modesOfOperation;
-    int8_t x6061_modesOfOperationDisplay;
-    int32_t x6063_positionActualValue;
-    int32_t x6069_velocitySensorActualValue;
-    int32_t x606B_velocityDemandValue;
-    int32_t x606C_velocityActualValue;
-    int16_t x6071_targetTorque;
-    uint16_t x6072_maxTorque;
-    uint8_t x607E_polarity;
-    uint32_t x6081_profileVelocity;
-    uint32_t x6083_profileAcceleration;
-    uint32_t x6084_profileDeceleration;
-    int16_t x6086_motionProfileType;
-    char x6089_positionNotationIndex[2];
-    uint8_t x608A_positionDimensionIndex;
-    int8_t x608B_velocityNotationIndex;
-    int8_t x608C_velocityDimensionIndex;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t encoderIncrements;
-        uint32_t motorRevolutions;
-    } x608F_positionEncoderResolution;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t encoderIncrementsPerSecond;
-        uint32_t motorRevolutionsPerSecond;
-    } x6090_velocityEncoderResolution;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t motorRevolutions;
-        uint32_t shaftRevolutions;
-    } x6091_gearRatio;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t feed;
-        uint32_t shaftRevolutions;
-    } x6092_feedConstant;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t feedConstant;
-    } x6093_positionFactor;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t divisor;
-    } x6094_velocityEncoderFactor;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t divisor;
-    } x6095_velocityFactor1;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t divisor;
-    } x6096_velocityFactor2;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t divisor;
-    } x6097_accelerationFactor;
-    int32_t x60F8_maxSlippage;
-    int32_t x60FF_targetVelocity;
-    uint32_t x6502_supportedDriveModes;
-    uint32_t x67FF_singleDeviceType;
 } OD_RAM_t;
 
 #ifndef OD_ATTR_PERSIST_COMM
@@ -330,12 +272,12 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1005 &OD->list[3]
 #define OD_ENTRY_H1006 &OD->list[4]
 #define OD_ENTRY_H1007 &OD->list[5]
-#define OD_ENTRY_H1008 &OD->list[6]
-#define OD_ENTRY_H1009 &OD->list[7]
-#define OD_ENTRY_H100A &OD->list[8]
-#define OD_ENTRY_H1012 &OD->list[9]
-#define OD_ENTRY_H1014 &OD->list[10]
-#define OD_ENTRY_H1015 &OD->list[11]
+#define OD_ENTRY_H1010 &OD->list[6]
+#define OD_ENTRY_H1011 &OD->list[7]
+#define OD_ENTRY_H1012 &OD->list[8]
+#define OD_ENTRY_H1014 &OD->list[9]
+#define OD_ENTRY_H1015 &OD->list[10]
+#define OD_ENTRY_H1016 &OD->list[11]
 #define OD_ENTRY_H1017 &OD->list[12]
 #define OD_ENTRY_H1018 &OD->list[13]
 #define OD_ENTRY_H1019 &OD->list[14]
@@ -357,39 +299,9 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01 &OD->list[30]
 #define OD_ENTRY_H1A02 &OD->list[31]
 #define OD_ENTRY_H1A03 &OD->list[32]
-#define OD_ENTRY_H2122 &OD->list[33]
-#define OD_ENTRY_H6040 &OD->list[34]
-#define OD_ENTRY_H6041 &OD->list[35]
-#define OD_ENTRY_H6060 &OD->list[36]
-#define OD_ENTRY_H6061 &OD->list[37]
-#define OD_ENTRY_H6063 &OD->list[38]
-#define OD_ENTRY_H6069 &OD->list[39]
-#define OD_ENTRY_H606B &OD->list[40]
-#define OD_ENTRY_H606C &OD->list[41]
-#define OD_ENTRY_H6071 &OD->list[42]
-#define OD_ENTRY_H6072 &OD->list[43]
-#define OD_ENTRY_H607E &OD->list[44]
-#define OD_ENTRY_H6081 &OD->list[45]
-#define OD_ENTRY_H6083 &OD->list[46]
-#define OD_ENTRY_H6084 &OD->list[47]
-#define OD_ENTRY_H6086 &OD->list[48]
-#define OD_ENTRY_H6089 &OD->list[49]
-#define OD_ENTRY_H608A &OD->list[50]
-#define OD_ENTRY_H608B &OD->list[51]
-#define OD_ENTRY_H608C &OD->list[52]
-#define OD_ENTRY_H608F &OD->list[53]
-#define OD_ENTRY_H6090 &OD->list[54]
-#define OD_ENTRY_H6091 &OD->list[55]
-#define OD_ENTRY_H6092 &OD->list[56]
-#define OD_ENTRY_H6093 &OD->list[57]
-#define OD_ENTRY_H6094 &OD->list[58]
-#define OD_ENTRY_H6095 &OD->list[59]
-#define OD_ENTRY_H6096 &OD->list[60]
-#define OD_ENTRY_H6097 &OD->list[61]
-#define OD_ENTRY_H60F8 &OD->list[62]
-#define OD_ENTRY_H60FF &OD->list[63]
-#define OD_ENTRY_H6502 &OD->list[64]
-#define OD_ENTRY_H67FF &OD->list[65]
+#define OD_ENTRY_H2001 &OD->list[33]
+#define OD_ENTRY_H2002 &OD->list[34]
+#define OD_ENTRY_H2122 &OD->list[35]
 
 
 /*******************************************************************************
@@ -401,12 +313,12 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1005_COB_ID_SYNCMessage &OD->list[3]
 #define OD_ENTRY_H1006_communicationCyclePeriod &OD->list[4]
 #define OD_ENTRY_H1007_synchronousWindowLength &OD->list[5]
-#define OD_ENTRY_H1008_manufacturerDeviceName &OD->list[6]
-#define OD_ENTRY_H1009_manufacturerHardwareVersion &OD->list[7]
-#define OD_ENTRY_H100A_manufacturerSoftwareVersion &OD->list[8]
-#define OD_ENTRY_H1012_COB_IDTimeStampObject &OD->list[9]
-#define OD_ENTRY_H1014_COB_ID_EMCY &OD->list[10]
-#define OD_ENTRY_H1015_inhibitTimeEMCY &OD->list[11]
+#define OD_ENTRY_H1010_storeParameters &OD->list[6]
+#define OD_ENTRY_H1011_restoreDefaultParameters &OD->list[7]
+#define OD_ENTRY_H1012_COB_IDTimeStampObject &OD->list[8]
+#define OD_ENTRY_H1014_COB_ID_EMCY &OD->list[9]
+#define OD_ENTRY_H1015_inhibitTimeEMCY &OD->list[10]
+#define OD_ENTRY_H1016_consumerHeartbeatTime &OD->list[11]
 #define OD_ENTRY_H1017_producerHeartbeatTime &OD->list[12]
 #define OD_ENTRY_H1018_identity &OD->list[13]
 #define OD_ENTRY_H1019_synchronousCounterOverflowValue &OD->list[14]
@@ -428,39 +340,9 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H1A01_TPDOMappingParameter &OD->list[30]
 #define OD_ENTRY_H1A02_TPDOMappingParameter &OD->list[31]
 #define OD_ENTRY_H1A03_TPDOMappingParameter &OD->list[32]
-#define OD_ENTRY_H2122_TMC9660SUPPLY_VOLTAGE &OD->list[33]
-#define OD_ENTRY_H6040_controlword &OD->list[34]
-#define OD_ENTRY_H6041_statusword &OD->list[35]
-#define OD_ENTRY_H6060_modesOfOperation &OD->list[36]
-#define OD_ENTRY_H6061_modesOfOperationDisplay &OD->list[37]
-#define OD_ENTRY_H6063_positionActualValue &OD->list[38]
-#define OD_ENTRY_H6069_velocitySensorActualValue &OD->list[39]
-#define OD_ENTRY_H606B_velocityDemandValue &OD->list[40]
-#define OD_ENTRY_H606C_velocityActualValue &OD->list[41]
-#define OD_ENTRY_H6071_targetTorque &OD->list[42]
-#define OD_ENTRY_H6072_maxTorque &OD->list[43]
-#define OD_ENTRY_H607E_polarity &OD->list[44]
-#define OD_ENTRY_H6081_profileVelocity &OD->list[45]
-#define OD_ENTRY_H6083_profileAcceleration &OD->list[46]
-#define OD_ENTRY_H6084_profileDeceleration &OD->list[47]
-#define OD_ENTRY_H6086_motionProfileType &OD->list[48]
-#define OD_ENTRY_H6089_positionNotationIndex &OD->list[49]
-#define OD_ENTRY_H608A_positionDimensionIndex &OD->list[50]
-#define OD_ENTRY_H608B_velocityNotationIndex &OD->list[51]
-#define OD_ENTRY_H608C_velocityDimensionIndex &OD->list[52]
-#define OD_ENTRY_H608F_positionEncoderResolution &OD->list[53]
-#define OD_ENTRY_H6090_velocityEncoderResolution &OD->list[54]
-#define OD_ENTRY_H6091_gearRatio &OD->list[55]
-#define OD_ENTRY_H6092_feedConstant &OD->list[56]
-#define OD_ENTRY_H6093_positionFactor &OD->list[57]
-#define OD_ENTRY_H6094_velocityEncoderFactor &OD->list[58]
-#define OD_ENTRY_H6095_velocityFactor1 &OD->list[59]
-#define OD_ENTRY_H6096_velocityFactor2 &OD->list[60]
-#define OD_ENTRY_H6097_accelerationFactor &OD->list[61]
-#define OD_ENTRY_H60F8_maxSlippage &OD->list[62]
-#define OD_ENTRY_H60FF_targetVelocity &OD->list[63]
-#define OD_ENTRY_H6502_supportedDriveModes &OD->list[64]
-#define OD_ENTRY_H67FF_singleDeviceType &OD->list[65]
+#define OD_ENTRY_H2001_lifterCommand &OD->list[33]
+#define OD_ENTRY_H2002_lifterStatus &OD->list[34]
+#define OD_ENTRY_H2122_TMC9660SUPPLY_VOLTAGE &OD->list[35]
 
 
 /*******************************************************************************
@@ -470,7 +352,7 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_INIT_CONFIG(config) {\
     (config).CNT_NMT = OD_CNT_NMT;\
     (config).ENTRY_H1017 = OD_ENTRY_H1017;\
-    (config).CNT_HB_CONS = 0;\
+    (config).CNT_HB_CONS = OD_CNT_HB_CONS;\
     (config).CNT_ARR_1016 = OD_CNT_ARR_1016;\
     (config).ENTRY_H1016 = OD_ENTRY_H1016;\
     (config).CNT_EM = OD_CNT_EM;\
