@@ -11,12 +11,12 @@
 
     File info:
         File Names:   OD.h; OD.c
-        Project File: AGV_CIA402_ProfileVelocity_Barebones.xdd
+        Project File: ardagvmotor.xdd
         File Version: 1
 
         Created:      2025-01-13 11:03:07 AM
         Created By:   
-        Modified:     2025-02-26 01:50:22 PM
+        Modified:     2025-03-20 01:32:01 PM
         Modified By:  
 
     Device Info:
@@ -239,9 +239,7 @@ typedef struct {
     uint16_t x6041_statusword;
     int8_t x6060_modesOfOperation;
     int8_t x6061_modesOfOperationDisplay;
-    int32_t x6063_positionActualValue;
     int32_t x6064_positionActualValue;
-    int32_t x6069_velocitySensorActualValue;
     int32_t x606B_velocityDemandValue;
     int32_t x606C_velocityActualValue;
     int16_t x6071_targetTorque;
@@ -251,56 +249,6 @@ typedef struct {
     uint32_t x6083_profileAcceleration;
     uint32_t x6084_profileDeceleration;
     int16_t x6086_motionProfileType;
-    char x6089_positionNotationIndex[2];
-    uint8_t x608A_positionDimensionIndex;
-    int8_t x608B_velocityNotationIndex;
-    int8_t x608C_velocityDimensionIndex;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t encoderIncrements;
-        uint32_t motorRevolutions;
-    } x608F_positionEncoderResolution;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t encoderIncrementsPerSecond;
-        uint32_t motorRevolutionsPerSecond;
-    } x6090_velocityEncoderResolution;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t motorRevolutions;
-        uint32_t shaftRevolutions;
-    } x6091_gearRatio;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t feed;
-        uint32_t shaftRevolutions;
-    } x6092_feedConstant;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t feedConstant;
-    } x6093_positionFactor;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t divisor;
-    } x6094_velocityEncoderFactor;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t divisor;
-    } x6095_velocityFactor1;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t divisor;
-    } x6096_velocityFactor2;
-    struct {
-        uint8_t highestSub_indexSupported;
-        uint32_t numerator;
-        uint32_t divisor;
-    } x6097_accelerationFactor;
-    int32_t x60F8_maxSlippage;
     int32_t x60FF_targetVelocity;
     uint32_t x6502_supportedDriveModes;
     uint32_t x67FF_singleDeviceType;
@@ -363,35 +311,19 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6041 &OD->list[35]
 #define OD_ENTRY_H6060 &OD->list[36]
 #define OD_ENTRY_H6061 &OD->list[37]
-#define OD_ENTRY_H6063 &OD->list[38]
-#define OD_ENTRY_H6064 &OD->list[39]
-#define OD_ENTRY_H6069 &OD->list[40]
-#define OD_ENTRY_H606B &OD->list[41]
-#define OD_ENTRY_H606C &OD->list[42]
-#define OD_ENTRY_H6071 &OD->list[43]
-#define OD_ENTRY_H6072 &OD->list[44]
-#define OD_ENTRY_H607E &OD->list[45]
-#define OD_ENTRY_H6081 &OD->list[46]
-#define OD_ENTRY_H6083 &OD->list[47]
-#define OD_ENTRY_H6084 &OD->list[48]
-#define OD_ENTRY_H6086 &OD->list[49]
-#define OD_ENTRY_H6089 &OD->list[50]
-#define OD_ENTRY_H608A &OD->list[51]
-#define OD_ENTRY_H608B &OD->list[52]
-#define OD_ENTRY_H608C &OD->list[53]
-#define OD_ENTRY_H608F &OD->list[54]
-#define OD_ENTRY_H6090 &OD->list[55]
-#define OD_ENTRY_H6091 &OD->list[56]
-#define OD_ENTRY_H6092 &OD->list[57]
-#define OD_ENTRY_H6093 &OD->list[58]
-#define OD_ENTRY_H6094 &OD->list[59]
-#define OD_ENTRY_H6095 &OD->list[60]
-#define OD_ENTRY_H6096 &OD->list[61]
-#define OD_ENTRY_H6097 &OD->list[62]
-#define OD_ENTRY_H60F8 &OD->list[63]
-#define OD_ENTRY_H60FF &OD->list[64]
-#define OD_ENTRY_H6502 &OD->list[65]
-#define OD_ENTRY_H67FF &OD->list[66]
+#define OD_ENTRY_H6064 &OD->list[38]
+#define OD_ENTRY_H606B &OD->list[39]
+#define OD_ENTRY_H606C &OD->list[40]
+#define OD_ENTRY_H6071 &OD->list[41]
+#define OD_ENTRY_H6072 &OD->list[42]
+#define OD_ENTRY_H607E &OD->list[43]
+#define OD_ENTRY_H6081 &OD->list[44]
+#define OD_ENTRY_H6083 &OD->list[45]
+#define OD_ENTRY_H6084 &OD->list[46]
+#define OD_ENTRY_H6086 &OD->list[47]
+#define OD_ENTRY_H60FF &OD->list[48]
+#define OD_ENTRY_H6502 &OD->list[49]
+#define OD_ENTRY_H67FF &OD->list[50]
 
 
 /*******************************************************************************
@@ -435,35 +367,19 @@ extern OD_ATTR_OD OD_t *OD;
 #define OD_ENTRY_H6041_statusword &OD->list[35]
 #define OD_ENTRY_H6060_modesOfOperation &OD->list[36]
 #define OD_ENTRY_H6061_modesOfOperationDisplay &OD->list[37]
-#define OD_ENTRY_H6063_positionActualValue &OD->list[38]
-#define OD_ENTRY_H6064_positionActualValue &OD->list[39]
-#define OD_ENTRY_H6069_velocitySensorActualValue &OD->list[40]
-#define OD_ENTRY_H606B_velocityDemandValue &OD->list[41]
-#define OD_ENTRY_H606C_velocityActualValue &OD->list[42]
-#define OD_ENTRY_H6071_targetTorque &OD->list[43]
-#define OD_ENTRY_H6072_maxTorque &OD->list[44]
-#define OD_ENTRY_H607E_polarity &OD->list[45]
-#define OD_ENTRY_H6081_profileVelocity &OD->list[46]
-#define OD_ENTRY_H6083_profileAcceleration &OD->list[47]
-#define OD_ENTRY_H6084_profileDeceleration &OD->list[48]
-#define OD_ENTRY_H6086_motionProfileType &OD->list[49]
-#define OD_ENTRY_H6089_positionNotationIndex &OD->list[50]
-#define OD_ENTRY_H608A_positionDimensionIndex &OD->list[51]
-#define OD_ENTRY_H608B_velocityNotationIndex &OD->list[52]
-#define OD_ENTRY_H608C_velocityDimensionIndex &OD->list[53]
-#define OD_ENTRY_H608F_positionEncoderResolution &OD->list[54]
-#define OD_ENTRY_H6090_velocityEncoderResolution &OD->list[55]
-#define OD_ENTRY_H6091_gearRatio &OD->list[56]
-#define OD_ENTRY_H6092_feedConstant &OD->list[57]
-#define OD_ENTRY_H6093_positionFactor &OD->list[58]
-#define OD_ENTRY_H6094_velocityEncoderFactor &OD->list[59]
-#define OD_ENTRY_H6095_velocityFactor1 &OD->list[60]
-#define OD_ENTRY_H6096_velocityFactor2 &OD->list[61]
-#define OD_ENTRY_H6097_accelerationFactor &OD->list[62]
-#define OD_ENTRY_H60F8_maxSlippage &OD->list[63]
-#define OD_ENTRY_H60FF_targetVelocity &OD->list[64]
-#define OD_ENTRY_H6502_supportedDriveModes &OD->list[65]
-#define OD_ENTRY_H67FF_singleDeviceType &OD->list[66]
+#define OD_ENTRY_H6064_positionActualValue &OD->list[38]
+#define OD_ENTRY_H606B_velocityDemandValue &OD->list[39]
+#define OD_ENTRY_H606C_velocityActualValue &OD->list[40]
+#define OD_ENTRY_H6071_targetTorque &OD->list[41]
+#define OD_ENTRY_H6072_maxTorque &OD->list[42]
+#define OD_ENTRY_H607E_polarity &OD->list[43]
+#define OD_ENTRY_H6081_profileVelocity &OD->list[44]
+#define OD_ENTRY_H6083_profileAcceleration &OD->list[45]
+#define OD_ENTRY_H6084_profileDeceleration &OD->list[46]
+#define OD_ENTRY_H6086_motionProfileType &OD->list[47]
+#define OD_ENTRY_H60FF_targetVelocity &OD->list[48]
+#define OD_ENTRY_H6502_supportedDriveModes &OD->list[49]
+#define OD_ENTRY_H67FF_singleDeviceType &OD->list[50]
 
 
 /*******************************************************************************

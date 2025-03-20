@@ -60,7 +60,7 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
     },
     .x1402_RPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x05,
-        .COB_IDUsedByRPDO = 0x00000400,
+        .COB_IDUsedByRPDO = 0x80000400,
         .transmissionType = 0xFF,
         .eventTimer = 0x0000
     },
@@ -126,23 +126,23 @@ OD_ATTR_PERSIST_COMM OD_PERSIST_COMM_t OD_PERSIST_COMM = {
         .highestSub_indexSupported = 0x06,
         .COB_IDUsedByTPDO = 0x40000280,
         .transmissionType = 0xFF,
-        .inhibitTime = 0x0000,
+        .inhibitTime = 0x000A,
         .eventTimer = 0x0000,
         .SYNCStartValue = 0x00
     },
     .x1802_TPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x06,
         .COB_IDUsedByTPDO = 0x40000380,
-        .transmissionType = 0xFF,
-        .inhibitTime = 0x0000,
+        .transmissionType = 0x01,
+        .inhibitTime = 0x000A,
         .eventTimer = 0x0000,
         .SYNCStartValue = 0x00
     },
     .x1803_TPDOCommunicationParameter = {
         .highestSub_indexSupported = 0x06,
         .COB_IDUsedByTPDO = 0x40000480,
-        .transmissionType = 0xFF,
-        .inhibitTime = 0x0000,
+        .transmissionType = 0x01,
+        .inhibitTime = 0x000A,
         .eventTimer = 0x0000,
         .SYNCStartValue = 0x00
     },
@@ -204,9 +204,7 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
     .x6041_statusword = 0x0000,
     .x6060_modesOfOperation = 3,
     .x6061_modesOfOperationDisplay = 3,
-    .x6063_positionActualValue = 0,
     .x6064_positionActualValue = 0,
-    .x6069_velocitySensorActualValue = 0,
     .x606B_velocityDemandValue = 0,
     .x606C_velocityActualValue = 0,
     .x6071_targetTorque = 0,
@@ -216,56 +214,6 @@ OD_ATTR_RAM OD_RAM_t OD_RAM = {
     .x6083_profileAcceleration = 0x00000000,
     .x6084_profileDeceleration = 0x00000000,
     .x6086_motionProfileType = 0,
-    .x6089_positionNotationIndex = {'0', 0},
-    .x608A_positionDimensionIndex = 0x00,
-    .x608B_velocityNotationIndex = 0,
-    .x608C_velocityDimensionIndex = 0,
-    .x608F_positionEncoderResolution = {
-        .highestSub_indexSupported = 0x02,
-        .encoderIncrements = 0x00009C40,
-        .motorRevolutions = 0x00000001
-    },
-    .x6090_velocityEncoderResolution = {
-        .highestSub_indexSupported = 0x02,
-        .encoderIncrementsPerSecond = 0x00000001,
-        .motorRevolutionsPerSecond = 0x00000001
-    },
-    .x6091_gearRatio = {
-        .highestSub_indexSupported = 0x02,
-        .motorRevolutions = 0x00000001,
-        .shaftRevolutions = 0x00000001
-    },
-    .x6092_feedConstant = {
-        .highestSub_indexSupported = 0x02,
-        .feed = 0x00000001,
-        .shaftRevolutions = 0x00000001
-    },
-    .x6093_positionFactor = {
-        .highestSub_indexSupported = 0x02,
-        .numerator = 0x00000001,
-        .feedConstant = 0x00000001
-    },
-    .x6094_velocityEncoderFactor = {
-        .highestSub_indexSupported = 0x02,
-        .numerator = 0x00000001,
-        .divisor = 0x00000001
-    },
-    .x6095_velocityFactor1 = {
-        .highestSub_indexSupported = 0x02,
-        .numerator = 0x00000001,
-        .divisor = 0x00000001
-    },
-    .x6096_velocityFactor2 = {
-        .highestSub_indexSupported = 0x02,
-        .numerator = 0x00000001,
-        .divisor = 0x00000001
-    },
-    .x6097_accelerationFactor = {
-        .highestSub_indexSupported = 0x02,
-        .numerator = 0x00000001,
-        .divisor = 0x00000001
-    },
-    .x60F8_maxSlippage = 0,
     .x60FF_targetVelocity = 0,
     .x6502_supportedDriveModes = 0x00000004,
     .x67FF_singleDeviceType = 0x00020192
@@ -315,9 +263,7 @@ typedef struct {
     OD_obj_var_t o_6041_statusword;
     OD_obj_var_t o_6060_modesOfOperation;
     OD_obj_var_t o_6061_modesOfOperationDisplay;
-    OD_obj_var_t o_6063_positionActualValue;
     OD_obj_var_t o_6064_positionActualValue;
-    OD_obj_var_t o_6069_velocitySensorActualValue;
     OD_obj_var_t o_606B_velocityDemandValue;
     OD_obj_var_t o_606C_velocityActualValue;
     OD_obj_var_t o_6071_targetTorque;
@@ -327,20 +273,6 @@ typedef struct {
     OD_obj_var_t o_6083_profileAcceleration;
     OD_obj_var_t o_6084_profileDeceleration;
     OD_obj_var_t o_6086_motionProfileType;
-    OD_obj_var_t o_6089_positionNotationIndex;
-    OD_obj_var_t o_608A_positionDimensionIndex;
-    OD_obj_var_t o_608B_velocityNotationIndex;
-    OD_obj_var_t o_608C_velocityDimensionIndex;
-    OD_obj_record_t o_608F_positionEncoderResolution[3];
-    OD_obj_record_t o_6090_velocityEncoderResolution[3];
-    OD_obj_record_t o_6091_gearRatio[3];
-    OD_obj_record_t o_6092_feedConstant[3];
-    OD_obj_record_t o_6093_positionFactor[3];
-    OD_obj_record_t o_6094_velocityEncoderFactor[3];
-    OD_obj_record_t o_6095_velocityFactor1[3];
-    OD_obj_record_t o_6096_velocityFactor2[3];
-    OD_obj_record_t o_6097_accelerationFactor[3];
-    OD_obj_var_t o_60F8_maxSlippage;
     OD_obj_var_t o_60FF_targetVelocity;
     OD_obj_var_t o_6502_supportedDriveModes;
     OD_obj_var_t o_67FF_singleDeviceType;
@@ -1227,18 +1159,8 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .attribute = ODA_SDO_R | ODA_TPDO,
         .dataLength = 1
     },
-    .o_6063_positionActualValue = {
-        .dataOrig = &OD_RAM.x6063_positionActualValue,
-        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
-        .dataLength = 4
-    },
     .o_6064_positionActualValue = {
         .dataOrig = &OD_RAM.x6064_positionActualValue,
-        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
-        .dataLength = 4
-    },
-    .o_6069_velocitySensorActualValue = {
-        .dataOrig = &OD_RAM.x6069_velocitySensorActualValue,
         .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
         .dataLength = 4
     },
@@ -1286,211 +1208,6 @@ static CO_PROGMEM ODObjs_t ODObjs = {
         .dataOrig = &OD_RAM.x6086_motionProfileType,
         .attribute = ODA_SDO_RW | ODA_MB,
         .dataLength = 2
-    },
-    .o_6089_positionNotationIndex = {
-        .dataOrig = &OD_RAM.x6089_positionNotationIndex[0],
-        .attribute = ODA_SDO_RW | ODA_STR,
-        .dataLength = 1
-    },
-    .o_608A_positionDimensionIndex = {
-        .dataOrig = &OD_RAM.x608A_positionDimensionIndex,
-        .attribute = ODA_SDO_RW,
-        .dataLength = 1
-    },
-    .o_608B_velocityNotationIndex = {
-        .dataOrig = &OD_RAM.x608B_velocityNotationIndex,
-        .attribute = ODA_SDO_RW,
-        .dataLength = 1
-    },
-    .o_608C_velocityDimensionIndex = {
-        .dataOrig = &OD_RAM.x608C_velocityDimensionIndex,
-        .attribute = ODA_SDO_RW,
-        .dataLength = 1
-    },
-    .o_608F_positionEncoderResolution = {
-        {
-            .dataOrig = &OD_RAM.x608F_positionEncoderResolution.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x608F_positionEncoderResolution.encoderIncrements,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x608F_positionEncoderResolution.motorRevolutions,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_6090_velocityEncoderResolution = {
-        {
-            .dataOrig = &OD_RAM.x6090_velocityEncoderResolution.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x6090_velocityEncoderResolution.encoderIncrementsPerSecond,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x6090_velocityEncoderResolution.motorRevolutionsPerSecond,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_6091_gearRatio = {
-        {
-            .dataOrig = &OD_RAM.x6091_gearRatio.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x6091_gearRatio.motorRevolutions,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x6091_gearRatio.shaftRevolutions,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_6092_feedConstant = {
-        {
-            .dataOrig = &OD_RAM.x6092_feedConstant.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x6092_feedConstant.feed,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x6092_feedConstant.shaftRevolutions,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_6093_positionFactor = {
-        {
-            .dataOrig = &OD_RAM.x6093_positionFactor.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x6093_positionFactor.numerator,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x6093_positionFactor.feedConstant,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_6094_velocityEncoderFactor = {
-        {
-            .dataOrig = &OD_RAM.x6094_velocityEncoderFactor.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x6094_velocityEncoderFactor.numerator,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x6094_velocityEncoderFactor.divisor,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_6095_velocityFactor1 = {
-        {
-            .dataOrig = &OD_RAM.x6095_velocityFactor1.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x6095_velocityFactor1.numerator,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x6095_velocityFactor1.divisor,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_6096_velocityFactor2 = {
-        {
-            .dataOrig = &OD_RAM.x6096_velocityFactor2.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x6096_velocityFactor2.numerator,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x6096_velocityFactor2.divisor,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_6097_accelerationFactor = {
-        {
-            .dataOrig = &OD_RAM.x6097_accelerationFactor.highestSub_indexSupported,
-            .subIndex = 0,
-            .attribute = ODA_SDO_R,
-            .dataLength = 1
-        },
-        {
-            .dataOrig = &OD_RAM.x6097_accelerationFactor.numerator,
-            .subIndex = 1,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        },
-        {
-            .dataOrig = &OD_RAM.x6097_accelerationFactor.divisor,
-            .subIndex = 2,
-            .attribute = ODA_SDO_RW | ODA_MB,
-            .dataLength = 4
-        }
-    },
-    .o_60F8_maxSlippage = {
-        .dataOrig = &OD_RAM.x60F8_maxSlippage,
-        .attribute = ODA_SDO_R | ODA_TPDO | ODA_MB,
-        .dataLength = 4
     },
     .o_60FF_targetVelocity = {
         .dataOrig = &OD_RAM.x60FF_targetVelocity,
@@ -1552,9 +1269,7 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x6041, 0x01, ODT_VAR, &ODObjs.o_6041_statusword, NULL},
     {0x6060, 0x01, ODT_VAR, &ODObjs.o_6060_modesOfOperation, NULL},
     {0x6061, 0x01, ODT_VAR, &ODObjs.o_6061_modesOfOperationDisplay, NULL},
-    {0x6063, 0x01, ODT_VAR, &ODObjs.o_6063_positionActualValue, NULL},
     {0x6064, 0x01, ODT_VAR, &ODObjs.o_6064_positionActualValue, NULL},
-    {0x6069, 0x01, ODT_VAR, &ODObjs.o_6069_velocitySensorActualValue, NULL},
     {0x606B, 0x01, ODT_VAR, &ODObjs.o_606B_velocityDemandValue, NULL},
     {0x606C, 0x01, ODT_VAR, &ODObjs.o_606C_velocityActualValue, NULL},
     {0x6071, 0x01, ODT_VAR, &ODObjs.o_6071_targetTorque, NULL},
@@ -1564,20 +1279,6 @@ static OD_ATTR_OD OD_entry_t ODList[] = {
     {0x6083, 0x01, ODT_VAR, &ODObjs.o_6083_profileAcceleration, NULL},
     {0x6084, 0x01, ODT_VAR, &ODObjs.o_6084_profileDeceleration, NULL},
     {0x6086, 0x01, ODT_VAR, &ODObjs.o_6086_motionProfileType, NULL},
-    {0x6089, 0x01, ODT_VAR, &ODObjs.o_6089_positionNotationIndex, NULL},
-    {0x608A, 0x01, ODT_VAR, &ODObjs.o_608A_positionDimensionIndex, NULL},
-    {0x608B, 0x01, ODT_VAR, &ODObjs.o_608B_velocityNotationIndex, NULL},
-    {0x608C, 0x01, ODT_VAR, &ODObjs.o_608C_velocityDimensionIndex, NULL},
-    {0x608F, 0x03, ODT_REC, &ODObjs.o_608F_positionEncoderResolution, NULL},
-    {0x6090, 0x03, ODT_REC, &ODObjs.o_6090_velocityEncoderResolution, NULL},
-    {0x6091, 0x03, ODT_REC, &ODObjs.o_6091_gearRatio, NULL},
-    {0x6092, 0x03, ODT_REC, &ODObjs.o_6092_feedConstant, NULL},
-    {0x6093, 0x03, ODT_REC, &ODObjs.o_6093_positionFactor, NULL},
-    {0x6094, 0x03, ODT_REC, &ODObjs.o_6094_velocityEncoderFactor, NULL},
-    {0x6095, 0x03, ODT_REC, &ODObjs.o_6095_velocityFactor1, NULL},
-    {0x6096, 0x03, ODT_REC, &ODObjs.o_6096_velocityFactor2, NULL},
-    {0x6097, 0x03, ODT_REC, &ODObjs.o_6097_accelerationFactor, NULL},
-    {0x60F8, 0x01, ODT_VAR, &ODObjs.o_60F8_maxSlippage, NULL},
     {0x60FF, 0x01, ODT_VAR, &ODObjs.o_60FF_targetVelocity, NULL},
     {0x6502, 0x01, ODT_VAR, &ODObjs.o_6502_supportedDriveModes, NULL},
     {0x67FF, 0x01, ODT_VAR, &ODObjs.o_67FF_singleDeviceType, NULL},
