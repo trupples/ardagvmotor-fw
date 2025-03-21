@@ -2497,11 +2497,27 @@ int tmc9660_set_param2(
     int *value_out
 );
 
+/* Set parameter mode parameter and retry on error. */
+int tmc9660_set_param_retry(
+    struct tmc9660_dev *dev,
+    enum tmc9660_param_id param,
+    int value,
+    int retries
+);
+
 /* Get parameter mode parameter */
 int tmc9660_get_param(
     struct tmc9660_dev *dev,
     enum tmc9660_param_id param,
     int *value
+);
+
+/* Get parameter mode parameter and retry on error. */
+int tmc9660_get_param_retry(
+    struct tmc9660_dev *dev,
+    enum tmc9660_param_id param,
+    int *value,
+    int retries
 );
 
 /* Sets a digital GPIO output */

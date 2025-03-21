@@ -44,6 +44,8 @@ int tmc9660_tmcl_command(
     uint32_t *value_recv
 )
 {
+    k_mutex_lock(&dev->mutex, K_FOREVER);
+
     uint8_t noop[8] = {
         GetInfo, 0, 0, 0, 0, 0, 0, GetInfo
     };
@@ -104,6 +106,7 @@ int tmc9660_tmcl_command(
 
     if(retries <= 0) {
         LOG_WRN("TMC9660 took 5 retries for submitting a command");
+        k_mutex_unlock(&dev->mutex);
         return -1;
     }
 
@@ -117,6 +120,7 @@ int tmc9660_tmcl_command(
     
     if(retries <= 0) {
         LOG_WRN("TMC9660 took 5 retries for answering a command");
+        k_mutex_unlock(&dev->mutex);
         return -1;
     }
 
@@ -129,15 +133,25 @@ int tmc9660_tmcl_command(
     {
         // bad checksum - rest of datagram will be malformed, incl the checksul
         LOG_HEXDUMP_ERR(recv, 8, "Checksum error in received");
+        k_mutex_unlock(&dev->mutex);
         return -EIO;
     }
     
-    if(spi_status != SPI_STATUS_OK || tmcl_status != 100 || retries < 4) {
+    if(spi_status != SPI_STATUS_OK || retries < 4) {
         LOG_HEXDUMP_DBG(recv, 8, "SPI recv");
-        LOG_WRN("spi_status %d (expect 255), tmcl_status %d (expect 100), reply %d, data %08x, retries %d (expect 5)", spi_status, tmcl_status, reply_operation, data, retries);
+        LOG_WRN("tmcl(%d, %d, %d, %d) -> spi %d (want 255), tmcl %d (want 100), reply %d, data %08x, retries %d (want 5)", 
+            operation, type, motorbank, value_send,
+            spi_status, tmcl_status, reply_operation, data, retries);
+    }
+    if(tmcl_status != 100) {
+        LOG_ERR("tmcl(%d, %d, %d, %d) -> spi %d (want 255), tmcl %d (want 100), reply %d, data %08x, retries %d (want 5)", 
+            operation, type, motorbank, value_send,
+            spi_status, tmcl_status, reply_operation, data, retries);
     }
 
     if(value_recv) *value_recv = data;
+
+    k_mutex_unlock(&dev->mutex);
 
     // TODO: sanity check for returned values...
     switch(spi_status)
@@ -162,8 +176,7 @@ int tmc9660_tmcl_command(
     case REPLY_DOWNLOAD_NOT_POSSIBLE: return -EPERM;
     }
 
-    // Should never get here
-    return -1;
+    CODE_UNREACHABLE;
 }
 
 int tmc9660_init(
@@ -172,6 +185,9 @@ int tmc9660_init(
 )
 {
     dev->spi = spi;
+    k_mutex_init(&dev->mutex);
+
+    k_mutex_lock(&dev->mutex, K_FOREVER);
 
     char tx[8] = { 3, 0, 0, 0, 0, 0, 0, 0 };
     char rx[8];
@@ -195,6 +211,8 @@ int tmc9660_init(
 
         LOG_HEXDUMP_DBG(rx, 8, "Init SPI recv");
     } while(!(rx[0] == SPI_STATUS_FIRST_CMD || rx[0] == SPI_STATUS_OK) && retries-- > 0);
+
+    k_mutex_unlock(&dev->mutex);
     
     if(rx[0] != SPI_STATUS_FIRST_CMD && rx[0] != SPI_STATUS_OK) {
         // Invalid wakeup
@@ -227,6 +245,22 @@ int tmc9660_set_param2(
     return tmc9660_tmcl_command(dev, SAP, param, 0, value, value_out);
 }
 
+int tmc9660_set_param_retry(
+    struct tmc9660_dev *dev,
+    enum tmc9660_param_id param,
+    int value,
+    int retries
+)
+{
+    int ret = 0;
+    for(int i = 0; i < retries; i++) {
+        ret = tmc9660_tmcl_command(dev, SAP, param, 0, value, NULL);
+        if(ret == 0)
+            return 0;
+    }
+    return ret;
+}
+
 int tmc9660_get_param(
     struct tmc9660_dev *dev,
     enum tmc9660_param_id param,
@@ -234,6 +268,22 @@ int tmc9660_get_param(
 )
 {
     return tmc9660_tmcl_command(dev, GAP, param, 0, 0, value);
+}
+
+int tmc9660_get_param_retry(
+    struct tmc9660_dev *dev,
+    enum tmc9660_param_id param,
+    int *value,
+    int retries
+)
+{
+    int ret = 0;
+    for(int i = 0; i < retries; i++) {
+        ret = tmc9660_tmcl_command(dev, GAP, param, 0, 0, value);
+        if(ret == 0)
+            return 0;
+    }
+    return ret;
 }
 
 int tmc9660_set_gpio(
