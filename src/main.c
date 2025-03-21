@@ -44,7 +44,8 @@ void led_callback(struct canopen *co, bool green, bool red)
 
 	/* Red LED is shared between the TMC and MAX. To light it up,
 	* its GPIO must be enabled and pulled low. To turn it off,
-	* its GPIO should be floated (so that the TMC may control it).
+	* its GPIO should be floated, so that the TMC may control it, and also so
+	* we can read the TMC fault line, if need be.
 	*/
     gpio_pin_configure_dt(&led_fault, red ? GPIO_OUTPUT_ACTIVE : GPIO_INPUT);
 }
@@ -168,6 +169,7 @@ int main()
 
     LOG_INF("Firmware git revision %s", GIT_REVISION_STR);
 
+    // Initialize LEDs
 	err = init_leds();
     if(err < 0)
     {
@@ -175,8 +177,7 @@ int main()
         goto fail;
     }
 
-    // Read DIP switches for Node ID
-
+    // Initialize and read DIP switches for CAN and I2C ID
     err = gpio_pin_configure_dt(&dip1, GPIO_INPUT);
     if(err < 0) {
         LOG_ERR("Could not initialize DIP GPIO 1: %d", err);
