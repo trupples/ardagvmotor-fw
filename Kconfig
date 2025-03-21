@@ -1,0 +1,17 @@
+source "Kconfig.zephyr"
+
+config SHELL_TMC_PARAMS
+    bool "tmc_params shell commands"
+    depends on SHELL
+
+config TMC_RWE_PARAM_NAMES
+    bool "Provide name strings for TMC9660 RWE parameters (persistent configuration)"
+    depends on SHELL_TMC_PARAMS
+
+config TMC_ALL_PARAM_NAMES
+    bool "Provide name strings for all TMC9660 parameters"
+    depends on SHELL_TMC_PARAMS
+
+config CIA402_THREAD_STACK_SIZE
+    int "CiA 402 thread stack size"
+    default 1024
