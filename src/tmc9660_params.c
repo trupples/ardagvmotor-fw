@@ -410,6 +410,8 @@ int cmd_tmc_flags(struct shell *sh, int argc, char **argv) {
 	if(flags & 536870912) shell_print(sh, "ABN1_FEEDBACK_AVAILABLE");
 	if(flags & 1073741824) shell_print(sh, "SPI_FLASH_AVAILABLE");
 	if(flags & 2147483648) shell_print(sh, "I2C_EEPROM_AVAILABLE");
+
+	return 0;
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_tmc,

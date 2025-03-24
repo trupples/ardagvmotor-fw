@@ -143,11 +143,11 @@ int tmc9660_tmcl_command(
             operation, type, motorbank, value_send,
             spi_status, tmcl_status, reply_operation, data, retries);
     }
-    if(tmcl_status != 100) {
+    /*if(tmcl_status != 100) {
         LOG_ERR("tmcl(%d, %d, %d, %d) -> spi %d (want 255), tmcl %d (want 100), reply %d, data %08x, retries %d (want 5)", 
             operation, type, motorbank, value_send,
             spi_status, tmcl_status, reply_operation, data, retries);
-    }
+    }*/
 
     if(value_recv) *value_recv = data;
 

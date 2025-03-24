@@ -199,7 +199,9 @@ static void can_debug_state(struct cia402 *cia402) {
     prev_state = state;
 }
 
-void cia402_thread_run(struct cia402 *cia402, void *unused2, void *unused3) {
+void cia402_thread_run(void *arg1, void *unused2, void *unused3) {
+    struct cia402 *cia402 = arg1;
+
     ARG_UNUSED(unused2);
     ARG_UNUSED(unused3);
 
