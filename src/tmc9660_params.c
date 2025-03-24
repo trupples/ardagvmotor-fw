@@ -7,6 +7,7 @@
 #endif /* CONFIG_SHELL_TMC_PARAMS */
 
 #include "tmc9660_params.h"
+#include "storage.h"
 
 LOG_MODULE_REGISTER(tmc9660_params, LOG_LEVEL_INF);
 
@@ -22,10 +23,8 @@ static size_t tmc9660_rwe_param_count = ARRAY_SIZE(tmc9660_rwe_param_ids);
 static char tmc9660_rwe_param_names[] = FOREACH_TMC9660_RWE_PARAM(PARAM_NAME_WITH_NULL);
 #endif /* CONFIG_TMC_RWE_PARAM_NAMES */
 
-
-// TODO: page-aligned link inside flash!
-// __attribute__((section(".flash_tmc9660_params")))
-static int32_t tmc9660_rwe_param_values[ARRAY_SIZE(tmc9660_rwe_param_ids)] = {
+ // Buffer used as an intermediary writable location when moving data from TMC to flash
+static int32_t tmc9660_rwe_param_rambuf[ARRAY_SIZE(tmc9660_rwe_param_ids)] = {
     // "Out-of-the-box" tuning parameters, based on a QSH5718 stepper motor
     // TODO: User-facing tuning procedure which overwrites these in flash
 	2, // MOTOR_TYPE
@@ -251,28 +250,38 @@ static int32_t tmc9660_rwe_param_values[ARRAY_SIZE(tmc9660_rwe_param_ids)] = {
 int tmc_params_save(struct tmc9660_dev *dev) {
     int ret = 0;
     for(int i = 0; i < tmc9660_rwe_param_count; i++) {
-        if(tmc9660_get_param(dev, tmc9660_rwe_param_ids[i], &tmc9660_rwe_param_values[i]))
+        if(tmc9660_get_param(dev, tmc9660_rwe_param_ids[i], &tmc9660_rwe_param_rambuf[i]))
             ret = -1;
     }
 
-    // TODO: commit to flash!
+	// Commit to flash
+	ret = storage_put(TMC9660_PARAMS_STORAGE, tmc9660_rwe_param_rambuf, sizeof(tmc9660_rwe_param_rambuf));
+	if(ret) {
+		LOG_ERR("Could not save TMC9660 RWE params to flash: %d", ret);
+	}
 
     return ret;
 }
 
 int tmc_params_load(struct tmc9660_dev *dev) {
     int ret = 0;
+
+	ret = storage_get(TMC9660_PARAMS_STORAGE, tmc9660_rwe_param_rambuf, sizeof(tmc9660_rwe_param_rambuf));
+	if(ret) {
+		LOG_ERR("Could not get TMC9660 RWE params from flash: %d", ret);
+	}
+
     #ifdef CONFIG_TMC_RWE_PARAM_NAMES
     char *name_ptr = tmc9660_rwe_param_names;
     #endif
     for(int i = 0; i < tmc9660_rwe_param_count; i++) {
-        int ret = tmc9660_set_param_retry(dev, tmc9660_rwe_param_ids[i], tmc9660_rwe_param_values[i], 3);
+        int ret = tmc9660_set_param_retry(dev, tmc9660_rwe_param_ids[i], tmc9660_rwe_param_rambuf[i], 3);
 
         if(ret) {
 #ifdef CONFIG_TMC_RWE_PARAM_NAMES
-            LOG_ERR("Could not set parameter %s = %d", name_ptr, tmc9660_rwe_param_values[i]);
+            LOG_ERR("Could not set parameter %s = %d", name_ptr, tmc9660_rwe_param_rambuf[i]);
 #else
-            LOG_ERR("Could not set parameter %d = %d", tmc9660_rwe_param_ids[i], tmc9660_rwe_param_values[i]);
+            LOG_ERR("Could not set parameter %d = %d", tmc9660_rwe_param_ids[i], tmc9660_rwe_param_rambuf[i]);
 #endif      
             ret = -1;
         }
@@ -307,12 +316,19 @@ int cmd_tmc_gap(struct shell *sh, int argc, char **argv) {
 }
 
 int cmd_tmc_rwe_show(struct shell *sh, int argc, char **argv) {
+	int ret = 0;
+
+	ret = storage_get(TMC9660_PARAMS_STORAGE, tmc9660_rwe_param_rambuf, sizeof(tmc9660_rwe_param_rambuf));
+	if(ret) {
+		LOG_ERR("Could not get TMC9660 RWE params from flash: %d", ret);
+	}
+
     #ifdef CONFIG_TMC_RWE_PARAM_NAMES
     char *name_ptr = tmc9660_rwe_param_names;
     #endif
     for(int i = 0; i < tmc9660_rwe_param_count; i++) {
         int param_id = tmc9660_rwe_param_ids[i];
-        int flash_value = tmc9660_rwe_param_values[i];
+        int flash_value = tmc9660_rwe_param_rambuf[i];
         int tmc_value = 0xcafebabe;
         int ret = tmc9660_get_param(&g_tmc9660, param_id, &tmc_value);
 

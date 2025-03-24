@@ -9,6 +9,7 @@
 #include "cia402.h"
 #include "OD.h"
 #include "tmc9660_params.h"
+#include "storage.h"
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
@@ -233,6 +234,9 @@ int main()
         CO_NMT_sendInternalCommand(co.CO->NMT, CO_NMT_ENTER_STOPPED);
         return -1;
     }
+
+    // Initialize nonvolatile storage
+    storage_init();
 
     // Load parameters from flash
     tmc_params_load(&g_tmc9660);

@@ -25,6 +25,8 @@ target_sources(app PRIVATE
 	objdict/OD.c
 	src/cia402.c
 	src/tmc9660_params.c
+	src/storage.c
 )
+
 zephyr_include_directories(objdict)
 
